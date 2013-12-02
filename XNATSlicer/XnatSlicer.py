@@ -57,7 +57,7 @@ from XnatDicomLoadWorkflow import *
 from XnatSceneLoadWorkflow import *
 from XnatFileLoadWorkflow import *
 from XnatAnalyzeLoadWorkflow import *
-from XnatSlicerTest import *
+#from XnatSlicerTest import *
 from XnatError import *
 from XnatSettings import *
 from XnatHostSettings import *
@@ -321,7 +321,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Tester
         #--------------------------------
-        self.tester = XnatSlicerTest(self)
+        #self.tester = XnatSlicerTest(self)
 
 
 
@@ -925,7 +925,7 @@ class XnatSlicerWidget:
         """     
         self.lastButtonClicked = "test" 
         self.XnatView.setEnabled(True)
-        self.tester.runTest()
+        #self.tester.runTest()
 
 
         

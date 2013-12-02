@@ -1,0 +1,2160 @@
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-14 12:53:34.878659
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-14 13:13:37.045071
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 14:56:10.909899
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 15:03:01.727846
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 15:10:57.292140
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-save.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 15:10:57.292140
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 15:14:15.723797
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+host:		Central
+saveDir:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+sessionType:		scene download
+sessionStart:		2013-10-15 15:14:15.723797
+otherDirs:		None
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:16:50.853974
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:16:50.853974
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:18:25.782716
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a0.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:18:25.782716
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a0.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 15:18:25.782716
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:26:45.975041
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:26:45.975041
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 15:26:45.975041
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:41:57.458658
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:41:57.458658
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 15:41:57.458658
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:45:42.088422
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:45:42.088422
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 15:45:42.088422
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 15:53:38.420247
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:06:36.538129
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:22:09.503273
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:22:09.503273
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 16:22:09.503273
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:22:42.890337
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:24:59.437721
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:32:34.766851
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:32:34.766851
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 16:32:34.766851
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:34:36.891918
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:34:36.891918
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 16:34:36.891918
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:44:11.569707
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_test.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:44:11.569707
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:47:56.220008
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297d.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:47:56.220008
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:52:27.120155
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:52:27.120155
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:54:20.171015
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297d.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:54:20.171015
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:56:14.237607
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-15 16:56:14.237607
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-15 16:56:14.237607
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-15 16:56:41.213435
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-16 09:04:39.176389
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-16 09:04:39.176389
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-16 09:04:39.176389
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-16 12:11:38.114519
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-16 16:01:59.210797
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_a.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-16 16:01:59.210797
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_a.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-16 16:01:59.210797
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-16 16:02:33.217510
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-17 11:40:49.823354
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_g.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-10-17 11:40:49.823354
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_g.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-10-17 11:40:49.823354
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_g.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-17 11:45:18.241123
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		jonTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-18 14:51:29.241342
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-20 23:36:51.840178
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-23 06:18:54.129299
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		central2
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-24 20:24:43.826390
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-25 11:29:19.556154
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-26 13:12:28.432279
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-30 10:51:32.183820
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-10-31 16:09:20.717683
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-01 11:10:53.590684
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-04 12:03:53.253858
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-04 16:21:58.878479
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-04 16:24:30.984799
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-04 16:33:07.420105
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-04 16:45:46.735053
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 05:50:21.961431
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 05:50:21.961431
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-05 05:50:21.961431
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 05:51:01.052995
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 05:58:55.457101
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 06:00:26.168774
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 06:12:50.138169
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 06:13:11.972030
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297_d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 06:16:27.204857
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-05 08:52:48.784324
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-11-06 15:15:09.182109
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-11-06 15:15:09.182109
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:15:09.182109
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:15:41.566169
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:15:41.566169
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:15:41.566169
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:16:24.192149
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:34:36.056941
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:43:29.564830
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:43:29.564830
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:43:29.564830
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:47:24.248650
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:47:24.248650
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:47:24.248650
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:48:15.333778
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:50:41.813880
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:50:41.813880
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:50:41.813880
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:53:34.254748
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 15:53:34.254748
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 15:53:34.254748
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:03:16.716494
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:03:16.716494
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:03:16.716494
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:05:25.923314
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:05:25.923314
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:05:25.923314
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:06:50.507606
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:06:50.507606
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:06:50.507606
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:08:45.101449
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:08:45.101449
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:08:45.101449
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:10:10.244336
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:10:10.244336
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:10:10.244336
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:15:43.261396
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:15:43.261396
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:15:43.261396
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:17:03.544857
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:17:03.544857
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:17:03.544857
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:20:26.199155
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:20:26.199155
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:20:26.199155
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:24:08.555475
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:24:08.555475
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5d-b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:24:08.555475
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:27:03.879165
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:27:03.879165
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:27:03.879165
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:32:04.922037
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:32:04.922037
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:32:04.922037
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:36:14.860178
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:36:14.860178
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:36:14.860178
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-c.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:36:45.279259
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-06 16:36:45.279259
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test5-d.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-06 16:36:45.279259
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		UCLA_1297
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-11-07 08:43:15.861879
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload - unlinked
+sessionStart:		2013-11-07 08:43:15.861879
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-07 08:43:15.861879
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 08:44:19.090313
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 08:44:19.090313
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-07 08:44:19.090313
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 08:44:51.150271
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 14:35:38.216899
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 14:35:38.216899
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-07 14:35:38.216899
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		W029_MR_20110614_preop_20_TRA_T1_25mm.4dfp.hdr
+saveUri:		/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-07 14:42:35.413154
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 08:55:12.325077
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 13:57:45.357324
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:39:30.979803
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest10.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:39:30.979803
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:42:08.462909
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:42:08.462909
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-08 14:42:08.462909
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest3.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:42:42.642314
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:54:55.079290
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:54:55.079290
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-08 14:54:55.079290
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 14:55:30.603132
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:14:29.512577
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:14:29.512577
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene upload
+sessionStart:		2013-11-08 15:14:29.512577
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab2.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:15:06.139525
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest4.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:16:07.350170
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest4.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:23:05.901021
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:29:23.790384
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest4.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:40:42.627508
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3b.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-08 15:42:16.591009
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3ab.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-10 15:29:10.270062
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest4.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-11 08:44:02.568969
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		test3a.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-14 13:49:03.436380
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297
+fileName:		demoTest4.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/UCLA_1297/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-15 14:06:01.710387
+metadata:		None
+
+
+username:		sunilk
+XnatIo:		None
+saveLevel:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze
+fileName:		testAnalyze1.mrb
+saveUri:		https://central.xnat.org/data/projects/XNATSlicerTest/subjects/DE-IDENTIFIED/experiments/Analyze/resources/Slicer/files
+host:		Central
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2013-11-16 09:50:58.210495
+metadata:		None
+
+

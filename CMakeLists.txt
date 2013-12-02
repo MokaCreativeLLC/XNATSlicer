@@ -7,8 +7,8 @@ if(NOT Slicer_SOURCE_DIR)
   set(EXTENSION_CATEGORY "Remote")
   set(EXTENSION_CONTRIBUTORS "Sunil Kumar (Moka Creative LLC, Washington University in St. Louis), Dan Marcus (Washington University in St. Louis), Steve Pieper (Isomics)")
   set(EXTENSION_DESCRIPTION "Secure GUI-based IO with any XNAT server.")
-  set(EXTENSION_ICONURL "https://raw.github.com/skumar221/XNATSlicer/master/XnatSlicer/Resources/Icons/XNATSlicer-MarketIcon.png")
-  set(EXTENSION_SCREENSHOTURLS "https://raw.github.com/skumar221/XNATSlicer/master/XnatSlicer/Resources/Images/UserDesc_MainPanel.png")
+  set(EXTENSION_ICONURL "https://raw.github.com/skumar221/XNATSlicer/master/XNATSlicer/Resources/Icons/XNATSlicer-MarketIcon.png")
+  set(EXTENSION_SCREENSHOTURLS "https://raw.github.com/skumar221/XNATSlicer/master/XNATSlicer/Resources/Images/UserDesc_MainPanel.png")
 endif()
 
 #-----------------------------------------------------------------------------
