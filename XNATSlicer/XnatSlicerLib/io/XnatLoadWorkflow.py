@@ -20,8 +20,8 @@ from XnatPopup import *
 
 
 comment = """
-XnatLoadWorkflow is a parent class to various loader classes:
-XnatSceneLoadWorkflow, XnatDicomLoadWorkflow, XnatFileLoadWorkflow.  
+XnatWorkflow is a parent class to various loader classes:
+XnatSceneLoadWorkflow, XnatLoadWorkflow, XnatFileLoadWorkflow.  
 Loader types are determined by the treeViewItem being clicked in the 
 XnatLoadWorkflow function 'beginWorkflow'.  Functions of XnatLoadWorkflow
 are generic in nature and pertain to string construction for querying
@@ -60,6 +60,7 @@ class XnatLoadWorkflow(object):
         """
         self.xnatSrc = args["xnatSrc"]
         self.localDst = args["localDst"]
+        self.uris = args["uris"]
 
 
 
@@ -210,40 +211,53 @@ class XnatLoadWorkflow(object):
 
 
 
+
+        #--------------------
+        # Open the download popup immediately for better UX.
+        #--------------------
+        self.MODULE.XnatDownloadPopup.reset(animated = False)
+        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(remoteUri)
+        self.MODULE.XnatDownloadPopup.setText("Initializing download for: '%s'"%(fileDisplayName), '')
+        self.MODULE.XnatDownloadPopup.show()
+
+
+        
+
         #------------------------
         # Determine the type of LoadWorkflow subclass
-        # based on the XnatView's currItem
+        # based on the files in the remote URI
         #------------------------
-        
-        #
+        contents = self.MODULE.XnatIo.getFolderContents(remoteUri, metadataTags = ['Name', 'URI'])
+        contentNames = contents['Name']
+        analyzeCount = 0
+        dicomCount = 0
+        loadableFileCount = 0
+
+        for fileName in contentNames:
+            if self.MODULE.utils.isAnalyze(fileName):
+                analyzeCount += 1
+            elif self.MODULE.utils.isDICOM(fileName):
+                dicomCount += 1
+            elif self.MODULE.utils.isRecognizedFileExt(fileName):
+                loadableFileCount += 1
+
+                
+        #------------------------
         # Create an 'XnatSceneLoadWorkflow' for Slicer files
-        #
+        #------------------------
         if remoteUri.endswith(self.MODULE.utils.defaultPackageExtension): 
             loader = self.MODULE.XnatSceneLoadWorkflow
-
-
-        #
-        # Create an 'XnatAnalyzeLoadWorkflow' for Analyze files
-        #
-        elif self.MODULE.utils.isAnalyze(pathObj['currUri']):
             
-            remoteUri = pathObj['currUri']
-            print "ANALYze", remoteUri, dst
+        elif analyzeCount > 0:
             loader =  self.MODULE.XnatAnalyzeLoadWorkflow
-
             
-        #    
-        # Create an 'XnatFileLoadWorkflow' for other files.
-        #
-        elif ('files' in remoteUri and '/resources/' in remoteUri):
-
+        elif dicomCount > 0:      
+            loader =  self.MODULE.XnatDicomLoadWorkflow
+            
+        else:
             loader =  self.MODULE.XnatFileLoadWorkflow
             
-        #    
-        # Create an 'XnatDicomLoadWorkflow' for DICOM files.
-        #
-        else:      
-            loader =  self.MODULE.XnatDicomLoadWorkflow
+
                     
                     
                 
@@ -253,17 +267,12 @@ class XnatLoadWorkflow(object):
         # NOTE: Again, the 'loader' is a subclass of this one.
         #------------------------
         args = {"xnatSrc": remoteUri, 
-                "localDst":dst, 
+                "localDst": dst, 
+                "uris": contents['URI'],
                 "folderContents": None}
 
 
-        #--------------------
-        # Open the download popup immediately for better UX.
-        #--------------------
-        self.MODULE.XnatDownloadPopup.reset(animated = False)
-        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(remoteUri)
-        self.MODULE.XnatDownloadPopup.setText("Initializing download for: '%s'"%(fileDisplayName), '')
-        self.MODULE.XnatDownloadPopup.show()
+
 
 
 

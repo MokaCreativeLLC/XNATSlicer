@@ -42,24 +42,18 @@ class XnatAnalyzeLoadWorkflow(XnatLoadWorkflow):
         downloadFiles = {'hdr': {'src': None, 'dst': None} , 'img': {'src': None, 'dst': None}}
 
 
-
         #-------------------- 
         # Construct the src-dst values in the dictionary.
         #-------------------- 
         for key in downloadFiles:
-            if self.xnatSrc.lower().endswith(key):
-                downloadFiles[key]['src'] = self.xnatSrc
-                downloadFiles[key]['dst'] = self.localDst
-            else:
-                if key == 'img':
-                    replacer = 'hdr'
-                else:
-                    replacer = 'img'
-                downloadFiles[key]['src'] = self.xnatSrc.replace(replacer, key)
-                downloadFiles[key]['dst'] = self.localDst.replace(replacer, key)                
+            for _file in self.uris:
+                if _file.lower().endswith(key):
+                    downloadFiles[key]['src'] = self.xnatSrc.split('/data/')[0] + _file
+                    downloadFiles[key]['dst'] = self.localDst + '/' + os.path.basename(_file)
+              
 
 
-                
+                    #print("DOWNLOAD FILES", downloadFiles)
         #-------------------- 
         # Get the files from XNAT.  
         #
@@ -77,7 +71,7 @@ class XnatAnalyzeLoadWorkflow(XnatLoadWorkflow):
         coreIoManager = slicer.app.coreIOManager()
 
 
-        
+        #print("ASDF", downloadFiles)
         #-------------------- 
         # Try to load the header file first, if it exists.
         #-------------------- 

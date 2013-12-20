@@ -17,7 +17,12 @@ class XnatFileLoadWorkflow(XnatLoadWorkflow):
         pass
 
 
+    def initLoad(self, args):
+        """ As stated.
+        """
+        self.load(args)
 
+        
     
     def load(self, args):
         """ Downloads a file from an XNAT host, then attempts to load it

@@ -150,8 +150,8 @@ class XnatIo(object):
         if fileOrFolder == "file":
             for src, dst in srcDstMap.iteritems():
                 #print("%s file download\nsrc: '%s' \ndst: '%s'"%(self.MODULE.utils.lf(), src, dst))
-                fName = os.path.basename(src)
-                fUri = "/projects/" + src.split("/projects/")[1]
+                #fName = os.path.basename(src)
+                #fUri = "/projects/" + src.split("/projects/")[1]
                 self.get(src, dst)
 
 
@@ -396,6 +396,9 @@ class XnatIo(object):
         # Open the local destination file 
         # so that it can start reading in the buffers.
         #-------------------- 
+        dstDir = os.path.dirname(localDstUri)
+        if not os.path.exists(dstDir):
+            os.makedirs(dstDir)
         XnatFile = open(localDstUri, "wb")
       
 
@@ -828,9 +831,11 @@ class XnatIo(object):
         # Track projects and files in global dict
         #-------------------- 
         for queryUri in queryUris:
+            queryUri = queryUri.replace('//', '/')
             if queryUri.endswith('/files'):
                 for content in contents:
                     # create a tracker in the fileDict
+                    #print "\n\nCONTENT", content, queryUri    
                     self.fileDict[content['Name']] = content
                 #print "%s %s"%(self.MODULE.utils.lf(), self.fileDict)
             elif queryUri.endswith('/projects'):

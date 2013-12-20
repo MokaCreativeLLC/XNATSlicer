@@ -575,7 +575,9 @@ class XnatUtils(object):
     def isDICOM(self, ext = None):
         """ As stated.
         """
-        return self.isExtension(ext, self.MODULE.GLOBALS.DICOM_EXTENSIONS)
+        plainTest = self.isExtension(ext, self.MODULE.GLOBALS.DICOM_EXTENSIONS) 
+        funnyTest = self.isExtension(ext.split('_')[0], self.MODULE.GLOBALS.DICOM_EXTENSIONS)
+        return plainTest or funnyTest
 
 
 

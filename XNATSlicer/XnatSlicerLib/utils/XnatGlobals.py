@@ -82,6 +82,7 @@ class XnatGlobals(object):
                                        ".ima",
                                        ".IMA",
                                        ".nhdr", 
+                                       ".nrrd",
                                        ".dc", 
                                        ".raw.gz", 
                                        ".gz", 

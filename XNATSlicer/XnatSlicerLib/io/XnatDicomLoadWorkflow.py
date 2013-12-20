@@ -116,18 +116,23 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         # Get the resources of the Xnat URI provided in the argument.
         #---------------------
         resources = self.MODULE.XnatIo.getResources(parentXnatUri)     
-        #print "%s parentXnatUri: %s\nresources:%s"%(self.MODULE.utils.lf(), parentXnatUri, resources) 
+        print "%s parentXnatUri: %s\nresources:%s"%(self.MODULE.utils.lf(), parentXnatUri, resources) 
 
-
+        
         #---------------------
         # Loop through resources.
         #---------------------
         for resource in resources:
-            
+
+
             #
-            # Construct the fileFolderUri.
+            # Only add the resource folder if the string length is greater than one.
             #
-            fileFolderUri =  "%s/resources/%s/files"%(parentXnatUri, resource) 
+            if len(resource) > 0:
+                fileFolderUri =  "%s/resources/%s/files"%(parentXnatUri, resource) 
+            else:
+                fileFolderUri =  "%s/files"%(parentXnatUri) 
+                
             
             #
             # Get the contentsof the fileFolderUri.
@@ -144,7 +149,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
                 # If valid, add to "downloadables" if DICOM
                 #
                 if self.MODULE.utils.isDICOM(filename.rsplit('.')[1]):
-                    self.downloadables.append(fileFolderUri + "/" + filename)
+                    self.downloadables.append(fileFolderUri + "/" + filename)                
                 else:
                     print  "%s Not a usable file: '%s' "%(self.MODULE.utils.lf(), (filename))
 
