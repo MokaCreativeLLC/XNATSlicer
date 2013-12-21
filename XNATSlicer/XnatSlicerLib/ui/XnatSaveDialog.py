@@ -134,7 +134,7 @@ class XnatSaveDialog(object):
                 # always in front.  Blocking out 
                 # all other interactions.
                 #
-                self.dialogs[x].setWindowModality(2) 
+                self.dialogs[x].setWindowModality(1) 
 
 
 
@@ -260,7 +260,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
         #--------------------
         self.setNumDialogs(1, {'0':qt.QDialog(slicer.util.mainWindow())}) 
         self.dialogs[0].setFixedWidth(600)
-        self.dialogs[0].setWindowModality(2)
+        self.dialogs[0].setWindowModality(1)
 
 
         

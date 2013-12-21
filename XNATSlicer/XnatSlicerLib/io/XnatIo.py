@@ -188,7 +188,9 @@ class XnatIo(object):
                     # Create src, dst strings, with a prefix of .zip
                     # to download the entire folder.
                     #
-                    src = (xnatFileFolder + "?format=zip")                 
+                    src = (xnatFileFolder + "?format=zip")  
+
+                    
                     dst = tempfile.mktemp('', 'XnatDownload', self.MODULE.GLOBALS.LOCAL_URIS['downloads']) + ".zip"
                     downloadFolders.append(self.MODULE.utils.adjustPathSlashes(dst))
                     
@@ -201,7 +203,8 @@ class XnatIo(object):
                     # 
                     # DOWNLOAD.
                     #
-                    #print("%s folder downloading %s to %s"%(self.MODULE.utils.lf(), src, dst))
+                    
+                    print("%s folder downloading %s to %s"%(self.MODULE.utils.lf(), src, dst))
                     self.get(src, dst)
 
 
@@ -326,9 +329,10 @@ class XnatIo(object):
             based on the 'xnatUri' argument.  Calls on the internal
             'httpsRequest' RESTfully.
         """
-        #print "%s deleting %s"%(self.MODULE.utils.lf(), xnatUri)
-        self.httpsRequest('DELETE', xnatUri, '')
-
+        print "%s deleting %s"%(self.MODULE.utils.lf(), xnatUri)
+        response =  self.httpsRequest('DELETE', xnatUri, '')
+        print response.read()
+        
 
         
         
@@ -378,7 +382,8 @@ class XnatIo(object):
         # internal variables of XnatIo.
         #-------------------- 
         xnatSrcUri = self.host + "/data/archive" + xnatSrcUri if not self.host in xnatSrcUri else xnatSrcUri
-
+        if xnatSrcUri.count('/data/') > 1:
+            xnatSrcUri = xnatSrcUri.replace('/data/archive', '')
         
 
         #-------------------- 
@@ -396,10 +401,15 @@ class XnatIo(object):
         # Open the local destination file 
         # so that it can start reading in the buffers.
         #-------------------- 
-        dstDir = os.path.dirname(localDstUri)
-        if not os.path.exists(dstDir):
-            os.makedirs(dstDir)
-        XnatFile = open(localDstUri, "wb")
+        try:
+            dstDir = os.path.dirname(localDstUri)        
+            if not os.path.exists(dstDir):
+                os.makedirs(dstDir)
+            XnatFile = open(localDstUri, "wb")
+        except Exception, e:
+            print "Warning: %s"%(str(e))
+            self.MODULE.XnatDownloadPopup.hide()
+            return
       
 
 
@@ -434,7 +444,8 @@ class XnatIo(object):
                 # to let the user know it's downloading stuff.
                 #
                 self.MODULE.XnatDownloadPopup.reset()
-                self.MODULE.XnatDownloadPopup.setDownloadFilename(xnatSrcUri) 
+                self.MODULE.XnatDownloadPopup.setDownloadFileName(xnatSrcUri)
+                
                 self.MODULE.XnatDownloadPopup.show()
                 self.MODULE.XnatDownloadPopup.setDownloadFileSize(0)
                 self.MODULE.XnatDownloadPopup.update(0)
@@ -514,7 +525,7 @@ class XnatIo(object):
                 #
                 # Set filename in progress popup.
                 #
-                self.MODULE.XnatDownloadPopup.setDownloadFilename(fileDisplayName) 
+                self.MODULE.XnatDownloadPopup.setDownloadFileName(fileDisplayName) 
                 self.MODULE.XnatDownloadPopup.show()
 
 
@@ -532,7 +543,7 @@ class XnatIo(object):
                 # If there's no file size, we then let the progress bar be animated.
                 #
                 else:
-                    self.MODULE.XnatDownloadPopup.setDownloadFilename(fileDisplayName) 
+                    self.MODULE.XnatDownloadPopup.setDownloadFileName(fileDisplayName) 
 
 
                     
@@ -803,7 +814,7 @@ class XnatIo(object):
                 self.projectCache = contents
 
 
-                
+                #print "CONTENTS", contents
         #-------------------- 
         # Exit out if there are non-Json or XML values.
         #-------------------- 

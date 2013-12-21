@@ -473,8 +473,12 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
     def removeCurrItem(self):
         """ Returns the currentItem
         """
-        self.currentItem().parent().removeChild(self.currentItem())
-
+        try:
+            self.currentItem().parent().removeChild(self.currentItem())
+        except Exception, e:
+            print "Deleting top level (%s"%(str(e))
+            self.removeItemWidget(self.currentItem(), 0)
+            
     
 
     
@@ -886,7 +890,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #------------------------
         self.MODULE.XnatButtons.setEnabled('save', False)
         self.MODULE.XnatButtons.setEnabled('load', False)
-        self.MODULE.XnatButtons.setEnabled('delete', False)
+        self.MODULE.XnatButtons.setEnabled('delete', True)
         self.MODULE.XnatButtons.setEnabled('addProj', True)
         if isExperiment or isScan:
             self.MODULE.XnatButtons.setEnabled('save', True)
@@ -894,7 +898,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         elif isFile or isSlicerFile or isResource:
             self.MODULE.XnatButtons.setEnabled('save', True)
             self.MODULE.XnatButtons.setEnabled('load', True)
-            self.MODULE.XnatButtons.setEnabled('delete', True)
+        
 
 
             
@@ -997,7 +1001,24 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #-------------------------
         pathObj['parents'] = self.getParents(item)
         xnatDir = self.constructXnatUri(pathObj['parents'])
-        pathObj['childQueryUris'] = [xnatDir if not '/scans/' in xnatDir else xnatDir + "files"]
+
+        if '/scans/' in xnatDir: 
+            if '/files/' in xnatDir:
+                if xnatDir.endswith('/'):
+                    if not xnatDir.endswith('files/'):
+                        xnatDir = xnatDir[:-1]
+
+        #pathObj['childQueryUris'] = [xnatDir if not '/scans/' in xnatDir else xnatDir + "files"]
+        pathObj['childQueryUris'] = []
+        childQuery = xnatDir
+        print "XNAT DIR", xnatDir
+        if '/scans/' in childQuery: 
+            if not '/files/' in childQuery:
+                childQuery = xnatDir + "files"
+        pathObj['childQueryUris'].append(childQuery)
+            
+
+        
         pathObj['currUri'] = os.path.dirname(pathObj['childQueryUris'][0])  
         pathObj['currLevel'] = xnatDir.split('/')[-1] if not '/scans/' in xnatDir else 'files'
 
@@ -1030,7 +1051,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             pathObj['slicerMetadataTag'] = 'Name'
 
 
-
+            #print "PATH OBJ", pathObj
         return pathObj
 
 
@@ -1040,14 +1061,17 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         """ Probes the children of a tree item to determine if the folder
             is a DICOM folder.
         """     
+        
         dicomCount = 0
         for x in range(0, item.childCount()):          
             try:
                 child = item.child(x)
-                ext = child.text(self.columns['MERGED_LABEL']['location']).rsplit(".")[1]            
-                if self.MODULE.utils.isDICOM(ext):
+                #ext = child.text(self.columns['MERGED_LABEL']['location']).rsplit(".", 1)[1]            
+                if self.MODULE.utils.isDICOM(child.text(self.columns['MERGED_LABEL']['location'])):
+                    print "found dicom"
                     dicomCount +=1
             except Exception, e:
+                print str(e)
                 pass        
         if dicomCount == item.childCount():
                 return True
@@ -1155,7 +1179,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         foundProjects = self.findItems(pathDict['projects'], 0)
             
         if not self.findItems(pathDict['projects'], 0) or len(foundProjects) == 0: 
-            print "IT SHOULD LOAD PROJECTS"
+            #print "IT SHOULD LOAD PROJECTS"
             self.MODULE.XnatIo.projectCache = None
             self.begin(skipAnim = True)
             slicer.app.processEvents()
@@ -1349,22 +1373,18 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
 
             NOTE: Consider moving this to XnatUtils.py.
         """
-        returnName = names[0]
-        stopIndex = len(returnName) - 1
+        #print("CONDENSE DICOMS")
+        returnName = None
+        index = 0
+        for name in names:
+            #print name, self.MODULE.utils.isDICOM(name)
+            if self.MODULE.utils.isDICOM(name):
+                returnName = name
+                break
+            index += 1
 
-        
-        for i in range(1, len(names)):
-            #
-            # Cycle through characters in name.
-            #
-            for j in range(0, len(names[i])):
-                #print (j, names[i], returnName, len(names[i]), len(returnName))
-                if j > len(returnName) - 1:
-                    break
-                elif j == len(returnName) - 1 or returnName[j] != names[i][j]:
-                    stopIndex = j
-
-        return [returnName[0:stopIndex] + "..."]
+            #print "RETURN", returnName, [returnName.rsplit('.',1)[0]]
+        return [returnName.rsplit('.',1)[0]], index
 
 
 
@@ -1467,13 +1487,16 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #----------------
         # Get the DICOM count if at 'scans' level
         #----------------
-        
+        condensed = False
+        childIndex = -1
         if (metadata['XNAT_LEVEL'][0] == 'files'):
             pathObj = self.getXnatUriObject(parentItem.parent())
             parentXnatLevel = pathObj['currLevel']
             if parentXnatLevel == 'scans':
                 if self.isDICOMFolder(parentItem):                
-                    children = self.condenseDicomsToOneName(children)
+                    children, childIndex = self.condenseDicomsToOneName(children)
+                    #print "CHILDREN", children
+                    condensed = True
                     
         
         
@@ -1501,8 +1524,15 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                 #print '\n\n', key, i, len(metadata[key]), metadata, len(children), children
                 if i < len(metadata[key]):
                     treeNodeMetadata[key] = metadata[key][i]
+                if childIndex > -1:
+                    treeNodeMetadata[key] = metadata[key][childIndex]
                     #print "\n\nTREE NODE METADATA", treeNodeMetadata
 
+            #
+            # Register the condensed tree node name, if it's there.
+            #
+            #print "\n\nTREE NODE METADATA2", treeNodeMetadata, condensed
+                
             treeNode = self.populateColumns(treeNode, treeNodeMetadata)
             #
             # Add the items array

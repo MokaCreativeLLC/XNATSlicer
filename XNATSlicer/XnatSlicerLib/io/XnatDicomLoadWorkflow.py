@@ -37,7 +37,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         """
 
         self.processingDicomsMessageBox = qt.QMessageBox(1, "Processing data", "Processing.  Data will load automatically.")
-        self.processingDicomsMessageBox.setWindowModality(2)
+        self.processingDicomsMessageBox.setWindowModality(1)
         self.processingDicomsMessageBox.setStandardButtons(0)
 
 
@@ -120,43 +120,30 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         #---------------------
         # Get the resources of the Xnat URI provided in the argument.
         #---------------------
-        resources = self.MODULE.XnatIo.getResources(parentXnatUri)     
-        print "%s parentXnatUri: %s\nresources:%s"%(self.MODULE.utils.lf(), parentXnatUri, resources) 
 
+        contents = self.MODULE.XnatIo.getFolderContents(parentXnatUri + '/files', metadataTags = ['URI'])
         
-        #---------------------
-        # Loop through resources.
-        #---------------------
-        for resource in resources:
 
+        try:
+            contents['URI']
+        except Exception, e:
+            print "Skipping '%s' (Error: %s)"%(fileFolderUri, str(e))
+            #return
 
+            
+        #
+        # Check to see if the file extensions (contents) are valid.
+        #
+        for filename in contents['URI']:
+                
             #
-            # Only add the resource folder if the string length is greater than one.
+            # If valid, add to "downloadables" if DICOM
             #
-            if len(resource) > 0:
-                fileFolderUri =  "%s/resources/%s/files"%(parentXnatUri, resource) 
+            print "Seeing if DICOM", filename
+            if self.MODULE.utils.isDICOM(filename):
+                self.downloadables.append(filename)                
             else:
-                fileFolderUri =  "%s/files"%(parentXnatUri) 
-                
-            
-            #
-            # Get the contentsof the fileFolderUri.
-            #
-            contents = self.MODULE.XnatIo.getFolderContents(fileFolderUri, metadataTags = ['Name', 'Size'])
-            fileNames = contents['Name']
-            
-            #
-            # Check to see if the file extensions (contents) are valid.
-            #
-            for filename in fileNames:
-                
-                #
-                # If valid, add to "downloadables" if DICOM
-                #
-                if self.MODULE.utils.isDICOM(filename.rsplit('.')[1]):
-                    self.downloadables.append(fileFolderUri + "/" + filename)                
-                else:
-                    print  "%s Not a usable file: '%s' "%(self.MODULE.utils.lf(), (filename))
+                print  "%s Not a usable file: '%s' "%(self.MODULE.utils.lf(), (filename))
 
 
 
@@ -189,57 +176,19 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         # Remove existing files in the local download path (self.localDst)
         # if they exist.
         #--------------------
-        if os.path.exists(self.localDst):
+        if os.path.exists(self.localDst) and os.path.isdir(self.localDst):
             self.MODULE.utils.removeFilesInDir(self.localDst)
         if not os.path.exists(self.localDst): 
             os.makedirs(self.localDst)
-        #print(self.MODULE.utils.lf(), "Downloading DICOMS in '%s'."%(self.xnatSrc),"Please wait.") 
-  
+        print(self.MODULE.utils.lf(), "Downloading DICOMS in '%s'."%(self.xnatSrc),"Please wait.") 
 
-        
-        #--------------------
-        # SUBJECT - get downloadables 
-        #
-        # NOTE: This is currently untested and disallowed 
-        # from the workflow, though it could be enabled in the
-        # future.
-        #--------------------
-        if self.XnatLevel == 'subjects':
-
-            #
-            # Get downloadables
-            #
-            self.getDownloadables(os.path.dirname(self.xnatSrc)) 
-
-            
-            #
-            # Get 'experiments'       
-            #                        
-            experimentsList, sizes = self.MODULE.XnatIo.getFolderContents(self.xnatSrc, self.MODULE.utils.XnatMetadataTags_subjects)
-
-
-            #
-            # Check for DICOMs (via 'resources') at the 'experiments' level.
-            #
-            for expt in experimentsList:
-                self.getDownloadables(self.xnatSrc + "/" + expt)
-
-
-            #    
-            # Get 'scans'
-            #
-            for expt in experimentsList:
-                parentScanFolder = self.xnatSrc + "/" + expt + "/scans"
-                scanList = self.MODULE.XnatIo.getFolderContents(parentScanFolder, self.MODULE.utils.XnatMetadataTags_scans)
-                for scan in scanList:
-                    self.getDownloadables(parentScanFolder + "/" + scan)
         
 
                         
         #--------------------
         # EXPERIMENT - get downloadables.
         #--------------------
-        elif self.XnatLevel == 'experiments':
+        if self.XnatLevel == 'experiments':
             #print(self.MODULE.utils.lf(), "Retrieving experiment-level DICOMS.") 
             
             #
@@ -305,7 +254,8 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         #--------------------           
         downloadDictionary = dict(zip(self.downloadables, [(self.localDst + "/" + os.path.basename(dcm)) for dcm in self.downloadables]))
 
-        
+        print downloadDictionary
+        #return
 
         #--------------------
         # CACHING: Check the slicer.dicomDatabase to see if 
@@ -401,13 +351,16 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
             # Show the 'Processing DICOMs' QMessageBox if it's not open
             #
             if not self.processingDicomsMessageBox.visible:
-                self.processingDicomsMessageBox.show()
+                #print "\n\n\t\tHiding processing DICOMS"
                 self.MODULE.utils.repositionToMainSlicerWindow(self.processingDicomsMessageBox)
+                self.processingDicomsMessageBox.show()
+                
                 
 
             #
             # Decompress zips.
             #
+            print zipFile, extractPath
             self.MODULE.utils.decompressFile(zipFile, extractPath)
 
             #
@@ -444,8 +397,6 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         # Load the 'downloaded' DICOMS from Slicer's database.
         #--------------------
         return self.loadDicomsFromDatabase(downloadedDicoms)
-
-
 
 
     

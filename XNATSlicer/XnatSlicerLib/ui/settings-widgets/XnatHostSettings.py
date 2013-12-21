@@ -118,7 +118,11 @@ class XnatHostSettings(XnatSettings):
         """ Callback for when a user clicks on a given item
             within the host editor.
         """
-        self.setButtonStates(self.hostTable.currentRowItems['name'])
+        try:
+            self.setButtonStates(self.hostTable.currentRowItems['name'])
+        except:
+            print "No row items selected"
+            return
         
         
         
@@ -306,7 +310,7 @@ class XnatHostSettings(XnatSettings):
         """ As described.
         """
         self.currModal = makeEditHostModal(self)
-        self.currModal.setWindowModality(2)
+        self.currModal.setWindowModality(1)
         self.currModal.show()  
         
         
@@ -464,12 +468,15 @@ class HostTable(qt.QTableWidget):
         # For more information on why 'trackedItems' exists,
         # see __init__ function.
         #--------------------
-        if self.trackedItems[rowNumber]:
-            returner = {}
-            for key, item in self.trackedItems[rowNumber].iteritems():
-                returner[key] = item.text()
+        try:
+            if self.trackedItems[rowNumber]:
+                returner = {}
+                for key, item in self.trackedItems[rowNumber].iteritems():
+                    returner[key] = item.text()
                 
-            return returner
+                return returner
+        except Exception, e:
+            print "Skipping (Ref: '%s')"%(str(e))
 
 
         
@@ -694,7 +701,7 @@ def makeAddHostModal(hostEditor):
     addHostModal.setWindowTitle("Add Host")
     addHostModal.setFixedWidth(300)
     addHostModal.setLayout(masterForm)
-    addHostModal.setWindowModality(2)
+    addHostModal.setWindowModality(1)
 
 
 
@@ -819,7 +826,7 @@ def makeEditHostModal(hostEditor):
     editHostModal.setWindowTitle("Edit Host")
     editHostModal.setFixedWidth(300)
     editHostModal.setLayout(masterForm)
-    editHostModal.setWindowModality(2)
+    editHostModal.setWindowModality(1)
 
 
     
@@ -894,7 +901,7 @@ def makeDeleteHostModal(hostEditor):
     deleteHostModal = qt.QDialog(hostEditor.addButton)
     deleteHostModal.setWindowTitle("Delete Host")
     deleteHostModal.setLayout(masterForm)
-    deleteHostModal.setWindowModality(2)
+    deleteHostModal.setWindowModality(1)
 
 
 

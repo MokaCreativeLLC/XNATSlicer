@@ -46,7 +46,7 @@ class XnatFolderMaker(qt.QWidget):
         # Adjust window features.
         #--------------------
         self.setWindowTitle("Add Folder to Xnat")
-        self.setWindowModality(2)
+        self.setWindowModality(1)
 
 
 

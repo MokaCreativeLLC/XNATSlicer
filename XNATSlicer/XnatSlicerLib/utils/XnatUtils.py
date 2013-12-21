@@ -572,12 +572,17 @@ class XnatUtils(object):
 
 
     
-    def isDICOM(self, ext = None):
+    def isDICOM(self, filename = None):
         """ As stated.
         """
-        plainTest = self.isExtension(ext, self.MODULE.GLOBALS.DICOM_EXTENSIONS) 
-        funnyTest = self.isExtension(ext.split('_')[0], self.MODULE.GLOBALS.DICOM_EXTENSIONS)
-        return plainTest or funnyTest
+        #print "\n\n\n\t\t*******IS DICOM"
+        filenameExt = '.' + filename.rsplit('.', 1)[1].lower()
+        #print "FILENAME EXT", filenameExt
+        for extension in self.MODULE.GLOBALS.DICOM_EXTENSIONS:
+            #print "DICOM CHECK", extension.lower(), filenameExt, extension.lower() in filenameExt
+            if extension.lower() in filenameExt:
+                return True
+        return False
 
 
 
@@ -1085,11 +1090,16 @@ class XnatUtils(object):
         
         if len(tempStr) == 0:
             return ''
-            
-        d = datetime.datetime.strptime(tempStr, '%Y-%m-%d %H:%M:%S.%f')
-        #day_string = d.strftime('%Y-%m-%d')
-        day_string = d.strftime('%A %d, %B %Y')
-        day_string = d.strftime('%c')
+
+        try:
+            d = datetime.datetime.strptime(tempStr, '%Y-%m-%d %H:%M:%S.%f')
+            #day_string = d.strftime('%Y-%m-%d')
+            day_string = d.strftime('%A %d, %B %Y')
+            day_string = d.strftime('%c')
+        except Exception, e:
+            print "Using default date string from server"#. (Error: %s)" %(e)
+            day_string = dateString
+        
         return day_string
 
 

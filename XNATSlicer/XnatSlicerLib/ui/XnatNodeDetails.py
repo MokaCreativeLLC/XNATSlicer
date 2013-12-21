@@ -147,6 +147,7 @@ class XnatNodeDetails(qt.QWidget):
             if key in visibleTags:
 
                 if key in self.MODULE.GLOBALS.DATE_TAGS:
+                    print value
                     value = self.MODULE.utils.makeDateReadable(value)
                     
                 detailsStr = "<b>%s</b>:  %s"%(key, value)

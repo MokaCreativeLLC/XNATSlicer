@@ -32,7 +32,7 @@ class XnatPopup(object):
     """ Popup class for XNAT-relevant interactions
     """
     
-    def __init__(self, MODULE, title = "XnatPopup", modality = 2):
+    def __init__(self, MODULE, title = "XnatPopup", modality = 1):
         """ Init function.
         """
         self.MODULE = MODULE
@@ -89,7 +89,7 @@ class XnatDownloadPopup(XnatPopup):
         super(XnatDownloadPopup, self).__init__(MODULE = MODULE, title = title)
 
 
-        
+        self.currFilename = ''
         #-------------------
         # Params
         #-------------------
@@ -108,8 +108,8 @@ class XnatDownloadPopup(XnatPopup):
         #-------------------
         # Line text
         #-------------------
-        self.textDisp = ['', '[Unknown amount] ' +  self.memDisplay + ' out of [Unknown total] ' + self.memDisplay]
-        self.lines = [qt.QLabel('') for x in range(0,2)]
+        self.textDisp = ['', '', '[Unknown amount] ' +  self.memDisplay + ' out of [Unknown total] ' + self.memDisplay]
+        self.lines = [qt.QLabel('') for x in range(0, len(self.textDisp))]
         
 
 
@@ -150,7 +150,12 @@ class XnatDownloadPopup(XnatPopup):
         self.layout.addRow(cancelRow)
 
 
+        self.downloadCount = 1
+        self.totalDownloads = 1
 
+
+        self.checkFileNameNotExtension = False
+        
         #-------------------
         # Clear all
         #-------------------
@@ -165,6 +170,7 @@ class XnatDownloadPopup(XnatPopup):
         """
         self.lines[0].setText(self.textDisp[0])
         self.lines[1].setText(self.textDisp[1])
+        self.lines[2].setText(self.textDisp[2])
 
 
         self.progBar.setMinimum(0)
@@ -191,25 +197,68 @@ class XnatDownloadPopup(XnatPopup):
         self.downloadFileSize = 0
         self.downloadedBytes = 0
 
+        
 
 
-    def setText(self, line1, line2):
+    def setText(self, line1, line2, line3 = None):
         """ As stated.
         """
+        #line1 = '[%s of %s] %s'%(self.downloadCount+1, self.totalDownloads, line1)
         self.lines[0].setText(line1)
-        self.lines[1].setText(line2)
+        self.lines[1].setText(self.abbreviateFile(line2))
+        if not line3:
+            self.lines[2].setText('')
+        else:
+            self.lines[2].setText(line3)
+            
+
+            
+    def setTotalDownloads(self, totalDownloads):
+        """ As stated.
+        """
+        self.downloadCount = 0
+        self.totalDownloads = totalDownloads
+
+
         
+    def addDownloadFileCount(self):
+        """ As stated.
+        """
+        self.downloadCount += 1
+        
+
+    def abbreviateFile(self, filename):
+        """
+        """
+        maxLen = 55
+        return filename if len(filename) < maxLen else '...' + filename[-1 * (maxLen-3):]
+
 
     
+    def setCheckFileNameNotExtension(self, val):
+        """
+        """
+        self.checkFileNameNotExtension = val
+
+
         
-    def setDownloadFilename(self, filename):
+    def setDownloadFileName(self, filename):
         """ As stated.
         """
-            
-        #-------------------
-        # Update Display
-        #-------------------
-        self.lines[0].setText("Downloading: '%s'"%(filename))
+        print "SET DOWNLOAD FILENAME", filename          
+        if filename != self.currFilename:
+
+            if self.checkFileNameNotExtension:
+                #print "SET CHECK FILENAME",  self.currFilename.rsplit('.', 1)[0] , filename.rsplit('.', 1)[0]
+                if self.currFilename.rsplit('.', 1)[0] != filename.rsplit('.', 1)[0]:
+                    self.addDownloadFileCount()
+            else:
+                self.addDownloadFileCount()
+
+            self.currFilename = filename    
+            self.lines[1].setText("'%s'"%(self.abbreviateFile(filename)))
+            downloadStat = '[%s of %s]'%(self.downloadCount, self.totalDownloads)
+            self.lines[0].setText(downloadStat + " Downloading:") 
 
         
 
@@ -232,18 +281,8 @@ class XnatDownloadPopup(XnatPopup):
             self.downloadFileSize = size
             self.progBar.setMinimum(0)
             self.progBar.setMaximum(100)
-
-            
-            #-------------------
-            # Memory display
-            #-------------------
             size = self.recalcMem(size)
-
-            
-            #-------------------
-            # Update display
-            #-------------------
-            self.lines[1].setText(self.lines[1].text.replace('[Unknown total]', str(size)))
+            self.lines[2].setText(self.lines[2].text.replace('[Unknown total]', str(size)))
 
 
 
@@ -267,7 +306,7 @@ class XnatDownloadPopup(XnatPopup):
             #
             # Update display
             #
-            self.lines[1].setText('%s MB out '%(str(size)) + self.lines[1].text.split('out')[1][1:])
+            self.lines[2].setText('%s MB out '%(str(size)) + self.lines[2].text.split('out')[1][1:])
 
 
             

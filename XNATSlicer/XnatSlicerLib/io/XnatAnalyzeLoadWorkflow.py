@@ -49,11 +49,30 @@ class XnatAnalyzeLoadWorkflow(XnatLoadWorkflow):
             for _file in self.uris:
                 if _file.lower().endswith(key):
                     downloadFiles[key]['src'] = self.xnatSrc.split('/data/')[0] + _file
-                    downloadFiles[key]['dst'] = self.localDst + '/' + os.path.basename(_file)
+
+                    fileBasename = os.path.basename(_file)
+                    if not fileBasename[:-3] in self.localDst:
+                        downloadFiles[key]['dst'] = self.localDst + '/' + fileBasename
+                    else:
+                        downloadFiles[key]['dst'] = self.localDst
+                        if not downloadFiles[key]['src'].endswith(downloadFiles[key]['dst'][-3:]):
+                            downloadFiles[key]['dst'] = os.path.dirname(downloadFiles[key]['dst']) + '/' + os.path.basename(downloadFiles[key]['src'])
+                            
               
 
-
-                    #print("DOWNLOAD FILES", downloadFiles)
+        #-------------------- 
+        # Update the download popup
+        #-------------------- 
+        if self.MODULE.XnatLoadWorkflow.currentDownloadState == 'single':
+            #print '\n\nSINGLE!'
+            totalDownloadFiles = 0
+            for key, item in downloadFiles.iteritems():
+                if item['src'] != None:
+                    totalDownloadFiles +=1
+            self.MODULE.XnatDownloadPopup.setTotalDownloads(totalDownloadFiles)
+        else:
+            self.MODULE.XnatDownloadPopup.setCheckFileNameNotExtension(True)
+        
         #-------------------- 
         # Get the files from XNAT.  
         #
@@ -109,7 +128,7 @@ class XnatAnalyzeLoadWorkflow(XnatLoadWorkflow):
         else: 
             errStr = "Could not load '%s'!"%(os.path.basename(self.localDst))
             print (errStr)
-            qt.QMessageBox.warning( None, "Load Failed", errStr) 
+            #qt.QMessageBox.warning( None, "Load Failed", errStr) 
 
 
             

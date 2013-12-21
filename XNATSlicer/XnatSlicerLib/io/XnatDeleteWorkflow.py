@@ -64,13 +64,16 @@ class XnatDeleteWorkflow(object):
         #--------------------
         # If 'ok' pressed in the deleteDialog...
         #--------------------
-        elif button and button.text.lower().find('ok') > -1: 
+        elif button and 'ok' in button.text.lower(): 
             
             #
             # Construct the full delete string based on type of tree item deleted
             #
             delStr = self.MODULE.XnatView.constructXnatUri()
+            print "delStr", delStr
 
+            if not '/files/' in delStr:
+                delStr = os.path.dirname(delStr)
                 
             #
             # Call delete XnatIo's 'delete' function.

@@ -205,7 +205,7 @@ class XnatLoadWorkflow(object):
         remoteUri = self.MODULE.XnatSettingsFile.getAddress(self.MODULE.XnatLoginMenu.hostDropdown.currentText) + '/data' + pathObj['childQueryUris'][0]
 
 
-
+        
         #------------------------    
         # If the 'remoteUri' is at the scan level, we have to 
         # adjust it a little bit: it needs a '/files' prefix.
@@ -221,13 +221,30 @@ class XnatLoadWorkflow(object):
         #------------------------
         dst = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['downloads'],  currItem.text(self.MODULE.XnatView.getColumn('MERGED_LABEL')))
 
-        
+
+        #print remoteUri
+        #print dst
+        #print os.path.dirname(remoteUri).endswith('scans')
+        #return
 
         #------------------------
-        # File download
+        # Scan file download
         #------------------------
-        if '/files/' in remoteUri:
+        if '/files/' in remoteUri and '/scans/' in remoteUri:
+            self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
             self.currentDownloadState = 'single'
+            currScan = remoteUri.split('/scans/')[1].split('/files/')[0]
+            self.loadScan(os.path.dirname(remoteUri), dst.split('downloads/')[0] + 'downloads/' + currScan)
+            #return
+
+            
+        
+        #------------------------
+        # Slicer file download
+        #------------------------
+        elif '/files/' in remoteUri and '/Slicer/' in remoteUri:
+            self.currentDownloadState = 'single'
+            self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
             loader =  self.MODULE.XnatFileLoadWorkflow
             args = {"xnatSrc": remoteUri, 
                     "localDst": dst, 
@@ -237,11 +254,13 @@ class XnatLoadWorkflow(object):
             
         
         #------------------------
-        # SCAN-level download
+        # SCAN-folder download
         #------------------------
-        if '/scans/' in remoteUri:
-            self.currentDownloadState = 'single'
-            self.loadScan(remoteUri, dst)
+        elif '/scans/' in remoteUri:
+            if not '/files/' in remoteUri:
+                self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
+                self.currentDownloadState = 'single'
+                self.loadScan(remoteUri, dst)
  
 
 
@@ -277,12 +296,15 @@ class XnatLoadWorkflow(object):
  
         if not 'yes' in button.text.lower(): 
             return
-            
         exptContents =  self.MODULE.XnatIo.getFolderContents(self.remoteUri, self.MODULE.utils.XnatMetadataTags_experiments) 
+
+        self.MODULE.XnatDownloadPopup.setTotalDownloads(len(exptContents['ID']))
+        
         for _id in exptContents['ID']:
             appender = '/' + _id + '/files'
             src = self.remoteUri + appender
             dst = self.dst + appender
+            self.MODULE.XnatDownloadPopup.setCheckFileNameNotExtension(False)
             self.loadScan(src, dst)        
 
 
@@ -296,11 +318,15 @@ class XnatLoadWorkflow(object):
         #
         self.MODULE.XnatDownloadPopup.reset(animated = False)
         fileDisplayName = self.MODULE.utils.makeDisplayableFileName(src)
-        self.MODULE.XnatDownloadPopup.setText("Initializing download for: '%s'"%(fileDisplayName), '')
+        self.MODULE.XnatDownloadPopup.setText("Initializing download for:", "'%s'"%(fileDisplayName))
         self.MODULE.XnatDownloadPopup.show()
 
-        
+        if '/files/' in src:
+            if '/scans/' in src:
+                src = os.path.dirname(src)
+            
         contents = self.MODULE.XnatIo.getFolderContents(src, metadataTags = ['URI'])
+        print "\n\nCONTETNS", contents
         contentNames = contents['URI']
         analyzeCount = 0
         dicomCount = 0
@@ -310,12 +336,13 @@ class XnatLoadWorkflow(object):
             if self.MODULE.utils.isAnalyze(fileName):
                 analyzeCount += 1
             elif self.MODULE.utils.isDICOM(fileName):
+                print "IS DICOM"
                 dicomCount += 1
             elif self.MODULE.utils.isRecognizedFileExt(fileName):
                 loadableFileCount += 1
 
                 
-        
+        print "DICOM count", dicomCount, src, dst
         # 'XnatSceneLoadWorkflow' for Slicer files
         if src.endswith(self.MODULE.utils.defaultPackageExtension): 
             loader = self.MODULE.XnatSceneLoadWorkflow
