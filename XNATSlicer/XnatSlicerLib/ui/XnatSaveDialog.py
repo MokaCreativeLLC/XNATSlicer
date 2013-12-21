@@ -268,7 +268,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
         # Label button and fileLine.
         #--------------------
         self.saveButtonStr = "Save"
-        fileLineLabel = qt.QLabel("Filename: ")
+        fileLineLabel = qt.QLabel("File Name: ")
 
         
 
@@ -352,6 +352,10 @@ class XnatFileSaveDialog(XnatSaveDialog):
         # Get filename from the text input line.
         #--------------------
         self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = self.MODULE.utils.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
+        if len(self.MODULE.XnatView.sessionManager.sessionArgs['fileName']) == 0:
+            import datetime
+            self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = datetime.datetime.now().strftime("%Y_%m_%d_%H-%M-%S")
+            
         self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] += self.MODULE.utils.defaultPackageExtension
 
 

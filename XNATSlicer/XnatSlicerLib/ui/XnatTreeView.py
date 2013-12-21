@@ -1118,7 +1118,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             argument based on the 'MERGED_LABEL' column.
         """
 
-        print "childName:", childName
+        #print "childName:", childName
         if isinstance(childName, list) and len(childName) == 1:
             childName = childName[0]
         elif isinstance(childName, list) and len(childName) > 1:
@@ -1146,7 +1146,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Break apart pathStr to its Xnat categories
         #------------------------
         pathDict = self.MODULE.utils.makeXnatUriDictionary(pathStr)
-        print "PATH DICT1", pathDict
+        #print "PATH DICT1", pathDict
 
         
         #------------------------

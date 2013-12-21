@@ -69,9 +69,9 @@ class XnatFileLoadWorkflow(XnatLoadWorkflow):
         # Otherwise kick back error.
         #-------------------- 
         else: 
-            errStr = "Could not load '%s'!"%(os.path.basename(self.localDst))
+            errStr = "There were some errors loading '%s'."%(os.path.basename(self.localDst))
             print (errStr)
-            qt.QMessageBox.warning( None, "Load Failed", errStr) 
+            #qt.QMessageBox.warning( None, "Load Failed", errStr) 
 
 
             

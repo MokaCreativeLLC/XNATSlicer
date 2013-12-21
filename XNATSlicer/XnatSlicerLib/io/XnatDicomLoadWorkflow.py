@@ -36,7 +36,12 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
             folders.
         """
 
-        
+        self.processingDicomsMessageBox = qt.QMessageBox(1, "Processing data", "Processing.  Data will load automatically.")
+        self.processingDicomsMessageBox.setWindowModality(2)
+        self.processingDicomsMessageBox.setStandardButtons(0)
+
+
+                
         #--------------------
         # Make sure Slicer's DICOMdatabase is set up.
         # Show a popup informing the user if it's not.
@@ -187,7 +192,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         if os.path.exists(self.localDst):
             self.MODULE.utils.removeFilesInDir(self.localDst)
         if not os.path.exists(self.localDst): 
-            os.mkdir(self.localDst)
+            os.makedirs(self.localDst)
         #print(self.MODULE.utils.lf(), "Downloading DICOMS in '%s'."%(self.xnatSrc),"Please wait.") 
   
 
@@ -273,7 +278,12 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         # Exit out if there are no downloadables.
         #--------------------           
         if len(self.downloadables) == 0:
-            self.MODULE.XnatIo.downloadFailed("Download Failed", "No scans in found to download!")
+            downloadFail = "No scans in '%s' found to download."%(self.xnatSrc)
+            if self.MODULE.XnatLoadWorkflow.currentDownloadState == 'single':
+                self.MODULE.XnatDownloadPopup.hide()
+                self.MODULE.XnatIo.downloadFailed('Download failed', downloadFail)
+            else:
+                print downloadFail
             return 
 
 
@@ -350,14 +360,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         #
         self.MODULE.XnatDownloadPopup.window.hide()
 
-        #
-        # Create and show a 'Processing DICOMs' QMessageBox.
-        #
-        self.processingDicomsMessageBox = qt.QMessageBox(1, "Processing", "ProcessingDicoms...")
-        self.processingDicomsMessageBox.setWindowModality(2)
-        self.processingDicomsMessageBox.setStandardButtons(0)
-        self.processingDicomsMessageBox.show()
-        self.MODULE.utils.repositionToMainSlicerWindow(self.processingDicomsMessageBox)
+
         
 
         
@@ -375,6 +378,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
         #--------------------
         
         for zipFile in zipFolders:
+        
             extractPath = zipFile.split(".")[0]
             
             #
@@ -391,6 +395,15 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
             if not os.path.exists(zipFile):
                 print "%s exiting workflow..."%(self.MODULE.utils.lf())  
                 return False
+
+            
+            #
+            # Show the 'Processing DICOMs' QMessageBox if it's not open
+            #
+            if not self.processingDicomsMessageBox.visible:
+                self.processingDicomsMessageBox.show()
+                self.MODULE.utils.repositionToMainSlicerWindow(self.processingDicomsMessageBox)
+                
 
             #
             # Decompress zips.
@@ -522,7 +535,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
 
             
     def beginDICOMSession(self):
-        """ DEPRECATED: Once a DICOM folder has been downloaded, 
+        """ DEECATED: Once a DICOM folder has been downloaded, 
             track the origins of the files for Save/upload
             routines.
 

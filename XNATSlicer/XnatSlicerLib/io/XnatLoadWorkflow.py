@@ -48,6 +48,18 @@ class XnatLoadWorkflow(object):
         self.currRemoteHost = None
 
 
+        self.areYouSureDialog = qt.QMessageBox()
+        self.areYouSureDialog.setIcon(4)
+        
+        self.areYouSureDialog.setText("You are about to load all readable scans from '**HERE**'.\n" +  
+                                      "This may take several minutes.\n" +
+                                      "Are you sure you want to continue?")
+        self.areYouSureDialog.addButton(qt.QMessageBox.Yes)
+        self.areYouSureDialog.addButton(qt.QMessageBox.No)
+        self.areYouSureDialog.connect('buttonClicked(QAbstractButton*)', self.loadMultipleScans)
+        
+
+
         
     def initLoad(self):
         """ As stated.
@@ -135,7 +147,7 @@ class XnatLoadWorkflow(object):
 
         
         #------------------------
-        # Cycle through list to determine loadability.
+        # Cycle through lit to determine loadability.
         #------------------------
         for file in fileList:
             file = str(file)
@@ -209,26 +221,87 @@ class XnatLoadWorkflow(object):
         #------------------------
         dst = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['downloads'],  currItem.text(self.MODULE.XnatView.getColumn('MERGED_LABEL')))
 
-
-
-
-        #--------------------
-        # Open the download popup immediately for better UX.
-        #--------------------
-        self.MODULE.XnatDownloadPopup.reset(animated = False)
-        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(remoteUri)
-        self.MODULE.XnatDownloadPopup.setText("Initializing download for: '%s'"%(fileDisplayName), '')
-        self.MODULE.XnatDownloadPopup.show()
-
-
         
 
         #------------------------
-        # Determine the type of LoadWorkflow subclass
-        # based on the files in the remote URI
+        # File download
         #------------------------
-        contents = self.MODULE.XnatIo.getFolderContents(remoteUri, metadataTags = ['Name', 'URI'])
-        contentNames = contents['Name']
+        if '/files/' in remoteUri:
+            self.currentDownloadState = 'single'
+            loader =  self.MODULE.XnatFileLoadWorkflow
+            args = {"xnatSrc": remoteUri, 
+                    "localDst": dst, 
+                    "uris": [remoteUri],
+                    "folderContents": None}
+            loadSuccessful = loader.initLoad(args) 
+            
+        
+        #------------------------
+        # SCAN-level download
+        #------------------------
+        if '/scans/' in remoteUri:
+            self.currentDownloadState = 'single'
+            self.loadScan(remoteUri, dst)
+ 
+
+
+        #------------------------
+        # EXPERIMENT-level download
+        #------------------------
+        elif not '/scans/' in remoteUri and '/experiments/' in remoteUri and remoteUri.endswith('scans'): 
+            self.currentDownloadState = 'multiple'
+            self.remoteUri = remoteUri
+            self.dst = dst
+            self.areYouSureDialog.setText(self.areYouSureDialog.text.replace('**HERE**', self.remoteUri.replace('/scans','').split('data/')[1])) 
+            #
+            # Hitting yes in this dialog will send you to 'loadMultipleScans'
+            #
+            self.areYouSureDialog.show()
+            
+
+
+                
+            
+        #------------------------
+        # Enable XnatView
+        #------------------------
+        self.MODULE.XnatView.setEnabled(True)
+        self.lastButtonClicked = None
+    
+
+
+        
+    def loadMultipleScans(self, button):
+        """
+        """
+ 
+        if not 'yes' in button.text.lower(): 
+            return
+            
+        exptContents =  self.MODULE.XnatIo.getFolderContents(self.remoteUri, self.MODULE.utils.XnatMetadataTags_experiments) 
+        for _id in exptContents['ID']:
+            appender = '/' + _id + '/files'
+            src = self.remoteUri + appender
+            dst = self.dst + appender
+            self.loadScan(src, dst)        
+
+
+        
+    def loadScan(self, src, dst):
+        """
+        """
+
+        #
+        # Open the download popup immediately for better UX.
+        #
+        self.MODULE.XnatDownloadPopup.reset(animated = False)
+        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(src)
+        self.MODULE.XnatDownloadPopup.setText("Initializing download for: '%s'"%(fileDisplayName), '')
+        self.MODULE.XnatDownloadPopup.show()
+
+        
+        contents = self.MODULE.XnatIo.getFolderContents(src, metadataTags = ['URI'])
+        contentNames = contents['URI']
         analyzeCount = 0
         dicomCount = 0
         loadableFileCount = 0
@@ -242,51 +315,36 @@ class XnatLoadWorkflow(object):
                 loadableFileCount += 1
 
                 
-        #------------------------
-        # Create an 'XnatSceneLoadWorkflow' for Slicer files
-        #------------------------
-        if remoteUri.endswith(self.MODULE.utils.defaultPackageExtension): 
+        
+        # 'XnatSceneLoadWorkflow' for Slicer files
+        if src.endswith(self.MODULE.utils.defaultPackageExtension): 
             loader = self.MODULE.XnatSceneLoadWorkflow
-            
+
+        # 'XnatAnalyzeWorkflow' for Analyze files
         elif analyzeCount > 0:
             loader =  self.MODULE.XnatAnalyzeLoadWorkflow
-            
+
+        # 'XnatDicomLoadWorkflow' for DICOM files
         elif dicomCount > 0:      
             loader =  self.MODULE.XnatDicomLoadWorkflow
-            
+
+        # 'XxnatFileLoadWorkflow' for other files
         else:
             loader =  self.MODULE.XnatFileLoadWorkflow
-            
 
-                    
-                    
-                
-        #------------------------
+
+        #
         # Call the 'loader's 'initLoad' function.
         #
         # NOTE: Again, the 'loader' is a subclass of this one.
-        #------------------------
-        args = {"xnatSrc": remoteUri, 
+        #
+        args = {"xnatSrc": src, 
                 "localDst": dst, 
                 "uris": contents['URI'],
                 "folderContents": None}
 
-
-
-
-
-
-        #--------------------
-        # Begin the LOAD process!!!!!!
-        #--------------------
-        loadSuccessful = loader.initLoad(args)  
-            
-            
-            
-        #------------------------
-        # Enable XnatView
-        #------------------------
-        self.MODULE.XnatView.setEnabled(True)
-        self.lastButtonClicked = None
-    
+        #
+        # Begin the LOAD process!
+        #
+        loadSuccessful = loader.initLoad(args) 
         

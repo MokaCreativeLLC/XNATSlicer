@@ -936,8 +936,8 @@ class XnatSlicerWidget:
         
         self.lastButtonClicked = "load"
         self.XnatView.setEnabled(False)
-        loader = XnatLoadWorkflow(self)
-        loader.beginWorkflow()
+        self.XnatLoadWorkflow = XnatLoadWorkflow(self)
+        self.XnatLoadWorkflow.beginWorkflow()
 
 
 
