@@ -351,7 +351,7 @@ class XnatDicomLoadWorkflow(XnatLoadWorkflow):
             # Show the 'Processing DICOMs' QMessageBox if it's not open
             #
             if not self.processingDicomsMessageBox.visible:
-                #print "\n\n\t\tHiding processing DICOMS"
+                ##print "\n\n\t\tHiding processing DICOMS"
                 self.MODULE.utils.repositionToMainSlicerWindow(self.processingDicomsMessageBox)
                 self.processingDicomsMessageBox.show()
                 
