@@ -439,8 +439,8 @@ class XnatSlicerWidget:
         #--------------------------------
         # Make Main Collapsible Button
         #--------------------------------
-        mainCollapsibleButton = ctk.ctkCollapsibleButton()
-        mainCollapsibleButton.text = "XNATSlicer"
+        self.mainCollapsibleButton = ctk.ctkCollapsibleButton()
+        self.mainCollapsibleButton.text = "XNATSlicer"
 
 
         
@@ -522,8 +522,8 @@ class XnatSlicerWidget:
         #--------------------------------
         # Add main layout to main collapsible button.
         #-------------------------------- 
-        self.mainLayout.addStretch(3000)
-        mainCollapsibleButton.setLayout(self.mainLayout)
+        self.mainLayout.addStretch(30)
+        self.mainCollapsibleButton.setLayout(self.mainLayout)
         
 
         
@@ -549,7 +549,7 @@ class XnatSlicerWidget:
         # Add main Collapsible button to layout registered
         # to Slicer.
         #--------------------------------
-        self.layout.addWidget(mainCollapsibleButton)
+        self.layout.addWidget(self.mainCollapsibleButton)
         
         #
         # NOTE: Showing the collapsibles beforehhand creates flickering 
@@ -701,6 +701,23 @@ class XnatSlicerWidget:
                 else:
                     collapsible.setChecked(False)
 
+
+            #
+            # Give the 'viewer' collapsible a bit more size than
+            # the 'details' collapsible. Shimmy as necessary. 
+            #
+            viewerMargin = 80
+            viewerHeight = self.collapsibles['viewer'].height
+            vhHeights = {
+                'viewer': viewerHeight + viewerMargin,
+                'details': viewerHeight - viewerMargin - 40
+            }
+            for vh, height in vhHeights.iteritems():
+                self.collapsibles[vh].setMinHeight(height)
+                self.collapsibles[vh].setMaxHeight(height)
+                self.collapsibles[vh].setChecked(True)
+            
+
             #
             # Record the geometries of the collapsibles.
             #
@@ -710,7 +727,7 @@ class XnatSlicerWidget:
 
             #
             # Compress the collapsibles, but expand 'login'.
-            # Make sure animations are suspendedn.
+            # Make sure animations are suspended.
             #
             for key, collapsible in self.collapsibles.iteritems():
                 collapsible.hide()
@@ -726,23 +743,9 @@ class XnatSlicerWidget:
             #
             # Get the total height of the XnatSlicer
             # widget.
-            #
-            widgetLength = 0           
-            for key, geom in targetGeometries.iteritems():
-                #aprint "GO", key, geom, geom.top()
-                targetHeights[key] = geom.height()
-                if geom.top() > widgetLength:
-                    widgetLength = geom.top()
-
-
-            #
-            # Modify some of the target geometries:
-            # we want the Viewer collapsible to be 
-            # slightly larger than the Details collapsible.
             #        
-            viewerDifference = 75
-            targetHeights['details'] = widgetLength - targetGeometries['details'].top() - viewerDifference
-            targetHeights['viewer'] = targetGeometries['viewer'].height() + viewerDifference
+            for key, geom in targetGeometries.iteritems():
+                targetHeights[key] = geom.height()
 
 
             return targetHeights
@@ -762,19 +765,21 @@ class XnatSlicerWidget:
         # Creat animation chain callbacks.
         #-------------------- 
         def expandViewer():
-            self.collapsibles[ 'viewer' ].setMaxHeight(heights['viewer'])
             self.collapsibles[ 'viewer' ].setChecked(True)
             self.collapsibles[ 'viewer' ].setEnabled(True)
 
         
         def expandDetails():
-            self.collapsibles[ 'details' ].setMaxHeight(heights['details'])
+            #self.collapsibles[ 'viewer' ].setFixedHeight(heights['viewer'])
+            #return
+            #self.collapsibles[ 'details' ].setMaxHeight(heights['details'])
             self.collapsibles[ 'details' ].setChecked(True)
             self.collapsibles[ 'details' ].setEnabled(True)
        
 
         
         def expandTools():
+            #self.collapsibles[ 'tools' ].setMaxHeight(heights['tools'])
             self.collapsibles[ 'tools' ].setChecked(True)
             self.collapsibles[ 'tools' ].setEnabled(True)
 
@@ -789,10 +794,10 @@ class XnatSlicerWidget:
                 collapsible.setOnExpand(None)
                 collapsible.setOnCollapse(None)
                 if key != 'tools' and key != 'login':
-                    #collapsible.setMaxHeight(1000)
-                    collapsible.setFixedHeight(heights[key])
-                    collapsible.setStretchHeight(1000)
-                   
+                    collapsible.setMinimumHeight(60)
+                    #collapsible.setStretchHeight(heights[key])
+                    #if key == 'viewer':
+                    collapsible.setStyleSheet('height: %spx'%(heights[key]))
 
 
         #--------------------
@@ -855,10 +860,12 @@ class XnatSlicerWidget:
 
         
         #--------------------
-        # Minimize the login group box.
-        # Fires off a chain of animations.
-        #--------------------      
-        self.collapsibles['login'].setChecked(True)
+        # Re-open the login only if it is closed.
+        #--------------------   
+        if not self.collapsibles['login'].toggled:    
+            self.collapsibles['login'].setChecked(True)
+        else:
+            self.collapsibles['viewer'].setChecked(False)
 
 
             

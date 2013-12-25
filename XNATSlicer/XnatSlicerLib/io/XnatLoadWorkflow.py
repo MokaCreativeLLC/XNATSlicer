@@ -57,6 +57,13 @@ class XnatLoadWorkflow(object):
         self.areYouSureDialog.addButton(qt.QMessageBox.Yes)
         self.areYouSureDialog.addButton(qt.QMessageBox.No)
         self.areYouSureDialog.connect('buttonClicked(QAbstractButton*)', self.loadMultipleScans)
+
+
+        self._dstBase = self.MODULE.GLOBALS.LOCAL_URIS['downloads']
+
+        self._src = ''
+        self._dst = ''
+
         
 
 
@@ -64,15 +71,6 @@ class XnatLoadWorkflow(object):
     def initLoad(self):
         """ As stated.
         """
-
-
-        
-    def load(self, args):
-        """ Sets needed variables.
-        """
-        self.xnatSrc = args["xnatSrc"]
-        self.localDst = args["localDst"]
-        self.uris = args["uris"]
 
 
 
@@ -90,6 +88,11 @@ class XnatLoadWorkflow(object):
         """
         pass
 
+
+    
+    @property
+    def loadArgs(self):
+        return {'src': self._src, 'dst': self._dst}
 
 
     
@@ -151,14 +154,12 @@ class XnatLoadWorkflow(object):
         #------------------------
         for file in fileList:
             file = str(file)
-            extension =  os.path.splitext(file)[1].lower() 
-            if extension or (extension != ""):
-                if self.MODULE.utils.isDICOM(ext = extension):
-                    dicoms.append(file)                   
-                if self.MODULE.utils.isMRML(ext = extension): 
-                    mrmls.append(file)
-                else:
-                    others.append(file)
+            if self.MODULE.utils.isDICOM(file):
+                dicoms.append(file)                   
+            if self.MODULE.utils.isMRML(file): 
+                mrmls.append(file)
+            else:
+                others.append(file)
         return {'MRMLS':mrmls, 'ALLIMAGES': allImages, 'DICOMS': dicoms, 'OTHERS': others, 'ALLNONMRML': allImages + dicoms + others}
    
 
@@ -202,76 +203,115 @@ class XnatLoadWorkflow(object):
         #------------------------
         currItem = self.MODULE.XnatView.currentItem()
         pathObj = self.MODULE.XnatView.getXnatUriObject(currItem)
-        remoteUri = self.MODULE.XnatSettingsFile.getAddress(self.MODULE.XnatLoginMenu.hostDropdown.currentText) + '/data' + pathObj['childQueryUris'][0]
+        _src = self.MODULE.XnatSettingsFile.getAddress(self.MODULE.XnatLoginMenu.hostDropdown.currentText) + '/data' + pathObj['childQueryUris'][0]
 
 
         
         #------------------------    
-        # If the 'remoteUri' is at the scan level, we have to 
+        # If the '_src' is at the scan level, we have to 
         # adjust it a little bit: it needs a '/files' prefix.
         #------------------------
-        if '/scans/' in remoteUri and os.path.dirname(remoteUri).endswith('scans'):
-            remoteUri += '/files'
+        if '/scans/' in _src and os.path.dirname(_src).endswith('scans'):
+            _src += '/files'
 
 
             
+        #------------------------    
+        # Clear download queue
         #------------------------
-        # Construct the local 'dst' string 
-        # (the local file to be downloaded).
-        #------------------------
-        dst = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['downloads'],  currItem.text(self.MODULE.XnatView.getColumn('MERGED_LABEL')))
+        self.MODULE.XnatIo.clearDownloadQueue()
+
+        ########################################################
+        #
+        #
+        # DOWNLOAD TYPES
+        #
+        #
+        ########################################################
 
 
-        #print remoteUri
-        #print dst
-        #print os.path.dirname(remoteUri).endswith('scans')
-        #return
 
+        
+        downloadFinishedCallbacks = []
+        def runDownloadFinishedCallbacks():
+            for callback in downloadFinishedCallbacks:
+                print "DOWNLOAD FINISHED!"
+                callback()
+                slicer.app.processEvents()
+
+
+
+        print "Initializing download..."
+        
+        self.MODULE.XnatDownloadPopup.show()
+        
         #------------------------
-        # Scan file download
+        # '/files/' LEVEL 
         #------------------------
-        if '/files/' in remoteUri and '/scans/' in remoteUri:
-            self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
-            self.currentDownloadState = 'single'
-            currScan = remoteUri.split('/scans/')[1].split('/files/')[0]
-            self.loadScan(os.path.dirname(remoteUri), dst.split('downloads/')[0] + 'downloads/' + currScan)
+        if '/files/' in _src:
+
+            #
+            # SLICER .MRB
+            #
+            if '/Slicer/files/' in _src:
+                self.MODULE.XnatDownloadPopup.addDownloadRow(_src)
+                loader =  self.MODULE.XnatSceneLoadWorkflow
+                slicer.app.processEvents()
+                loader.setLoadArgs(_src)
+                self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
+                downloadFinishedCallbacks.append(loader.load) 
+
+        elif '/scans/' in _src:
+            #loader =  self.MODULE.XnatDicomLoadWorkflow
+            self.MODULE.XnatDownloadPopup.addDownloadRow(_src)   
+            slicer.app.processEvents()     
+            splitScan =  _src.split('/scans/')   
+            scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
+            print scanSrc
+            contents = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])
+            print contents
+            return
+
+
+        self.MODULE.XnatIo.startDownloadQueue(runDownloadFinishedCallbacks)
+      
+
+    
+            
+        #------------------------
+        # SCAN FILE (NOT THE FOLDER)
+        #------------------------
+        if '/files/' in _src and '/scans/' in _src:
+            currScan = _src.split('/scans/')[1].split('/files/')[0]
+            self.loadScan(os.path.dirname(_src), dst.split('downloads/')[0] + 'downloads/' + currScan)
             #return
 
             
         
         #------------------------
-        # Slicer file download
-        #------------------------
-        elif '/files/' in remoteUri and '/Slicer/' in remoteUri:
-            self.currentDownloadState = 'single'
-            self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
-            loader =  self.MODULE.XnatFileLoadWorkflow
-            args = {"xnatSrc": remoteUri, 
-                    "localDst": dst, 
-                    "uris": [remoteUri],
-                    "folderContents": None}
-            loadSuccessful = loader.initLoad(args) 
-            
-        
-        #------------------------
         # SCAN-folder download
         #------------------------
-        elif '/scans/' in remoteUri:
-            if not '/files/' in remoteUri:
+        elif '/scans/' in _src:
+            if not '/files/' in _src:
+
+                scanSrc = _src.split('/scans/')[0] + '/scans/files'
+                contents = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])
+                print contents
+                return
                 self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
                 self.currentDownloadState = 'single'
-                self.loadScan(remoteUri, dst)
+                self.loadScan(_src, dst)
  
 
 
         #------------------------
         # EXPERIMENT-level download
         #------------------------
-        elif not '/scans/' in remoteUri and '/experiments/' in remoteUri and remoteUri.endswith('scans'): 
+        elif not '/scans/' in _src and '/experiments/' in _src and _src.endswith('scans'): 
             self.currentDownloadState = 'multiple'
-            self.remoteUri = remoteUri
+            self._src = _src
             self.dst = dst
-            self.areYouSureDialog.setText(self.areYouSureDialog.text.replace('**HERE**', self.remoteUri.replace('/scans','').split('data/')[1])) 
+            self.areYouSureDialog.setText(self.areYouSureDialog.text.replace('**HERE**', self._src.replace('/scans','').split('data/')[1])) 
             #
             # Hitting yes in this dialog will send you to 'loadMultipleScans'
             #
@@ -296,13 +336,13 @@ class XnatLoadWorkflow(object):
  
         if not 'yes' in button.text.lower(): 
             return
-        exptContents =  self.MODULE.XnatIo.getFolderContents(self.remoteUri, self.MODULE.utils.XnatMetadataTags_experiments) 
+        exptContents =  self.MODULE.XnatIo.getFolderContents(self._src, self.MODULE.utils.XnatMetadataTags_experiments) 
 
         self.MODULE.XnatDownloadPopup.setTotalDownloads(len(exptContents['ID']))
         
         for _id in exptContents['ID']:
             appender = '/' + _id + '/files'
-            src = self.remoteUri + appender
+            src = self._src + appender
             dst = self.dst + appender
             self.MODULE.XnatDownloadPopup.setCheckFileNameNotExtension(False)
             self.loadScan(src, dst)        

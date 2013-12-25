@@ -22,33 +22,21 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
     """ Descriptor above.
     """
 
-    def initLoad(self, args):
-        """ As stated.
-        """
-        self.load(args)
 
+    def setLoadArgs(self, _src):
+        self._src = _src
+        self._dst = os.path.join(self._dstBase , 'projects' + self._src.split('projects')[1])
+        
 
 
         
-    def load(self, args):
+    def load(self):
         """ Main load function for downloading Slicer scenes
             and loading them into Slicer.  
 
             Refers to a number of functions below (updateAbsoluteMrmlUrisToRelative, 
             deconstructMrb, etc.) to load the mrml.
         """
-
-        #-------------------------
-        # Superclass call.
-        #-------------------------
-        super(XnatSceneLoadWorkflow, self).load(args)
-
-
-        
-        #-------------------------
-        # Get scene package from XNAT host.
-        #-------------------------
-        self.MODULE.XnatIo.getFile({self.xnatSrc : self.localDst})
 
 
         
@@ -57,7 +45,7 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         # (This is the result of the 'Cancel' button 
         # being pressed in download modal) 
         #-------------------------
-        if not os.path.exists(self.localDst):
+        if not os.path.exists(self._dst):
             print "%s exiting workflow..."%(self.MODULE.utils.lf())  
             self.MODULE.XnatView.setEnabled(True) 
             return False       
@@ -68,7 +56,7 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         # To track relevant 'XnatFileInfo' object remote and local
         # filepaths associated with the scene.
         #-------------------------
-        fileInfo = XnatFileInfo(remoteURI = self.xnatSrc, localURI = self.localDst)
+        fileInfo = XnatFileInfo(remoteURI = self._src, localURI = self._dst)
 
 
         
@@ -199,11 +187,6 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         for root, subFolders, files in os.walk(rootdir):
             for file in files:
                 fileList.append(os.path.join(root,file))
-        loadables = self.getLoadables_byList(fileList)
-        imageFiles = loadables['ALLIMAGES']
-        mrmlFiles = loadables['MRMLS']
-        parseableFiles = loadables['ALLNONMRML']
-
 
 
         #-------------------------
@@ -218,13 +201,16 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         # Look at the files within the bundle.  Create a key-value
         # pair of the absolute URIs to relative URIs.
         #-------------------------
-        for parseableFile in parseableFiles:
-            parseableFileBase = os.path.basename(parseableFile)
-            if os.path.basename(os.path.dirname(parseableFile)) == "Data":
-                #
-                # Special case for url encoding
-                #
-                filePathsToChange[os.path.basename(urllib2.quote(parseableFileBase))] = "./Data/" + urllib2.quote(parseableFileBase)
+        mrmlFiles = []
+        for fileUri in fileList:
+            if self.MODULE.utils.isMRML(fileUri): 
+                mrmlFiles.append(fileUri)
+                mrmlBase = os.path.basename(fileUri)
+                if os.path.basename(os.path.dirname(fileUri)) == "Data":
+                    #
+                    # Special case for url encoding
+                    #
+                    filePathsToChange[os.path.basename(urllib2.quote(mrmlBase))] = "./Data/" + urllib2.quote(mrmlBase)
 
                 
 
@@ -237,14 +223,15 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         # Therefore it's necessary to parse the MRML and convert
         # all absolute URIs to relative.
         #-------------------------
-        newMRMLFile = self.MODULE.utils.appendFile(mrmlFiles[0], "-LOCALIZED")       
-        #
-        # NOTE: Parsing of the MRML is needed because node filePaths are absolute, not relative.
-        # TODO: Submit a change request for absolute path values to Slicer
-        #
-        mrmlParser = XnatMrmlParser(self.MODULE)
-        mrmlParser.changeValues(mrmlFiles[0], newMRMLFile,  {},  None, True)
-        return newMRMLFile
+        if len(mrmlFiles) > 0:
+            newMRMLFile = self.MODULE.utils.appendFile(mrmlFiles[0], "-LOCALIZED")       
+            #
+            # NOTE: Parsing of the MRML is needed because node filePaths are absolute, not relative.
+            # TODO: Submit a change request for absolute path values to Slicer
+            #
+            mrmlParser = XnatMrmlParser(self.MODULE)
+            mrmlParser.changeValues(mrmlFiles[0], newMRMLFile,  {},  None, True)
+            return newMRMLFile
 
 
 
@@ -328,7 +315,7 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         #-------------------------
         # Call slicer's native 'loadscene' function.
         #-------------------------
-        #print( "Loading '" + os.path.basename(self.xnatSrc) + "'")
+        #print( "Loading '" + os.path.basename(self._src) + "'")
         slicer.util.loadScene(fileName) 
 
 
@@ -336,7 +323,7 @@ class XnatSceneLoadWorkflow(XnatLoadWorkflow):
         #-------------------------
         # Create new XNAT session.
         #-------------------------
-        sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self.xnatSrc)
+        sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self._src)
         sessionArgs['sessionType'] = "scene download"
         self.MODULE.XnatView.startNewSession(sessionArgs)
         #print( "\nScene '%s' loaded."%(os.path.basename(fileName.rsplit(".")[0])))  

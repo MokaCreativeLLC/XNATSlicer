@@ -99,7 +99,7 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
         #-------------------- 
         # Set the animation duration
         #--------------------
-        self.animDuration = 300
+        self.animDuration = 350
 
 
         
@@ -115,7 +115,7 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
         # http://harmattan-dev.nokia.com/docs/library/html/qt4/qeasingcurve.html
         # for more options.
         #----------------
-        self.easingCurve = qt.QEasingCurve(2);
+        self.easingCurve = qt.QEasingCurve(6);
 
 
         
@@ -227,7 +227,23 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
         #----------------
         self.stretchHeight = None
 
-            
+        
+
+
+        self.sizeGrip.installEventFilter(self)
+        self.installEventFilter(self)
+
+
+
+        
+    def eventFilter(self, ob, event):
+        """ Event filter to for searchLine events.
+        """
+        print event
+        if event.type() == qt.QEvent.FocusIn:
+            print "CLICL!"
+
+
         
 
     def suspendAnimationDuration(self, suspend):
@@ -530,6 +546,7 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
             endSize = qt.QSize(self.geometry.width(), self.maxHeight)  
             self.setMaximumHeight(self.collapsedHeight)
             self.setMinimumHeight(self.collapsedHeight)
+  
 
 
         else:
@@ -538,6 +555,13 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
             # Establish the 'untoggled'/collapsed animation sizes.
             #	
             startHeight = self.geometry.height()
+
+            #
+            # Save original stretch height
+            #
+            self.setMaximumHeight(startHeight)
+
+            
             startSize = qt.QSize(self.geometry.width(), startHeight)
             endSize = qt.QSize(self.geometry.width(), self.collapsedHeight)  
             self.setMaximumHeight(startHeight)
