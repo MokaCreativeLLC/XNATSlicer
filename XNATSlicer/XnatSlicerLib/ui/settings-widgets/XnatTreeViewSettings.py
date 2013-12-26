@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -134,7 +136,7 @@ class XnatTreeViewSettings(XnatSettings):
         # the font back to the XnatSettingsFile.
         #-------------------- 
         if len(font) == 0:
-            currSize = self.MODULE.GLOBALS.FONT_SIZE
+            currSize = GLOB_FONT_SIZE
             self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(currSize)]})
 
 
@@ -157,7 +159,7 @@ class XnatTreeViewSettings(XnatSettings):
                 self.MODULE.XnatView.changeFontSize(int(size))
                 self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(size)]})
             except Exception, e:
-                #print self.MODULE.utils.lf(), str(e)
+                #print XnatUtils.lf(), str(e)
                 pass
 
 
@@ -250,9 +252,9 @@ class XnatTreeViewSettings(XnatSettings):
         #--------------------
         self.buttons = {}
         self.buttons['sort'] = {}
-        self.buttons['sort'] = {'accessed': self.MODULE.utils.generateButton(iconOrLabel = 'Last Accessed', 
+        self.buttons['sort'] = {'accessed': XnatUtils.generateButton(iconOrLabel = 'Last Accessed', 
                                                                                toolTip = "Sort projects, prioritizing those accessed by current user.", 
-                                                                               font = self.MODULE.GLOBALS.LABEL_FONT,
+                                                                               font = GLOB_LABEL_FONT,
                                                                                size = qt.QSize(90, 20), 
                                                                                enabled = True)}
       

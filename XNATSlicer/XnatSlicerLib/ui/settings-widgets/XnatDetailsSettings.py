@@ -1,3 +1,4 @@
+from GLOB import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -72,7 +73,7 @@ class XnatDetailsSettings(XnatSettings):
         #--------------------
         # Set the default selected metadata.
         #--------------------
-        self.setDefaultSelectedMetadata('main',  self.MODULE.GLOBALS.DEFAULT_XNAT_METADATA)
+        self.setDefaultSelectedMetadata('main',  GLOB_DEFAULT_XNAT_METADATA)
 
 
 
@@ -131,7 +132,7 @@ class XnatDetailsSettings(XnatSettings):
         # This will be stored as 'currSize'.
         #--------------------
         if len(font) == 0:
-            currSize = self.MODULE.GLOBALS.FONT_SIZE
+            currSize = GLOB_FONT_SIZE
             self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(currSize)]})
 
 

@@ -1,7 +1,9 @@
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
 import sys
+
 import shutil
 
 from XnatFileInfo import *
@@ -182,8 +184,8 @@ class XnatSaveUnlinkedDialog(XnatSaveDialog):
          #--------------------
          self.setNumDialogs(1)
          msg = """the scene doesn't appear to be associated with a specific xnat location.  Would you like to save it within this xnat """
-         msg = "%s %s (%s)?" %(msg, self.MODULE.utils.defaultXnatSaveLevel[:-1], os.path.basename(self.MODULE.XnatView.sessionManager.sessionArgs['savelevel']))
-         msg.replace('location', self.MODULE.utils.defaultXnatSaveLevel[:-1])
+         msg = "%s %s (%s)?" %(msg, GLOB_DEFAULT_XNAT_SAVE_LEVEL[:-1], os.path.basename(self.MODULE.XnatView.sessionManager.sessionArgs['savelevel']))
+         msg.replace('location', GLOB_DEFAULT_XNAT_SAVE_LEVEL[:-1])
          self.dialogs[0].setText(msg)      
          
 
@@ -276,7 +278,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
         # Set fileline text (where user enters the file
         # name) 
         #--------------------
-        self.fileLine = qt.QLineEdit(self.MODULE.XnatView.sessionManager.sessionArgs['fileName'].split(self.MODULE.utils.defaultPackageExtension)[0])
+        self.fileLine = qt.QLineEdit(self.MODULE.XnatView.sessionManager.sessionArgs['fileName'].split(XnatUtils.defaultPackageExtension)[0])
 
         
 
@@ -329,7 +331,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
 
 
 
-        #print "%s"%(self.MODULE.utils.lf())
+        #print "%s"%(XnatUtils.lf())
 
 
 
@@ -351,12 +353,12 @@ class XnatFileSaveDialog(XnatSaveDialog):
         #--------------------
         # Get filename from the text input line.
         #--------------------
-        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = self.MODULE.utils.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
+        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = XnatUtils.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
         if len(self.MODULE.XnatView.sessionManager.sessionArgs['fileName']) == 0:
             import datetime
             self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = datetime.datetime.now().strftime("%Y_%m_%d_%H-%M-%S")
             
-        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] += self.MODULE.utils.defaultPackageExtension
+        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] += XnatUtils.defaultPackageExtension
 
 
         

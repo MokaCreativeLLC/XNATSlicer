@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 import datetime, time
 
@@ -70,7 +72,7 @@ class XnatFolderMaker(qt.QWidget):
         # creation.
         #--------------------
         self.xsiList = qt.QComboBox()
-        self.xsiList.addItems([key for key, value in self.MODULE.GLOBALS.XNAT_XSI_TYPES.iteritems()])
+        self.xsiList.addItems([key for key, value in GLOB_XNAT_XSI_TYPES.iteritems()])
 
 
         
@@ -359,8 +361,8 @@ class XnatFolderMaker(qt.QWidget):
                     # Get the plainText values of the nameLine
                     # and the lineEdit associated with the level.
                     #
-                    nameText = self.MODULE.utils.toPlainText(self.nameLabels[level].text)
-                    lineText = self.MODULE.utils.toPlainText(self.lineEdits[level].text)
+                    nameText = XnatUtils.toPlainText(self.nameLabels[level].text)
+                    lineText = XnatUtils.toPlainText(self.lineEdits[level].text)
                     
                     #
                     # Choose the text that does not have
@@ -375,19 +377,19 @@ class XnatFolderMaker(qt.QWidget):
                     # Special case for experiments
                     #
                     if level == 'experiments':
-                        xnatUri += '?xsiType=' + self.MODULE.GLOBALS.XNAT_XSI_TYPES[self.xsiList.currentText]
+                        xnatUri += '?xsiType=' + GLOB_XNAT_XSI_TYPES[self.xsiList.currentText]
                     
                 else:
                     break
                 #
                 # IMPORTANT: Add the xsi for experiments
                 #
-                #xnatUri += '?xsiType=' + self.MODULE.GLOBALS.XNAT_XSI_TYPES[self.xsiList.currentText]
+                #xnatUri += '?xsiType=' + GLOB_XNAT_XSI_TYPES[self.xsiList.currentText]
 
             #
             # Make folder in XnatIo, processEvents
             #
-            print ("%s creating %s "%(self.MODULE.utils.lf(), xnatUri))
+            print ("%s creating %s "%(XnatUtils.lf(), xnatUri))
             self.MODULE.XnatIo.makeFolder(xnatUri)
             slicer.app.processEvents()
             

@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
@@ -35,13 +37,13 @@ class XnatNodeDetails(qt.QWidget):
         self.MODULE = MODULE
 
 
-        #self.settingsButton = self.MODULE.utils.makeSettingsButton(self.MODULE.XnatDetailsSettings)
+        #self.settingsButton = XnatUtils.makeSettingsButton(self.MODULE.XnatDetailsSettings)
 
 
 
         self.textEdit = qt.QTextEdit(self)
 
-        self.currFont = self.MODULE.GLOBALS.LABEL_FONT
+        self.currFont = GLOB_LABEL_FONT
         self.textEdit.setFont(self.currFont)
         self.textEdit.setReadOnly(True)
 
@@ -146,9 +148,9 @@ class XnatNodeDetails(qt.QWidget):
         for key, value in detailsDict.iteritems():
             if key in visibleTags:
 
-                if key in self.MODULE.GLOBALS.DATE_TAGS:
+                if key in GLOB_DATE_TAGS:
                     print value
-                    value = self.MODULE.utils.makeDateReadable(value)
+                    value = XnatUtils.makeDateReadable(value)
                     
                 detailsStr = "<b>%s</b>:  %s"%(key, value)
 

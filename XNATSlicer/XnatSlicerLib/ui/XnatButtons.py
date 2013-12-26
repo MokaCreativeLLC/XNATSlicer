@@ -6,6 +6,8 @@ from XnatLoadWorkflow import *
 from XnatSaveWorkflow import *
 from XnatDeleteWorkflow import *
 
+from GLOB import *
+from XnatUtils import *
 
 
 
@@ -94,10 +96,10 @@ class XnatButtons(object):
         # Add the settings button.
         #--------------------
         self.buttons['settings'] = {}
-        self.buttons['settings']['settings'] = self.MODULE.utils.generateButton(iconOrLabel = 'gear.png', 
+        self.buttons['settings']['settings'] = XnatUtils.generateButton(iconOrLabel = 'gear.png', 
                                                                                 toolTip = "Open settings window.", 
-                                                                                font = self.MODULE.GLOBALS.LABEL_FONT,
-                                                                                size = self.MODULE.GLOBALS.BUTTON_SIZE_SMALL, 
+                                                                                font = GLOB_LABEL_FONT,
+                                                                                size = GLOB_BUTTON_SIZE_SMALL, 
                                                                                 enabled = True)
         self.buttons['settings']['settings'].setToolTip('Open XNATSlicer settings.')
         self.toolsLayout.addWidget(self.buttons['settings']['settings'])
@@ -183,47 +185,47 @@ def makeButtons_io(XnatButtons):
     buttons = {}
 
 
-    buttons['load'] = XnatButtons.MODULE.utils.generateButton(iconOrLabel = 'load.png', 
-                                                              toolTip = "Load file, image folder or scene from Xnat to Slicer.", 
-                                                              font = XnatButtons.MODULE.GLOBALS.LABEL_FONT,
-                                                              size = XnatButtons.MODULE.GLOBALS.BUTTON_SIZE_SMALL, 
-                                                              enabled = False)
+    buttons['load'] = XnatUtils.generateButton(iconOrLabel = 'load.png', 
+                                               toolTip = "Load file, image folder or scene from Xnat to Slicer.", 
+                                               font = GLOB_LABEL_FONT,
+                                               size = GLOB_BUTTON_SIZE_SMALL, 
+                                               enabled = False)
     buttons['load'].setToolTip('Load folder or file from XNAT instance.')
-
-
     
-    buttons['save'] = XnatButtons.MODULE.utils.generateButton(iconOrLabel = 'save.png', 
-                                                              toolTip ="Upload current scene to Xnat.", 
-                                                              font = XnatButtons.MODULE.GLOBALS.LABEL_FONT,
-                                                              size = XnatButtons.MODULE.GLOBALS.BUTTON_SIZE_SMALL,
-                                                              enabled = False)
+    
+    
+    buttons['save'] = XnatUtils.generateButton(iconOrLabel = 'save.png', 
+                                               toolTip ="Upload current scene to Xnat.", 
+                                               font = GLOB_LABEL_FONT,
+                                               size = GLOB_BUTTON_SIZE_SMALL,
+                                               enabled = False)
     buttons['save'].setToolTip('Save scene to XNAT instance.')
-
     
     
-    buttons['delete'] = XnatButtons.MODULE.utils.generateButton(iconOrLabel = 'delete.png', 
-                                                                toolTip = "Delete Xnat file or folder.", 
-                                                                font = XnatButtons.MODULE.GLOBALS.LABEL_FONT,
-                                                                size = XnatButtons.MODULE.GLOBALS.BUTTON_SIZE_SMALL, 
-                                                                enabled = False)
+    
+    buttons['delete'] = XnatUtils.generateButton(iconOrLabel = 'delete.png', 
+                                                 toolTip = "Delete Xnat file or folder.", 
+                                                 font = GLOB_LABEL_FONT,
+                                                 size = GLOB_BUTTON_SIZE_SMALL, 
+                                                 enabled = False)
     buttons['delete'].setToolTip('Delete file from XNAT instance.')
     
-
     
-    buttons['addProj'] = XnatButtons.MODULE.utils.generateButton(iconOrLabel = 'addproj.png', 
-                                                                 toolTip = "Add Project, Subject, or Experiment to Xnat.", 
-                                                                 font = XnatButtons.MODULE.GLOBALS.LABEL_FONT,
-                                                                 size = XnatButtons.MODULE.GLOBALS.BUTTON_SIZE_SMALL, 
-                                                                 enabled = False)
+    
+    buttons['addProj'] = XnatUtils.generateButton(iconOrLabel = 'addproj.png', 
+                                                  toolTip = "Add Project, Subject, or Experiment to Xnat.", 
+                                                  font = GLOB_LABEL_FONT,
+                                                  size = GLOB_BUTTON_SIZE_SMALL, 
+                                                  enabled = False)
     buttons['addProj'].setToolTip('Add project, subject or experiment to XNAT instance.')
-
     
-
-    buttons['test'] = XnatButtons.MODULE.utils.generateButton(iconOrLabel = 'test.png', 
-                                                              toolTip = "Run XNATSlicer tests...", 
-                                                              font = XnatButtons.MODULE.GLOBALS.LABEL_FONT,
-                                                              size = XnatButtons.MODULE.GLOBALS.BUTTON_SIZE_SMALL, 
-                                                              enabled = False)
+    
+    
+    buttons['test'] = XnatUtils.generateButton(iconOrLabel = 'test.png', 
+                                               toolTip = "Run XNATSlicer tests...", 
+                                               font = GLOB_LABEL_FONT,
+                                               size = GLOB_BUTTON_SIZE_SMALL, 
+                                               enabled = False)
     buttons['test'].setToolTip('Run testing suite (COMING SOON).')
     
     

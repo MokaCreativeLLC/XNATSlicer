@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import datetime, time
@@ -66,7 +68,7 @@ class XnatSessionArgs(dict):
         """ Consructs a number of the session values
             by one argument, 'filePath'.
         """
-        saveLevelDir, slicerDir = self.MODULE.utils.getSaveTuple(filePath) 
+        saveLevelDir, slicerDir = XnatUtils.getSaveTuple(filePath) 
         self['host'] = self.MODULE.XnatLoginMenu.hostDropdown.currentText
         self['username'] = self.MODULE.XnatLoginMenu.usernameLine.text        
         self['saveLevel'] = saveLevelDir
@@ -101,7 +103,7 @@ class XnatSessionManager(object):
         """ Init function.
         """
         self.MODULE = MODULE
-        self.sessionFileName = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['settings'], 'SessionLog.txt')
+        self.sessionFileName = os.path.join(GLOB_LOCAL_URIS['settings'], 'SessionLog.txt')
         self.sessionArgs = None
         self.saveItem = None
 
@@ -122,7 +124,7 @@ class XnatSessionManager(object):
     def clearCurrentSession(self):
         """ As stated.
         """
-        #print(self.MODULE.utils.lf() + "Clearing current session")
+        #print(XnatUtils.lf() + "Clearing current session")
         self.sessionArgs = None
 
 
@@ -136,7 +138,7 @@ class XnatSessionManager(object):
             fileLines.append("%s:\t\t%s\n"%(item, self.sessionArgs[item]))
         
         fileLines.append("\n\n")
-        #print(self.MODULE.utils.lf() + "Session log file: %s"%(self.sessionFileName))
+        #print(XnatUtils.lf() + "Session log file: %s"%(self.sessionFileName))
         f = open(self.sessionFileName, 'a')
         f.writelines(fileLines)            
         f.close()

@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -6,6 +8,7 @@ import sys
 
 
 from VariableItemListWidget import *
+from XnatUtils import *
 
 
 
@@ -377,7 +380,7 @@ class XnatDefaultMetadataEditor(XnatMetadataEditor):
         """ Add metadata items to the list widget of default
             (label) type.
         """
-        self.listWidget.addItemsByType([tag for tag in self.MODULE.GLOBALS.DEFAULT_XNAT_METADATA[self.xnatLevel]])
+        self.listWidget.addItemsByType([tag for tag in GLOB_DEFAULT_XNAT_METADATA[self.xnatLevel]])
 
 
 
@@ -505,7 +508,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # stored in the XnatSettingsFile.
         #--------------------  
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.GLOBALS.makeCustomMetadataTag(self.xnatLevel))
+        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
 
 
 
@@ -529,7 +532,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # Write all selected items to the 
         # XnatSettingsFile.
         #--------------------        
-        tagDict = {self.MODULE.GLOBALS.makeCustomMetadataTag(self.xnatLevel) : updatedMetadataItems}
+        tagDict = {XnatUtils.makeCustomMetadataTag(self.xnatLevel) : updatedMetadataItems}
         self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
 
 
@@ -554,7 +557,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         #--------------------
         try:
             xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-            customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.GLOBALS.makeCustomMetadataTag(self.xnatLevel))
+            customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
             self.listWidget.clear()
             self.listWidget.addItems(customMetadataItems)
             
@@ -602,9 +605,9 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # metadata.
         #-------------------- 
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.GLOBALS.makeCustomMetadataTag(self.xnatLevel))
+        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
 
-        tagDict = {self.MODULE.GLOBALS.makeCustomMetadataTag(self.xnatLevel) : [lineText] + customMetadataItems}
+        tagDict = {XnatUtils.makeCustomMetadataTag(self.xnatLevel) : [lineText] + customMetadataItems}
         self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
 
 

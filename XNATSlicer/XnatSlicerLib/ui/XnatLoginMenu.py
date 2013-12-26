@@ -1,6 +1,8 @@
+from GLOB import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
+import GLOB
 
 from XnatSettings import *
 
@@ -299,10 +301,10 @@ def makeCredentialsWidgets(XnatLoginMenu):
     # Username + password label and lines.
     #--------------------
     usernameLabel = qt.QLabel('username:')
-    usernameLabel.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT_BOLD)
+    usernameLabel.setFont(GLOB_LABEL_FONT_BOLD)
     
     passwordLabel = qt.QLabel('password:')
-    passwordLabel.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT_BOLD)    
+    passwordLabel.setFont(GLOB_LABEL_FONT_BOLD)    
     
     usernameLine = qt.QLineEdit()   
     passwordLine = qt.QLineEdit() # encrypted
@@ -315,8 +317,8 @@ def makeCredentialsWidgets(XnatLoginMenu):
     # Sets aesthetics.
     #--------------------
     usernameLine.setText(XnatLoginMenu.defaultUsernameText)
-    usernameLine.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT_ITALIC)
-    passwordLine.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT_ITALIC) 
+    usernameLine.setFont(GLOB_LABEL_FONT_ITALIC)
+    passwordLine.setFont(GLOB_LABEL_FONT_ITALIC) 
 
     passwordLine.setStyleSheet("color: lightgray")
     passwordLine.setText(XnatLoginMenu.defaultPasswordText)
@@ -334,7 +336,7 @@ def makeHostDropdown(XnatLoginMenu):
     """
     
     hostDropdown = qt.QComboBox()
-    hostDropdown.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT)
+    hostDropdown.setFont(GLOB_LABEL_FONT)
     hostDropdown.toolTip = "Select Xnat host"
     return hostDropdown
 
@@ -348,7 +350,7 @@ def makeLoginButton(XnatLoginMenu):
     plt = qt.QPalette()
     plt.setColor(qt.QPalette().Button, qt.QColor(255,255,255))  
     loginButton = qt.QPushButton("Login")
-    loginButton.setFont(XnatLoginMenu.MODULE.GLOBALS.LABEL_FONT)    
+    loginButton.setFont(GLOB_LABEL_FONT)    
     loginButton.toolTip = "Login to selected Xnat host"    
     loginButton.setFixedSize(48, 24)
     return loginButton
@@ -362,7 +364,7 @@ def makeManageHostsButton(XnatLoginMenu):
     """
     
     manageHostsButton = qt.QPushButton('+')
-    #manageHostsButton.setIcon(qt.QIcon(os.path.join(XnatLoginMenu.MODULE.GLOBALS.LOCAL_URIS['icons'], 'gear.png')) )
+    #manageHostsButton.setIcon(qt.QIcon(os.path.join(GLOB_LOCAL_URIS['icons'], 'gear.png')) )
     manageHostsButton.toolTip = "Manage XNAT hosts."
     manageHostsButton.setFixedSize(24, 24)
 

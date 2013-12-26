@@ -1,3 +1,4 @@
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
@@ -62,7 +63,7 @@ class XnatView(object):
         if self.MODULE.XnatIo.projectCache == None:
             self.clear()
             projectContents = self.MODULE.XnatIo.getFolderContents(queryUris = ['/projects'], 
-                                                                              metadataTags = self.MODULE.utils.XnatMetadataTags_projects,
+                                                                              metadataTags = GLOB_DEFAULT_XNAT_METADATA['projects'],
                                                                               queryArguments = ['accessible'])
             #
             # If the class name of the Json is 'XnatError'

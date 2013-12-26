@@ -1,6 +1,3 @@
-from __main__ import vtk, ctk, qt, slicer
-
-
 import os
 import sys
 import shutil
@@ -13,9 +10,6 @@ import codecs
 from os.path import abspath, isabs, isdir, isfile, join
 from base64 import b64encode
 import json
-from multiprocessing import Pool
-
-from XnatError import *
 
 
 
@@ -43,15 +37,38 @@ class XnatIo(object):
     def __init__(self):
         """ Parent init.
         """
-        self.downloadQueue = []
-        self.postGetCallbacks = []
-        self.preGetCallbacks = []
+        self.downloadQueue = []        
         self.downloadState = {}
+        self.callbacks = {
+            'downloadCancelled': [],
+            'downloading': [],
+            'downloadStarted': [],
+            'downloadFinished': [],
+            'downloadFailed': [],
+            'jsonError': []
+        }
+
+
+        
+
+    def setCallback(self, callbackKey, callback):
+        """
+        """
+        self.callbacks[callbackKey].append(callback)
+
 
         
         
+    def runCallbacks(self, callbackKey, *args):
+        """
+        """
+        for callback in self.callbacks[callbackKey]:
+            callback(*args)
+            
         
-    def setup(self, MODULE, host, user, password):
+        
+        
+    def setup(self, host, user, password):
         """ Setup function.  Initializes the internal variables. 
             A 'setup' paradigm is employed, as opposed
             to an 'init' paradim, because the XnatIo object is created, but
@@ -62,7 +79,6 @@ class XnatIo(object):
         # Set relevant variables (all required)
         #-------------------
         self.projectCache = None
-        self.MODULE = MODULE
         self.host = host
         self.user = user
         self.password = password
@@ -100,7 +116,7 @@ class XnatIo(object):
 
 
     
-    def getFile(self, src, dst, callback = None): 
+    def getFile(self, src, dst): 
         """ 
         """
 
@@ -154,7 +170,7 @@ class XnatIo(object):
         #-------------------- 
         if delExisting:
             self.httpsRequest('DELETE', remoteDstUri, '')
-        #print "%s Uploading\nsrc: '%s'\nremoteDstUri: '%s'"%(self.MODULE.utils.lf(), localSrcUri, remoteDstUri)
+        #print "%s Uploading\nsrc: '%s'\nremoteDstUri: '%s'"%(localSrcUri, remoteDstUri)
 
 
         
@@ -226,7 +242,7 @@ class XnatIo(object):
         # Conduct REST call
         #-------------------- 
         connection.request(restMethod, req.get_selector (), body = body, headers = header)
-        #print ('%s httpsRequest: %s %s')%(self.MODULE.utils.lf(), restMethod, url)
+        #print ('%s httpsRequest: %s %s')%(, restMethod, url)
 
 
         
@@ -244,39 +260,49 @@ class XnatIo(object):
             based on the 'xnatUri' argument.  Calls on the internal
             'httpsRequest' RESTfully.
         """
-        print "%s deleting %s"%(self.MODULE.utils.lf(), xnatUri)
+        print "Deleting %s"%(xnatUri)
         response =  self.httpsRequest('DELETE', xnatUri, '')
         print response.read()
 
+
+
+
+    def bytesToMB(self, bytes):
+        """ Converts bytes to MB.  Returns a float.
+        """
+        bytes = int(bytes)
+        mb = str(bytes/(1024*1024.0)).split(".")[0] + "." + str(bytes/(1024*1024.0)).split(".")[1][:2]
+        return float(mb)
         
 
+        
         
         
     def cancelDownload(self, uri):
         """ Set's the download state to 0.  The open buffer in the 'GET' method
             will then read this download state, and cancel out.
         """
+        print "\n\nXNAT IO CANCEL DOWNLOAD", uri
+        print self.downloadState
         self.downloadState[uri] = 0
-        for key, state in self.downloadState.iteritems():
-            if state == 0:
-                self.MODULE.XnatDownloadPopup.hide()
+        self.runCallbacks('downloadCancelled', uri)
        
         
 
 
 
         
-    def downloadFailed(self, windowTitle, msg):
+    def downloadFailed(self, message):
         """ Opens a QMessageBox informing the user
             of the faile download.
         """
-        qt.QMessageBox.warning(None, windowTitle, msg)
+        self.runCallbacks('downloadFailed', message)
     
 
         
 
     
-    def get(self, _xnatSrc, _dst, showProgressIndicator = True, callback = None):
+    def get(self, _xnatSrc, _dst, showProgressIndicator = True):
         """ This method is in place for the main purpose of downlading
             a given Uri in packets (buffers) as opposed to one large file.
             If, for whatever reason, a packet-based download cannot occur,
@@ -330,7 +356,7 @@ class XnatIo(object):
             XnatFile = open(_dst, "wb")
         except Exception, e:
             print "Warning: %s"%(str(e))
-            self.MODULE.XnatDownloadPopup.hide()
+            self.downloadFailed(str(e))
             return
       
 
@@ -340,7 +366,7 @@ class XnatIo(object):
         #-------------------- 
         errorString = ""
         try:
-            #print self.MODULE.utils.lf(), "_xnatSrc: ", _xnatSrc
+            #print "_xnatSrc: ", _xnatSrc
             response = urllib2.urlopen(_xnatSrc)
 
 
@@ -355,18 +381,11 @@ class XnatIo(object):
             errorString += str(e) + "\n"
  
             try:
-                #print self.MODULE.utils.lf(), "urllib2 get failed.  Attempting httplib version."
+                print "urllib2 get failed.  Attempting httplib version."
+                
                 #------------
                 # HTTP LIB VERSION - if urllib2 doesn't work.
                 #-----------
-                
-                #
-                # Reset popup and basically show it without
-                # any real progress indicator -- it's just there
-                # to let the user know it's downloading stuff.
-                #
-                self.MODULE.XnatDownloadPopup.setDownloading(_xnatSrc)
-               
                 
                 #
                 # Get the file using httpsRequest and GET
@@ -381,17 +400,13 @@ class XnatIo(object):
                 with open(_dst, 'wb') as f:
                     f.write(data)
 
-                #
-                # Enable the view widget.
-                #
-                self.MODULE.XnatView.setEnabled(True)
                 
                 return
                 
             except Exception, e2:
                 errorString += str(e2)
-                qt.QMessageBox.warning( None, "Xnat Error", errorStrings)
-                self.MODULE.XnatView.setEnabled(True)
+                self.downloadFailed(errorString)
+
                 return
 
 
@@ -405,14 +420,7 @@ class XnatIo(object):
             # If not in log, read the header
             if response.headers and "Content-Length" in response.headers:
                 self.downloadTracker['totalDownloadSize']['bytes'] = int(response.headers["Content-Length"])  
-                self.downloadTracker['totalDownloadSize']['MB'] = self.MODULE.utils.bytesToMB(self.downloadTracker['totalDownloadSize']['bytes'])
-
-
-            
-        #-------------------- 
-        # Adjust XnatView UI.
-        #-------------------- 
-        #self.MODULE.XnatView.setEnabled(False)
+                self.downloadTracker['totalDownloadSize']['MB'] = self.bytesToMB(self.downloadTracker['totalDownloadSize']['bytes'])
 
         
 
@@ -425,52 +433,18 @@ class XnatIo(object):
         # For showing the progress bar as we download, we also 
         # need to set it up and update it accordingly.
         #-------------------- 
-        def buffer_read(response, fileToWrite, buffer_size=8192, currSrc = "", fileDisplayName = ""):
+        def buffer_read(response, fileToWrite, buffer_size=8192, currSrc = ''):
             """Downloads files by a constant buffer size.
             """
 
-            #
-            # If a progress indicator is desired,
-            # set the parameters of self.MODULE.XnatDownloadPopup.
-            #
             if showProgressIndicator:
                 
-                #
-                # Reset progress popup, keeping it unanimated initially.
-                #
-                #self.MODULE.XnatDownloadPopup.reset()
-                
-                #
-                # Set filename in progress popup.
-                #
-                self.MODULE.XnatDownloadPopup.updateDownload(_xnatSrc)
-
-
-
-                #
-                # Update the download popup file size
-                #
-                if self.downloadTracker['totalDownloadSize']['bytes']:
-                    self.MODULE.XnatDownloadPopup.setSize(_xnatSrc, self.downloadTracker['totalDownloadSize']['bytes'])
-                    #
-                    # Wait for threads to catch up 
-                    #
-                    #slicer.app.processEvents()
-
-                #
-                # If there's no file size, we then let the progress bar be animated.
-                #
-                else:
-                    self.MODULE.XnatDownloadPopup.setDownloadFileName(fileDisplayName) 
-
-
-                    
-            #--------------------
-            # Disable view widget
-            #--------------------
-            self.MODULE.XnatView.setEnabled(False)
-
-
+                # Callbacks
+                size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else 0
+                self.runCallbacks('downloadStarted', _xnatSrc, size)
+                self.runCallbacks('downloading', _xnatSrc, size)
+                                  
+ 
             
             #--------------------
             # Define the buffer read loop
@@ -483,43 +457,30 @@ class XnatIo(object):
                 if self.downloadState[_xnatSrc] == 0:
                     print "Exiting download of '%s'"%(_xnatSrc)
                     fileToWrite.close()
-                    slicer.app.processEvents()
-                    self.MODULE.utils.removeFile(fileToWrite.name)
+                    #if slicer and slicer.app: slicer.app.processEvents()
+                    os.remove(fileToWrite.name)
+                    self.runCallbacks('downloadCancelled', _xnatSrc)
                     break
 
                 
-                #
                 # Read buffer by size.  If there's nothing
                 # more to read, we exit the loop and close
                 # the XnatDownloadPopup.
-                #
                 buffer = response.read(buffer_size)
                 if not buffer: 
-                    if self.MODULE.XnatDownloadPopup:
-                        self.MODULE.XnatDownloadPopup.hide()
-                        if callback != None:
-                            callback()
-                        break 
+                    self.runCallbacks('downloadFinished', _xnatSrc)
+                    break
 
-                    
-                #    
+  
                 # Write buffer chunk to file
-                #
                 fileToWrite.write(buffer)
 
-                
-                #    
+  
                 # Update progress indicators
-                #
                 self.downloadTracker['downloadedSize']['bytes'] += len(buffer)
-                if showProgressIndicator and self.MODULE.XnatDownloadPopup:
-                    self.MODULE.XnatDownloadPopup.updateDownload(_xnatSrc, self.downloadTracker['downloadedSize']['bytes'])
-
-                    
-                #   
-                # Wait for threads to catch up      
-                #
-                slicer.app.processEvents()
+                if showProgressIndicator:
+                    self.runCallbacks('downloading', _xnatSrc, self.downloadTracker['downloadedSize']['bytes'])
+ 
                 
             return self.downloadTracker['downloadedSize']['bytes']
 
@@ -529,18 +490,11 @@ class XnatIo(object):
         # Start the buffer reading cycle by
         # calling on the buffer_read function above.
         #-------------------- 
-
-        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(_xnatSrc)
-        #fileDisplayName = os.path.basename(_xnatSrc) if not 'format=zip' in _xnatSrc else _xnatSrc.split("/subjects/")[1]  
         bytesRead = buffer_read(response = response, fileToWrite = XnatFile, 
-                                buffer_size = 8192, currSrc = _xnatSrc, fileDisplayName = fileDisplayName)
+                                buffer_size = 8192, currSrc = _xnatSrc)
 
 
-        
-        #-------------------- 
-        # When finished, reenable XnatView and close the file
-        #-------------------- 
-        self.MODULE.XnatView.setEnabled(True)
+
         XnatFile.close()
 
     
@@ -555,7 +509,7 @@ class XnatIo(object):
         # Get the response from httpRequest
         #--------------------      
         response = self.httpsRequest('GET', xnatUri).read()
-        #print "%s %s"%(self.MODULE.utils.lf(), xnatUri)
+        #print "%s %s"%(, xnatUri)
         ##print "Get JSON Response: %s"%(response)
 
 
@@ -572,8 +526,9 @@ class XnatIo(object):
         # If that fails, kick back error...
         #-------------------- 
         except Exception, e:
-            #print "%s login error to host '%s'!"%(self.MODULE.utils.lf(), self.host)
-            return XnatError(self.host, self.user, response)
+            #print "%s login error to host '%s'!"%(, self.host)
+            self.runCallbacks('jsonError', self.host, self.user, response)
+            
 
 
 
@@ -583,13 +538,13 @@ class XnatIo(object):
         """ Returns the XNAT path from 'xnatUri' at the 
             provided 'level' by splicing 'xnatUri' accordingly.
         """
-        #print "%s %s"%(self.MODULE.utils.lf(), xnatUri, level)
+        #print "%s %s"%(, xnatUri, level)
         if not level.startswith('/'):
             level = '/' + level
         if level in xnatUri:
             return  xnatUri.split(level)[0] + level
         else:
-            raise Exception("%s invalid get level '%s' parameter: %s"%(self.MODULE.utils.lf(), xnatUri, level))
+            raise Exception("Invalid get level '%s' parameter: %s"%(xnatUri, level))
 
         
 
@@ -598,7 +553,7 @@ class XnatIo(object):
         """ Determines whether a file exists
             on an XNAT host based on the 'fileUri' argument.
         """
-        #print "%s %s"%(self.MODULE.utils.lf(), fileUri)
+        #print "%s %s"%(fileUri)
 
         #-------------------- 
         # Query logged files before checking
@@ -633,7 +588,7 @@ class XnatIo(object):
             'fileDict' which contains the raw byte size 
             of the given file.
         """
-        #print "%s %s"%(self.MODULE.utils.lf(), fileUri)
+        #print "%s %s"%(, fileUri)
         #--------------------
         # Query the tracked files by the name
         # of the fileUri.
@@ -642,7 +597,7 @@ class XnatIo(object):
         fileName = os.path.basename(fileUri)
         if fileName in self.fileDict:
             bytes = int(self.fileDict[fileName]['Size'])
-            return {"bytes": (bytes), "MB" : self.MODULE.utils.bytesToMB(bytes)}
+            return {"bytes": (bytes), "MB" : self.bytesToMB(bytes)}
 
         return {"bytes": None, "MB" : None}
 
@@ -711,7 +666,7 @@ class XnatIo(object):
             if queryArguments:
                 newQueryUri = self.applyQueryArgumentsToUri(queryUri, queryArguments)
                 
-                #print "%s query path: %s"%(self.MODULE.utils.lf(), newQueryUri)
+                #print "%s query path: %s"%(, newQueryUri)
             #
             # Get the JSON
             #
@@ -735,7 +690,7 @@ class XnatIo(object):
                 self.projectCache = contents
 
 
-            print "CONTENTS", contents
+                #print "CONTENTS", contents
         #-------------------- 
         # Exit out if there are non-Json or XML values.
         #-------------------- 
@@ -769,7 +724,7 @@ class XnatIo(object):
                     # create a tracker in the fileDict
                     #print "\n\nCONTENT", content, queryUri    
                     self.fileDict[content['Name']] = content
-                #print "%s %s"%(self.MODULE.utils.lf(), self.fileDict)
+                #print "%s %s"%(, self.fileDict)
             elif queryUri.endswith('/projects'):
                 self.projectCache = returnContents
 
@@ -797,8 +752,8 @@ class XnatIo(object):
         #-------------------- 
         folder += "/resources"
         resources = self.getJson(folder)
-        #print "%s %s"%(self.MODULE.utils.lf(), folder)
-        #print self.MODULE.utils.lf() + " Got resources: '%s'"%(str(resources))
+        #print "%s %s"%(, folder)
+        #print  + " Got resources: '%s'"%(str(resources))
 
 
         
@@ -809,10 +764,10 @@ class XnatIo(object):
         for r in resources:
             if 'label' in r:
                 resourceNames.append(r['label'])
-                #print (self.MODULE.utils.lf() +  "FOUND RESOURCE ('%s') : %s"%(folder, r['label']))
+                #print ( +  "FOUND RESOURCE ('%s') : %s"%(folder, r['label']))
             elif 'Name' in r:
                 resourceNames.append(r['Name'])
-                #print (self.MODULE.utils.lf() +  "FOUND RESOURCE ('%s') : %s"%(folder, r['Name']))                
+                #print ( +  "FOUND RESOURCE ('%s') : %s"%(folder, r['Name']))                
             
             return resourceNames
 
@@ -827,7 +782,7 @@ class XnatIo(object):
         # Clean string
         #-------------------- 
         XnatItem = self.cleanUri(XnatItem)
-        #print "%s %s %s"%(self.MODULE.utils.lf(), XnatItem, attr)
+        #print "%s %s %s"%(, XnatItem, attr)
 
 
         
@@ -887,7 +842,7 @@ class XnatIo(object):
         #-------------------- 
         # Get and return the response from the connetion.
         #-------------------- 
-        #print self.MODULE.utils.lf(), "MAKE FOLDER", response.read()
+        #print , "MAKE FOLDER", response.read()
         return response
     
 
@@ -947,49 +902,37 @@ class XnatIo(object):
         """
         """
         print "CLEAR DOWNLOAD QUEUE"
-        self.downloadQueue = []
-        self.postGetCallbacks = []
-        self.preGetCallbacks = []
+        
+
 
         
         
-    def addToDownloadQueue(self, srcDstDict, preGetCallback = None, postGetCallback = None):
+    def addToDownloadQueue(self, srcDstDict):
         """
         """
         print "ADD TO DOWNLOAD QUEUE"
-        
         self.downloadQueue.append(srcDstDict)
-        self.preGetCallbacks.append(preGetCallback)
-        self.postGetCallbacks.append(postGetCallback)
 
 
-        
-    def startDownloadQueue(self, onDownloadQueueFinished = None):
-        """
-        """
-        print "BEGIN DOWNLOAD QUEUE"
 
         
-        #-------------------- 
-        # Update the download dialog
-        #--------------------  
+    def startDownloadQueue(self, onQueueStarted = None, onQueueFinished = None):
+        """
+        """
+
+        if onQueueStarted:
+            onQueueStarted()
+            
         for i in range(0, len(self.downloadQueue)):
-            print "GETTING", self.downloadQueue[i]['src'], self.downloadQueue[i]['dst']
-            if self.preGetCallbacks[i] != None:
-                self.preGetCallbacks[i]()
-                #slicer.app.processEvents()
+            if self.downloadQueue[i]['dst'] != None:
+                self.getFile(self.downloadQueue[i]['src'], self.downloadQueue[i]['dst'])
 
-            self.getFile(self.downloadQueue[i]['src'], self.downloadQueue[i]['dst'])
-            
-            if self.postGetCallbacks[i]: 
-                self.postGetCallbacks[i]()
-                #slicer.app.processEvents()
+        if onQueueFinished:
+            onQueueFinished()
 
-        if onDownloadQueueFinished != None:
-            onDownloadQueueFinished()
-            slicer.app.processEvents()
             
-        self.clearDownloadQueue()
+        #if slicer and slicer.app: slicer.app.processEvents()
+
             
         
 

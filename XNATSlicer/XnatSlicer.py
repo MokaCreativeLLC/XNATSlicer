@@ -36,7 +36,7 @@ sys.path.append(os.path.join(LIB_PATH, 'utils'))
 sys.path.append(os.path.join(LIB_PATH, 'io'))
 
 
-from XnatGlobals import *
+import GLOB
 from XnatFileInfo import *
 from XnatFolderMaker import *
 from XnatLoadWorkflow import *
@@ -53,10 +53,13 @@ from XnatButtons import *
 from XnatViewer import *
 from XnatView import *
 from XnatPopup import *
-from XnatDicomLoadWorkflow import *
-from XnatSceneLoadWorkflow import *
-from XnatFileLoadWorkflow import *
-from XnatAnalyzeLoadWorkflow import *
+
+from XnatLoader import *
+from XnatLoader_Dicom import *
+from XnatLoader_Analyze import *
+from XnatLoader_File import *
+from XnatLoader_Mrb import *
+
 #from XnatSlicerTest import *
 from XnatError import *
 from XnatSettings import *
@@ -148,22 +151,12 @@ class XnatSlicerWidget:
 
 
         #--------------------------------
-        # Init Xnat GLOBALS
-        #--------------------------------
-        self.GLOBALS = XnatGlobals() 
-
-
-        
-        #--------------------------------
-        # Init Xnat Utils
-        #--------------------------------
-        self.utils = XnatUtils(self)   
-
-
-        #--------------------------------
         # Xnat IO
         #--------------------------------
         self.XnatIo = XnatIo()
+        def jsonError(host, user, response):
+            return XnatError(self.host, self.user, response)
+        self.XnatIo.setCallback('jsonError', jsonError)
 
         
 
@@ -171,7 +164,7 @@ class XnatSlicerWidget:
         # Construct all needed directories
         # if not there...
         #--------------------------------
-        self.utils.constructNecessaryModuleDirectories()
+        XnatUtils.constructNecessaryModuleDirectories()
 
         
         
@@ -193,7 +186,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Xnat settingsFile
         #--------------------------------
-        self.XnatSettingsFile = XnatSettingsFile(slicer.qMRMLWidget(), self.GLOBALS.LOCAL_URIS['settings'], self)
+        self.XnatSettingsFile = XnatSettingsFile(slicer.qMRMLWidget(), GLOB_LOCAL_URIS['settings'], self)
 
 
         
@@ -275,24 +268,6 @@ class XnatSlicerWidget:
         self.XnatButtons = XnatButtons(self.parent, MODULE=self)  
         
         
-        
-        #--------------------------------
-        # Popups
-        #--------------------------------
-        self.XnatDownloadPopup = XnatDownloadPopup(MODULE = self)
-        #self.uploadPopup = XnatDownloadPopup(MODULE = self)
-
-                
-        
-        #--------------------------------
-        # LoadWorkflows
-        #--------------------------------
-        self.XnatSceneLoadWorkflow = XnatSceneLoadWorkflow(self)
-        self.XnatFileLoadWorkflow = XnatFileLoadWorkflow(self)
-        self.XnatDicomLoadWorkflow = XnatDicomLoadWorkflow(self)
-        self.XnatAnalyzeLoadWorkflow = XnatAnalyzeLoadWorkflow(self)
-        
-
 
 
         #--------------------------------
@@ -601,7 +576,7 @@ class XnatSlicerWidget:
         """ Empties contents of the temp directory based upon maxSize
         """
         import math
-        folder = self.GLOBALS.CACHE_URI
+        folder = GLOB_CACHE_URI
         folder_size = 0
 
 
@@ -621,7 +596,7 @@ class XnatSlicerWidget:
         #--------------------------------
         folder_size = math.ceil(folder_size/(1024*1024.0))
         if folder_size > maxSize:
-            self.utils.removeFilesInDir(folder)    
+            XnatUtils.removeFilesInDir(folder)    
 
 
 
@@ -658,9 +633,8 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo.setup(MODULE = self, 
-                                    host = self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
-                                    user = self.XnatLoginMenu.usernameLine.text, password=self.XnatLoginMenu.passwordLine.text)
+        self.XnatIo.setup(host = self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
+                          user = self.XnatLoginMenu.usernameLine.text, password=self.XnatLoginMenu.passwordLine.text)
 
         
 
@@ -899,7 +873,7 @@ class XnatSlicerWidget:
             self.loggedIn = True
             self.beginXnat()
         else:
-            print "%s The host '%s' doesn't appear to have a valid URL"%(self.utils.lf(), self.XnatLoginMenu.hostDropdown.currentText) 
+            print "%s The host '%s' doesn't appear to have a valid URL"%(XnatUtils.lf(), self.XnatLoginMenu.hostDropdown.currentText) 
             pass  
 
 
@@ -920,7 +894,6 @@ class XnatSlicerWidget:
         """     
         
         self.lastButtonClicked = "save" 
-        self.XnatView.setEnabled(False)
         saver = XnatSaveWorkflow(self)
         saver.beginWorkflow()
 
@@ -935,6 +908,15 @@ class XnatSlicerWidget:
         #self.tester.runTest()
 
 
+
+        
+    def getFullXnatUrl(self, uri):
+        if uri.startswith('/'):
+            uri = uri[1:]
+        if uri.startswith('projects'):
+            return self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText) + '/data/archive/' + uri
+        
+
         
         
     def onLoadClicked(self):
@@ -942,9 +924,8 @@ class XnatSlicerWidget:
         """
         
         self.lastButtonClicked = "load"
-        self.XnatView.setEnabled(False)
         self.XnatLoadWorkflow = XnatLoadWorkflow(self)
-        self.XnatLoadWorkflow.beginWorkflow()
+        self.XnatLoadWorkflow.beginWorkflow(self.getFullXnatUrl(self.XnatView.getXnatUri()))
 
 
 

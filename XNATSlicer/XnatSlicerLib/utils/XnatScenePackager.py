@@ -1,3 +1,4 @@
+
 from __future__ import with_statement
 from __main__ import vtk, ctk, qt, slicer
 import datetime, time
@@ -8,10 +9,11 @@ import shutil
 from contextlib import closing
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from XnatFileInfo import *
 
+from GLOB import *
 from XnatUtils import *
 from XnatTimer import *
+from XnatFileInfo import *
 
 
 
@@ -57,8 +59,8 @@ class XnatScenePackager(object):
         #-------------------
         # Create a directory for saving locally.
         #-------------------
-        saveDirectory = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['uploads'], packageName)
-        #print self.MODULE.utils.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
+        saveDirectory = os.path.join(GLOB_LOCAL_URIS['uploads'], packageName)
+        #print XnatUtils.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
 
 
 
@@ -67,9 +69,9 @@ class XnatScenePackager(object):
         # with the same name if it exists
         #-------------------
         try:
-            #print self.MODULE.utils.lf() + ("%s does not exist. Making it."%(saveDirectory)) 
+            #print XnatUtils.lf() + ("%s does not exist. Making it."%(saveDirectory)) 
             if os.path.exists(saveDirectory): 
-                self.MODULE.utils.removeDirsAndFiles(saveDirectory)
+                XnatUtils.removeDirsAndFiles(saveDirectory)
         except Exception, e: 
             pass
 
@@ -91,7 +93,7 @@ class XnatScenePackager(object):
         try: 
             os.makedirs(saveDirectory + "/Data")
         except Exception, e: 
-            print self.MODULE.utils.lf() +  "Likely the dir already exists: " + str(e)
+            print XnatUtils.lf() +  "Likely the dir already exists: " + str(e)
 
 
 
@@ -120,8 +122,8 @@ class XnatScenePackager(object):
         # Return appropriate dictionary with the mrml file
         # and the save directory.
         #-------------------
-        return {'path':self.MODULE.utils.adjustPathSlashes(saveDirectory), 
-                'mrml': self.MODULE.utils.adjustPathSlashes(mrml)}
+        return {'path':XnatUtils.adjustPathSlashes(saveDirectory), 
+                'mrml': XnatUtils.adjustPathSlashes(mrml)}
 
 
 

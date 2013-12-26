@@ -1,3 +1,4 @@
+
 from __future__ import with_statement
 from __main__ import vtk, ctk, qt, slicer
 
@@ -16,8 +17,10 @@ import inspect
 from contextlib import closing
 from zipfile import ZipFile, ZIP_DEFLATED
 
+from GLOB import *
 
 from HoverButton import *
+
 
 
 
@@ -36,39 +39,28 @@ TODO :
 
 
 class XnatUtils(object):
-    
-    def __init__(self, MODULE):
-        self.MODULE = MODULE   
-        pass
 
 
-        
-    def constructNecessaryModuleDirectories(self):
+    @staticmethod
+    def constructNecessaryModuleDirectories():
         """ As stated.
         """
-
-        
         #---------------------
         # Make the module paths if they don't exist.
         #---------------------
-        for key, val in self.MODULE.GLOBALS.LOCAL_URIS.iteritems():
+        for key, val in GLOB_LOCAL_URIS.iteritems():
             if not os.path.exists(val):    
                 os.makedirs(val)
 
     
 
     
-    @property
-    def xnatDepthDict(self):
-        return {0:"projects",
-                1:"subjects",
-                2:"experiments",
-                3:"scans"}
+
 
 
     
     @property
-    def osType(self):
+    def osType():
         if slicer.app.os.lower() == "win":
             return "win"
         elif slicer.app.os.lower() == "darwin" or slicer.app.os.lower() == "macosx": 
@@ -80,213 +72,84 @@ class XnatUtils(object):
     
     
     @property
-    def localizedMRMLExtension(self):
+    def localizedMRMLExtension():
         return "-LOCALIZED"
 
 
     
     
     @property
-    def referencedMRMLExtension(self):
+    def referencedMRMLExtension():
         return ""
 
 
 
     
     @property
-    def condensedMRMLExtension(self):
+    def condensedMRMLExtension():
         return ""
 
 
     
 
     @property
-    def defaultSceneName(self):
+    def defaultSceneName():
         return "SlicerScene_"
 
 
     
     
     @property
-    def referenceDirName(self):
+    def referenceDirName():
         return "reference/"
 
 
     
     
     @property
-    def slicerFolderName(self):
-        return "Slicer"
-
-
-
-    
-    @property
-    def defaultXnatSaveLevel(self):
-        return "experiments"
-
-
-    
-    
-    @property
-    def requiredSlicerFolders(self):
-        return [self.slicerFolderName]
-
-    
-    
-    @property
-    def defaultPackageExtension(self):
+    def defaultPackageExtension():
         return ".mrb"
 
 
 
     
     @property
-    def packageExtensions(self):
+    def packageExtensions():
         return  [".zip", ".mrb"]
 
 
 
     
     @property
-    def dicomDBBackupFN(self):
-        return self.adjustPathSlashes(os.path.join(self.LOCAL_URIS['settings'], "slicerDICOMDBBackup.txt")) 
+    def dicomDBBackupFN():
+        return XnatUtils.adjustPathSlashes(os.path.join(XnatUtils.LOCAL_URIS['settings'], "slicerDICOMDBBackup.txt")) 
 
 
-
-
-    @property
-    def XnatMetadataTags_projects(self):
-        return ['secondary_ID',
-                'pi_lastname',
-                'pi_firstname',
-                'description',
-                'name',
-                'ID',
-                'URI',
-                # The reason for two ID keys is because the "?accessible=True" filter
-                # returns lowercase 'id'
-                'id',	
-                'pi',	
-                'project_invs',	
-                'project_access_img',	
-                'insert_date',
-                'insert_user',	
-                'user_role_497',	
-                'last_accessed_497',	
-                'quarantine_status'
-                ]
-
-
-
-    
-    @property
-    def XnatMetadataTags_subjects(self):
-        return ['project',
-                'insert_user',
-                'ID',
-                'insert_date',
-                'label',
-                'URI',
-                'totalRecords'
-                ]
-
-
-    
-
-    @property
-    def XnatMetadataTags_experiments(self):
-        return ['project',
-                'xsiType',
-                'ID',
-                'insert_date',
-                'label',
-                'date',
-                'URI',
-                'totalRecords'
-                ]
-
-
-
-    
-    @property
-    def XnatMetadataTags_resources(self):
-        return ['cat_id',
-                'element_name',
-                'category',
-                'xnat_abstractresource_id',
-                'label',
-                'cat_desc',
-                ]
-
-
-    
-
-    @property
-    def XnatMetadataTags_scans(self):
-        return ['xsiType',
-                'quality',
-                'series_description',
-                'xnat_imagescandata_id',
-                'URI',
-                'note',
-                'type',
-                'ID'
-                ]
-
-    
-
-    
-    @property
-    def XnatMetadataTags_files(self):
-        return ['Name', 
-                'file_content',
-                'collection',
-                'file_format',
-                'file_tags',
-                'cat_ID',
-                'URI',
-                'Size'
-                ]
-
-
-    
-    
-    @property
-    def XnatMetadataTags_all(self):
-        return self.uniqify(self.XnatMetadataTags_projects + 
-                                self.XnatMetadataTags_subjects + 
-                                self.XnatMetadataTags_experiments + 
-                                self.XnatMetadataTags_resources + 
-                                self.XnatMetadataTags_scans + 
-                                self.XnatMetadataTags_files)
-
-
-
-
-    def getMetadataTagsByXnatLevel(self, xnatLevel):
+    @staticmethod
+    def getMetadataTagsByLevel( xnatLevel):
         """ Returns the appropriate tag list by the given
             'xnatLevel' argument.
         """
 
         if 'projects' in xnatLevel:
-            return self.XnatMetadataTags_projects
+            return GLOB_DEFAULT_XNAT_METADATA['projects']
         elif 'subjects' in xnatLevel:
-            return self.XnatMetadataTags_subjects
+            return GLOB_DEFAULT_XNAT_METADATA['subjects']
         elif 'experiments' in xnatLevel:
-            return self.XnatMetadataTags_experiments
+            return GLOB_DEFAULT_XNAT_METADATA['experiments']
         elif 'resources' in xnatLevel:
-            return self.XnatMetadataTags_resources   
+            return GLOB_DEFAULT_XNAT_METADATA['resources']  
         elif 'scans' in xnatLevel:
-            return self.XnatMetadataTags_scans
+            return GLOB_DEFAULT_XNAT_METADATA['scans']
         elif 'files' in xnatLevel:
-            return self.XnatMetadataTags_files
+            return GLOB_DEFAULT_XNAT_METADATA['files']
         elif 'Slicer' in xnatLevel:
-            return self.XnatMetadataTags_files     
-
+            return GLOB_DEFAULT_XNAT_METADATA['slicer']     
         
 
-    def uniqify(self, seq):
+        
+    @staticmethod
+    def uniqify( seq):
         """ Returns only unique elements in a list, while 
             preserving order: O(1).
             From: http://www.peterbe.com/plog/uniqifiers-benchmark
@@ -296,39 +159,25 @@ class XnatUtils(object):
         return [ x for x in seq if x not in seen and not seen_add(x)]
 
 
-    
-
-    def XnatMetadataTagsByLevel(self, level):
-        """ Returns the relevant XNAT metadata dags that the 
-            XNAT server returns when looking at the contents of a 
-            given XNAT level at provided by the 'level' argument.
-        """
-        if level == 'projects': return self.XnatMetadataTags_projects
-        elif level == 'subjects' : return self.XnatMetadataTags_subjects
-        elif level == 'experiments' : return self.XnatMetadataTags_experiments
-        elif level == 'scans' : return self.XnatMetadataTags_scans
-        elif level == 'resources' : return self.XnatMetadataTags_resources
-        elif level == 'files' : return self.XnatMetadataTags_files
-
 
         
-            
-    def removeDirsAndFiles(self, path):
+    @staticmethod            
+    def removeDirsAndFiles( path):
         """ Attempts multiple approaches (they vary from OS)
             to remove the files and directories of the path.
         """
         if os.path.exists(path):
-            self.removeDir(path)
+            XnatUtils.removeDir(path)
         if os.path.exists(path):
             try:
                 os.rmdir(path)
             except Exception, e:
-                print self.lf() + "%s Can't remove dir '%s'"%(str(e), path)
+                print XnatUtils.lf() + "%s Can't remove dir '%s'"%(str(e), path)
 
 
                 
-            
-    def appendFile(self, fileName, appendStr):
+    @staticmethod            
+    def appendFile( fileName, appendStr):
         """ Appends a string to a given filename by
             splitting at the '.' to preserve the extension.
         """
@@ -338,8 +187,8 @@ class XnatUtils(object):
 
 
 
-    
-    def removeDir(self, path, pattern=''):
+    @staticmethod    
+    def removeDir( path, pattern=''):
         """ Tries various approaches to remove a directory.
             (Approaches can vary by OS).
         """
@@ -352,20 +201,20 @@ class XnatUtils(object):
                     try: 
                         os.remove(name)
                     except:
-                        self.removeDir(name, '')
+                        XnatUtils.removeDir(name, '')
                         try:
                             os.rmdir(name)
                         except Exception, e:
-                            print self.lf() + "%s Can't remove dir '%s'"%(str(e), name)
+                            print XnatUtils.lf() + "%s Can't remove dir '%s'"%(str(e), name)
         else:
-            print self.lf() + " ATTEMPTED TO REMOVE: %s but it does not exist!"%(path)
+            print XnatUtils.lf() + " ATTEMPTED TO REMOVE: %s but it does not exist!"%(path)
 
 
 
-            
-    def removeFilesInDir(self, theDir):
+    @staticmethod            
+    def removeFilesInDir( theDir):
         """  Removes the files within a directory but not the 
-             directory itself.
+             directory itXnatUtils.
         """
         for the_file in os.listdir(theDir):
             file_path = os.path.join(theDir, the_file)
@@ -374,12 +223,12 @@ class XnatUtils(object):
                 os.remove(file_path)
             except Exception, e:
                 if the_file.endswith("\\") or the_file.endswith("/"): 
-                    self.removeFilesInDir(file_path)
+                    XnatUtils.removeFilesInDir(file_path)
 
 
 
-                    
-    def shortenFileName(self, fn, maxLen = 20):
+    @staticmethod                    
+    def shortenFileName( fn, maxLen = 20):
         """ Shortens a given filename to a length provided
             in the argument.  Appends the file with "..." string.
         """
@@ -391,8 +240,8 @@ class XnatUtils(object):
 
 
     
-    
-    def removeFile(self, theFile):
+    @staticmethod    
+    def removeFile( theFile):
         """ Attempts to a remove a file from disk.
         """
         try:           
@@ -403,8 +252,8 @@ class XnatUtils(object):
 
 
 
-            
-    def moveDirContents(self, srcDir, destDir, deleteSrc = True):
+    @staticmethod            
+    def moveDirContents( srcDir, destDir, deleteSrc = True):
         """ Moves the contents of one directory to another.
         """
         
@@ -449,12 +298,12 @@ class XnatUtils(object):
                             os.mkdir(newPath)
                         newURI = os.path.join(newPath, file)
                 except Exception, e: 
-                    print (self.lf() + "RootSplit Error: " + str(e))
+                    print (XnatUtils.lf() + "RootSplit Error: " + str(e))
                 #
                 # Move the file, and track it             
                 #
                 shutil.move(currURI, newURI)
-                newURIs.append(self.adjustPathSlashes(newURI))
+                newURIs.append(XnatUtils.adjustPathSlashes(newURI))
 
                  
                 
@@ -463,15 +312,15 @@ class XnatUtils(object):
         #------------------
         if deleteSrc:
             if not srcDir.find(destDir) == -1:
-                self.removeDirsAndFiles(srcDir)
+                XnatUtils.removeDirsAndFiles(srcDir)
         
 
         return newURIs
 
 
 
-    
-    def writeZip(self, packageDir, deleteFolders = False):
+    @staticmethod    
+    def writeZip( packageDir, deleteFolders = False):
         """ Writes a given path to a zip file based on the basename
             of the 'packageDir' argument.
             
@@ -490,8 +339,8 @@ class XnatUtils(object):
 
 
 
-            
-    def checkStorageNodeDirs(self, currScene):
+    @staticmethod            
+    def checkStorageNodeDirs( currScene):
         """Determines if there's at least one storable node 
            with at least one filename associated with it. 
            Part of a series of functions to determine if a 
@@ -530,26 +379,26 @@ class XnatUtils(object):
 
 
 
-    
-    def writeDebugToFile(self, debugStr):
+    @staticmethod    
+    def writeDebugToFile( debugStr):
         """ Writes a string to a file for debugging purposes.
         """
-        f = open(os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['home'], "DebugLog.txt"), 'a')
+        f = open(os.path.join(GLOB_LOCAL_URIS['home'], "DebugLog.txt"), 'a')
         f.write(str(datetime.datetime.now()) + ": " + debugStr + "\n")            
         f.close()
 
 
 
-        
-    def isRecognizedFileExt(self, ext):
+    @staticmethod        
+    def isRecognizedFileExt( ext):
         """ Determine if an extension is a readable file
             by Slicer and/or XNATSlicer.
         """
         if len(ext) > 0 and ext[0] != '.':   ext = "." + ext
-        arr = (self.MODULE.GLOBALS.DICOM_EXTENSIONS + 
-               self.MODULE.GLOBALS.MRML_EXTENSIONS + 
-               self.MODULE.GLOBALS.ALL_LOADABLE_EXTENSIONS + 
-               self.packageExtensions)
+        arr = (GLOB_DICOM_EXTENSIONS + 
+               GLOB_MRML_EXTENSIONS + 
+               GLOB_ALL_LOADABLE_EXTENSIONS + 
+               XnatUtils.packageExtensions)
         for item in arr:
             if ext == item:
                 return True
@@ -558,8 +407,8 @@ class XnatUtils(object):
         return False
 
 
-
-    def isExtension(self, ext, extList):  
+    @staticmethod
+    def isExtension( ext, extList):  
         """  Compares two strings to see if they match
              for extension matching.
         """    
@@ -570,48 +419,51 @@ class XnatUtils(object):
         return False
 
 
-
-    
-    def isDICOM(self, filename = None):
+    @staticmethod
+    def isMiscLoadable( filename = None):
         """ As stated.
         """
-        #print "\n\n\n\t\t*******IS DICOM"
+        return XnatUtils.isExtension(filename, GLOB_MISC_LOADABLE_EXTENSIONS)
+
+    
+    @staticmethod    
+    def isDICOM( filename = None):
+        """ As stated.
+        """
         filenameExt = '.' + filename.rsplit('.', 1)[1].lower()
-        #print "FILENAME EXT", filenameExt
-        for extension in self.MODULE.GLOBALS.DICOM_EXTENSIONS:
-            #print "DICOM CHECK", extension.lower(), filenameExt, extension.lower() in filenameExt
+        for extension in GLOB_DICOM_EXTENSIONS:
             if extension.lower() in filenameExt:
                 return True
         return False
 
 
-
-    def isAnalyze(self, ext = None):
+    @staticmethod
+    def isAnalyze( ext = None):
         """ As stated.
         """
-        return self.isExtension(ext, self.MODULE.GLOBALS.ANALYZE_EXTENSIONS)
+        return XnatUtils.isExtension(ext, GLOB_ANALYZE_EXTENSIONS)
 
 
 
-    
-    def isMRML(self, ext = None): 
+    @staticmethod    
+    def isMRML( ext = None): 
         """ As stated.
         """    
-        return self.isExtension(ext, self.MODULE.GLOBALS.MRML_EXTENSIONS)
+        return XnatUtils.isExtension(ext, GLOB_MRML_EXTENSIONS)
 
 
        
-       
-    def isScenePackage(self, ext = None):
+    @staticmethod       
+    def isScenePackage( ext = None):
         """ Determins if a given extension is a Slicer scene
             package.
         """
-        return self.isExtension(ext, self.packageExtensions)
+        return XnatUtils.isExtension(ext, XnatUtils.packageExtensions)
    
     
 
-    
-    def getAncestorUri(self, remotePath, ancestorName = None):
+    @staticmethod    
+    def getAncestorUri( remotePath, ancestorName = None):
         """ Returns an ancestor path based on the provided level.
         """ 
         
@@ -635,8 +487,8 @@ class XnatUtils(object):
 
 
 
-    
-    def isCurrSceneEmpty(self):
+    @staticmethod    
+    def isCurrSceneEmpty():
         """Determines if the scene is empty based on 
            the visible node count.
         """
@@ -682,30 +534,30 @@ class XnatUtils(object):
 
 
 
-    
-    def doNotCache(self, filename):
+    @staticmethod    
+    def doNotCache( filename):
         """ Determine if a file is not cachable.
         """
-        for ext in self.doNotCache:
+        for ext in XnatUtils.doNotCache:
             if filename.endswith(ext):
                 return True
         return False
 
 
 
-    
-    def isDecompressible(self, filename):
+    @staticmethod    
+    def isDecompressible( filename):
         """ Determine if a file can be decompressed.
         """
-        for ext in self.MODULE.GLOBALS.DECOMPRESSIBLE_EXTENSIONS:
+        for ext in GLOB_DECOMPRESSIBLE_EXTENSIONS:
             if filename.endswith(ext):
                 return True
         return False
 
 
 
-    
-    def decompressFile(self, filename, dest = None):
+    @staticmethod    
+    def decompressFile( filename, dest = None):
         """  Various methods to decompress a given file
              based on the file extension.  
         """
@@ -725,8 +577,8 @@ class XnatUtils(object):
 
 
 
-    
-    def getCurrImageNodes(self, packageDir = None):
+    @staticmethod    
+    def getCurrImageNodes( packageDir = None):
         """
         """
         
@@ -784,8 +636,8 @@ class XnatUtils(object):
 
 
 
-    
-    def getDateTimeStr(self):
+    @staticmethod    
+    def getDateTimeStr():
         """ As stated.
         """
         strList = str(datetime.datetime.today()).rsplit(" ")
@@ -798,8 +650,8 @@ class XnatUtils(object):
 
 
 
-    
-    def createSceneName(self):   
+    @staticmethod   
+    def createSceneName():   
         """ For creating scene names if none is provided by the 
             user.
         """
@@ -809,21 +661,21 @@ class XnatUtils(object):
         timeStr = timeStr.replace(".", " ")
         timeList = timeStr.rsplit(" ")
         shortTime = timeList[0]+ "-" + timeList[1]
-        tempFilename = self.defaultSceneName + self.getDateTimeStr()
+        tempFilename = XnatUtils.defaultSceneName + XnatUtils.getDateTimeStr()
         return tempFilename
 
 
     
-    
-    def adjustPathSlashes(self, str):
+    @staticmethod    
+    def adjustPathSlashes( str):
         """  Replaces '\\' path
         """
         return str.replace("\\", "/").replace("//", "/")
 
 
     
-    
-    def replaceForbiddenChars(self, fn, replaceStr=None):
+    @staticmethod    
+    def replaceForbiddenChars( fn, replaceStr=None):
         """ As stated.
         """
         if not replaceStr: replaceStr = "_"
@@ -841,12 +693,12 @@ class XnatUtils(object):
 
 
     
-    
-    def constructSlicerSaveUri(self, currUri, xnatLevel = None):
+    @staticmethod    
+    def constructSlicerSaveUri( currUri, xnatLevel = None):
         """ Constructs a Slicer save URI (on the XNAT host) based on the provided 
             arguments of currUri and the optional arguments of xnatLevel and findNearest.  
             If xnatLevel is left as 'None', the Slicers save URI will be constructed based upon
-            the 'self.defaultXnatSaveLevel' value.
+            the 'GLOB_DEFAULT_XNAT_SAVE_LEVEL' value.
         """
 
         #-----------------------
@@ -854,7 +706,7 @@ class XnatUtils(object):
         # none (i.e. not entered by user.)
         #------------------------
         if (not xnatLevel):
-            xnatLevel = self.defaultXnatSaveLevel
+            xnatLevel = GLOB_DEFAULT_XNAT_SAVE_LEVEL
 
 
             
@@ -888,14 +740,14 @@ class XnatUtils(object):
         #------------------------
         if not slicerSaveUri.endswith("/"):
             slicerSaveUri+="/"    
-        slicerSaveUri += "resources/%s/files/"%(self.slicerFolderName) 
+        slicerSaveUri += "resources/%s/files/"%(GLOB_SLICER_FOLDER_NAME) 
 
         return slicerSaveUri
 
 
 
-    
-    def lf(self, msg=""):
+    @staticmethod    
+    def lf( msg=""):
         """For debugging purposes.  Returns the current line number and function
            when used throughout the module.
         """
@@ -918,8 +770,8 @@ class XnatUtils(object):
 
 
 
-    
-    def removeZeroLenStrVals(self, _list):
+    @staticmethod    
+    def removeZeroLenStrVals( _list):
         """ As stated.  Removes any string values with 
             zero length within a list.
         """
@@ -931,8 +783,8 @@ class XnatUtils(object):
 
 
 
-    
-    def getSaveTuple(self, filepath = None):
+    @staticmethod    
+    def getSaveTuple( filepath = None):
         """ Constructs a save URI based upon a provided
             filePath by splitting it and then applying the default
             locations specified in this cass.
@@ -940,16 +792,16 @@ class XnatUtils(object):
         saveLevelDir = None
         slicerDir = None
         if filepath:
-            lSplit, rSplit = filepath.split(self.defaultXnatSaveLevel + "/")
-            saveLevelDir = (lSplit + self.defaultXnatSaveLevel + "/" + rSplit.split("/")[0])
-            slicerDir = saveLevelDir + "/resources/" + self.slicerFolderName + "/files"
+            lSplit, rSplit = filepath.split(GLOB_DEFAULT_XNAT_SAVE_LEVEL + "/")
+            saveLevelDir = (lSplit + GLOB_DEFAULT_XNAT_SAVE_LEVEL + "/" + rSplit.split("/")[0])
+            slicerDir = saveLevelDir + "/resources/" + GLOB_SLICER_FOLDER_NAME + "/files"
         return saveLevelDir, slicerDir
 
 
 
     
-
-    def bytesToMB(self, bytes):
+    @staticmethod
+    def bytesToMB( bytes):
         """ Converts bytes to MB.  Returns a float.
         """
         bytes = int(bytes)
@@ -958,8 +810,8 @@ class XnatUtils(object):
 
 
 
-
-    def repositionToMainSlicerWindow(self, positionable, location = "center"):
+    @staticmethod
+    def repositionToMainSlicerWindow( positionable, location = "center"):
         """ As stated.  User can provide location of window
             within the arguments.
         """
@@ -997,12 +849,12 @@ class XnatUtils(object):
 
 
 
-
-    def makeXnatUriDictionary(self, xnatUri):
+    @staticmethod
+    def getXnatPathDict( xnatUri):
         """ Splits apart the 'path' into the various
             XNAT folder levels, then returns it as a dictionary.
         """
-        uriDict = {"projects":None, "subjects":None, "experiments":None, "scans":None, "resources":None, "files":None}
+        uriDict = GLOB_DEFAULT_PATH_DICT.copy()
         uriList = xnatUri.split("/")
         for i in range(0, len(uriList)):
             for k in uriDict:
@@ -1010,11 +862,12 @@ class XnatUtils(object):
                     if (i+1) < len(uriList):
                         uriDict[uriList[i]] = uriList[i+1]
         return uriDict
+    
 
 
 
-
-    def generateButton(self, iconOrLabel="", toolTip="", font = qt.QFont('Arial', 10, 10, False),  size = None, enabled=False):
+    @staticmethod
+    def generateButton(iconOrLabel="", toolTip="", font = qt.QFont('Arial', 10, 10, False),  size = None, enabled=False):
         """ Creates a qt.QPushButton(), with the arguments.  Sets text, font,
         toolTip, icon, size, and enabled state.
         """
@@ -1027,7 +880,7 @@ class XnatUtils(object):
         # Set either Icon or label, depending on
         # whehter the icon file exists.
         #--------------------
-        iconPath = os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['icons'], iconOrLabel)
+        iconPath = os.path.join(GLOB_LOCAL_URIS['icons'], iconOrLabel)
         if os.path.exists(iconPath):
             button.setIcon(qt.QIcon(iconPath))
         else:
@@ -1048,26 +901,26 @@ class XnatUtils(object):
 
 
 
-
-    def makeSettingsButton(self, XnatSetting):
+    @staticmethod
+    def makeSettingsButton( XnatSetting):
         """ Constructs a setting button with a wrench icon that
             opens the appropriate settings tab.
         """
         button = HoverButton()
-        button.setIcon(qt.QIcon(os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['icons'], 'wrench.png')) )
+        button.setIcon(qt.QIcon(os.path.join(GLOB_LOCAL_URIS['icons'], 'wrench.png')) )
         button.setFixedWidth(23)
         button.setFixedHeight(17)
         button.setDefaultStyleSheet('border: 1px solid transparent; border-radius: 2px; background-color: transparent; margin-left: 5px; text-align: left; padding-left: 0px; ')
         button.setHoverStyleSheet('border: 1px solid rgb(150,150,150); border-radius: 2px; background-color: transparent; margin-left: 5px; text-align: left; padding-left: 0px;')
         def openSettings():
-            self.MODULE.XnatSettingsWindow.showWindow(XnatSetting.tabTitle)
+            XnatUtils.MODULE.XnatSettingsWindow.showWindow(XnatSetting.tabTitle)
         button.connect('clicked()', openSettings)
         return button
 
 
 
-
-    def makeDisplayableFileName(self, fileUri):
+    @staticmethod
+    def makeDisplayableFileName( fileUri):
         """ Makes a filename displayable but culling
             a lot of the unnecessary file path characters.
         """
@@ -1079,8 +932,8 @@ class XnatUtils(object):
 
     
         
-    
-    def makeDateReadable(self, dateString):
+    @staticmethod
+    def makeDateReadable( dateString):
         """ Xnat Date metadata is generally long and not
             very human readable.  This converts it.
         """
@@ -1104,11 +957,70 @@ class XnatUtils(object):
 
 
     
-
-    def toPlainText(self, text):
+    @staticmethod
+    def toPlainText( text):
         """ Converts a string to plain text.
         """
         doc = qt.QTextDocument()
         doc.setHtml(text)
         return doc.toPlainText()
         
+
+    @staticmethod
+    def loadNodeFromFile( fileName):
+        """
+        """
+        coreIOManager = slicer.app.coreIOManager()
+        fileType = coreIOManager.fileType(fileName)
+        fileSuccessfullyLoaded = slicer.util.loadNodeFromFile(fileName, fileType)            
+        if not fileSuccessfullyLoaded:
+            errStr = "Could not load '%s'!"%(fileName)
+            print (errStr)
+
+            
+
+    @staticmethod      
+    def filterFiles( fileArr, filterFunction):
+        """
+        """
+        newExtractedFiles = []
+        for fileName in fileArr:
+            if filterFunction(fileName):
+                newExtractedFiles.append(fileName)
+        return newExtractedFiles
+
+
+
+    @staticmethod
+    def sortLoadablesByType( fileNames):
+        """
+        """
+        
+        filesByType = {
+            'analyze': [],
+            'dicom': [],
+            'misc': [],
+            'unknown': []
+        }
+
+        for fileName in fileNames:
+            if XnatUtils.isAnalyze(fileName):
+                filesByType['analyze'].append(fileName)
+            elif XnatUtils.isDICOM(fileName):
+                filesByType['dicom'].append(fileName)
+            elif XnatUtils.isMiscLoadable(fileName):
+                filesByType['misc'].append(fileName)
+            else:
+                filesByType['unknown'].append(fileName)
+
+        return filesByType
+
+
+    @staticmethod
+    def makeCustomMetadataTag(xnatLevel): 
+        """
+        """
+        return GLOB_CUSTOM_METADATA_SETTINGS_PREFIX + xnatLevel.lower()
+
+
+

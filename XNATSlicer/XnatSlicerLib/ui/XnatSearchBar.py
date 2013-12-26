@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
@@ -53,7 +55,7 @@ class XnatSearchBar(qt.QFrame):
         # The search button
         #--------------------------------
         self.button = qt.QPushButton('')
-        self.button.setIcon(qt.QIcon(os.path.join(self.MODULE.GLOBALS.LOCAL_URIS['icons'], 'x.png')) )
+        self.button.setIcon(qt.QIcon(os.path.join(GLOB_LOCAL_URIS['icons'], 'x.png')) )
         size = qt.QSize(26,26)
         self.button.setFixedSize(size)
         self.button.connect('clicked()', self.onClearButtonClicked)
@@ -141,19 +143,19 @@ class XnatSearchBar(qt.QFrame):
             italicized.
         """
         if mode == 'empty':
-            self.searchLine.setFont(self.MODULE.GLOBALS.LABEL_FONT_ITALIC) 
+            self.searchLine.setFont(GLOB_LABEL_FONT_ITALIC) 
             palette = qt.QPalette();
             color = qt.QColor(150,150,150)
             palette.setColor(6, color);
             self.searchLine.setPalette(palette);
             self.searchLine.update()
-            self.searchLine.setFont(self.MODULE.GLOBALS.LABEL_FONT_ITALIC) 
+            self.searchLine.setFont(GLOB_LABEL_FONT_ITALIC) 
             self.searchLine.setObjectName("searchLine")
             self.searchLine.setStyleSheet("#searchLine {color: lightgray; border: none}")
         
         elif mode == 'not empty':
             self.searchLine.setStyleSheet("#searchLine {color: rgb(20,40, 200); border: none}")
-            self.searchLine.setFont(self.MODULE.GLOBALS.LABEL_FONT) 
+            self.searchLine.setFont(GLOB_LABEL_FONT) 
             palette = qt.QPalette();
             color = qt.QColor(0,0,0)
             palette.setColor(6, color);
@@ -208,7 +210,7 @@ class XnatSearchBar(qt.QFrame):
             self.MODULE.XnatView.defaultFilterFunction()
             self.MODULE.XnatView.refreshColumns()
         except Exception, e:
-            #print self.MODULE.utils.lf(), str(e)
+            #print XnatUtils.lf(), str(e)
             pass
 
 

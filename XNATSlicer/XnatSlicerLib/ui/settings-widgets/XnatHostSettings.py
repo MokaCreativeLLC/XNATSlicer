@@ -1,8 +1,13 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
 import glob
 import sys
+
+from GLOB import *
+from XnatUtils import *
 
 from XnatSettings import *
 
@@ -433,7 +438,7 @@ class HostTable(qt.QTableWidget):
     def printAll(self):
         """ Prints the row/column count of the hostTable.
         """
-        print self.MODULE.utils.lf(), "PRINT ALL:", self.rowCount, self.columnCount 
+        print XnatUtils.lf(), "PRINT ALL:", self.rowCount, self.columnCount 
 
 
         
@@ -597,7 +602,7 @@ class HostTable(qt.QTableWidget):
         # Set the added items' aeshetics.
         #--------------------
         for key, item in self.trackedItems[self.rowCount-1].iteritems():
-            item.setFont(self.MODULE.GLOBALS.LABEL_FONT)
+            item.setFont(GLOB_LABEL_FONT)
 
 
 
@@ -748,10 +753,10 @@ def makeEditHostModal(hostEditor):
     #--------------------
     if not hostEditor.MODULE.XnatSettingsFile.isModifiable(selHost['name']):
         hostEditor.nameLine.setReadOnly(True)
-        hostEditor.nameLine.setFont(hostEditor.MODULE.GLOBALS.LABEL_FONT_ITALIC)
+        hostEditor.nameLine.setFont(GLOB_LABEL_FONT_ITALIC)
         hostEditor.nameLine.setEnabled(False)
         hostEditor.urlLine.setReadOnly(True)
-        hostEditor.urlLine.setFont(hostEditor.MODULE.GLOBALS.LABEL_FONT_ITALIC)
+        hostEditor.urlLine.setFont(GLOB_LABEL_FONT_ITALIC)
         hostEditor.urlLine.setEnabled(False)
 
 
@@ -920,21 +925,21 @@ def makeDeleteHostModal(hostEditor):
 def makeButtons(hostEditor):
     """ As described.
     """
-    addButton = hostEditor.MODULE.utils.generateButton(iconOrLabel = 'Add', 
-                                                                               toolTip = "Need tool-tip.", 
-                                                                               font = hostEditor.MODULE.GLOBALS.LABEL_FONT,
-                                                                               size = qt.QSize(90, 20), 
-                                                                               enabled = True)
-    editButton = hostEditor.MODULE.utils.generateButton(iconOrLabel = 'Edit', 
-                                                                               toolTip = "Need tool-tip.", 
-                                                                               font = hostEditor.MODULE.GLOBALS.LABEL_FONT,
-                                                                               size = qt.QSize(90, 20), 
-                                                                               enabled = True)
-    deleteButton = hostEditor.MODULE.utils.generateButton(iconOrLabel = 'Delete', 
-                                                                               toolTip = "Need tool-tip.", 
-                                                                               font = hostEditor.MODULE.GLOBALS.LABEL_FONT,
-                                                                               size = qt.QSize(90, 20), 
-                                                                               enabled = True)
+    addButton = XnatUtils.generateButton(iconOrLabel = 'Add', 
+                                         toolTip = "Need tool-tip.", 
+                                         font = GLOB_LABEL_FONT,
+                                         size = qt.QSize(90, 20), 
+                                         enabled = True)
+    editButton = XnatUtils.generateButton(iconOrLabel = 'Edit', 
+                                          toolTip = "Need tool-tip.", 
+                                          font = GLOB_LABEL_FONT,
+                                          size = qt.QSize(90, 20), 
+                                          enabled = True)
+    deleteButton = XnatUtils.generateButton(iconOrLabel = 'Delete', 
+                                            toolTip = "Need tool-tip.", 
+                                            font = GLOB_LABEL_FONT,
+                                            size = qt.QSize(90, 20), 
+                                            enabled = True)
     
     deleteButton.setEnabled(False)
     editButton.setEnabled(False)  
@@ -954,6 +959,6 @@ def makeSharedHostModalObjects(hostEditor):
         
     urlLine.setEnabled(True)
     nameLine.setEnabled(True) 
-    usernameLine.setFont(hostEditor.MODULE.GLOBALS.LABEL_FONT_ITALIC) 
+    usernameLine.setFont(GLOB_LABEL_FONT_ITALIC) 
 
     return urlLine, nameLine, setDefault, usernameLine 

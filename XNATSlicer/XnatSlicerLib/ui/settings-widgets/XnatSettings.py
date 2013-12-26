@@ -1,3 +1,4 @@
+from GLOB import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -162,7 +163,7 @@ class XnatSettings(qt.QScrollArea):
             #
             # Loop through all xnatLevels (projects, subjects, etc.)
             #
-            for xnatLevel in self.MODULE.GLOBALS.XNAT_LEVELS:
+            for xnatLevel in GLOB_XNAT_LEVELS:
 
                 #
                 # Loop through the metadatacheckedtags

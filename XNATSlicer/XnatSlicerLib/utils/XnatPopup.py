@@ -1,6 +1,9 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import math
+from XnatUtils import *
 
 comment =  """
 XnatPopup and its children are used for any needed popup interaction with XNAT.
@@ -28,18 +31,39 @@ TODO:
 
 
 
-class XnatPopup(qt.QWidget):
+
+class XnatClearScenePopup(qt.QMessageBox):
+    """
+    """
+    def __init__(self, title = "Clear current scene", modality = 1):
+
+        #--------------------
+        # Call parent init.
+        #--------------------
+        super(XnatClearScenePopup, self).__init__(self)
+        
+        self.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.No)
+        #self.setTitle(title)
+        #self.setWindowModality(modality)
+        self.setDefaultButton(qt.QMessageBox.No)
+        self.setText("Clear the current scene?")
+
+
+        
+    
+
+class XnatEmptyPopup(qt.QWidget):
     """ Popup class for XNAT-relevant interactions
     """
     
-    def __init__(self, MODULE, title = "XnatPopup", modality = 1):
+    def __init__(self, title = "XnatPopup", modality = 1):
         """ Init function.
         """
         #--------------------
         # Call parent init.
         #--------------------
-        super(XnatPopup, self).__init__(self)
-        self.MODULE = MODULE
+        super(XnatEmptyPopup, self).__init__(self)
+
         self.spacer = qt.QLabel("\n\n\n")
 
 
@@ -71,18 +95,35 @@ class XnatPopup(qt.QWidget):
         qt.QWidget.show(self)
         
 
+
+        
+        
+class XnatTextPopup(XnatEmptyPopup):
+    """
+    """
+    def __init__(self, text = 'Empty Text', title = ''):
+        """ Init funnction.
+        """
+        super(XnatTextPopup, self).__init__(title = title)
+        self.setFixedHeight(100)
+        self.textEdit = qt.QTextEdit(text)
+        self.textEdit.setAlignment(0x0084)
+        self.textEdit.setStyleSheet('border: none')
+        self.masterLayout.addRow(self.textEdit)
+
         
 
         
-class XnatDownloadPopup(XnatPopup):
+        
+class XnatDownloadPopup(XnatEmptyPopup):
     """ Subclass of the XnatPopup class pertaining
         specifically to downloading files.
     """
 
-    def __init__(self, MODULE, title = "XNAT Download Queue", memDisplay = "MB"):
+    def __init__(self, title = "XNAT Download Queue", memDisplay = "MB"):
         """ Init funnction.
         """
-        super(XnatDownloadPopup, self).__init__(MODULE = MODULE, title = title)
+        super(XnatDownloadPopup, self).__init__(title = title)
         self.memDisplay = memDisplay
         
         self.downloadRows = {}
@@ -98,9 +139,9 @@ class XnatDownloadPopup(XnatPopup):
 
         self.masterLayout.setContentsMargins(0,0, 0, 0)
         self.hide()
-
+        #self.show()
         #for i in range(0, 10):
-        #    self.addDownloadRow('easdfasdfasdfasdf/AAAAAAAAADDDDDDDDDDDDDDDDDDDDD/333333333333333333333333/%s/asdf.asdf'%(i))
+        #    self.addDownloadRow('projects/fooProject/subjects/fooSuject/experiments/fooExperiments/scans/fooScan/%s/files/foo_%s.dcm'%(i, i))
 
 
 
@@ -109,62 +150,88 @@ class XnatDownloadPopup(XnatPopup):
 
 
     def addDownloadRow(self, uri, size = -1):
+        """ Constructs a download row object based
+            on the URI
         """
-        """
-        
+
+
+        #-------------------
+        # Cancel button row
+        #-------------------
         rowWidget = qt.QWidget()
         rowWidget.setObjectName('downloadRowWidget')
         rowWidget.setStyleSheet('#downloadRowWidget {border: 1px solid rgb(160,160,160); border-radius: 2px; width: 100%;}')
-        rowWidget.setFixedHeight(90)
+        rowWidget.setFixedHeight(70)
         rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
         layout = qt.QFormLayout()
         rowWidget.setLayout(layout)
-        #rowWidget.setEnabled(False)
 
 
-        
+
+        #-------------------
+        # Text Edit
+        #-------------------
         textEdit = qt.QTextEdit("Checking: '%s'<br>Please wait...<br>"%(self.abbreviateFile(uri)))
         textEdit.setStyleSheet("border: none")
-        textEdit.setFixedHeight(60)
+        textEdit.setFixedHeight(45)
+        textEdit.setFont(GLOB_LABEL_FONT)
         layout.addRow(textEdit)
         
 
+        
+        #-------------------
+        # Progress Bar
+        #-------------------
         progressBar = qt.QProgressBar(rowWidget)
         progressBar.setFixedHeight(17)
+        progressBar.setFixedWidth(390)
         progressBar.setMinimum(0)
-        #progressBar.setTextVisible(False)
+        progressBar.setMaximum(0)
         progressBar.setAlignment(0x0084)
-        layout.addRow(progressBar)
+        
 
         
         #-------------------
         # Cancel button row
         #-------------------
-
         cancelButton = qt.QPushButton()
         cancelButton.setText("Cancel")
-        cancelButton.setFont(self.MODULE.GLOBALS.LABEL_FONT) 
+        cancelButton.setFont(GLOB_LABEL_FONT) 
         def cancelClick():
             rowWidget.setEnabled(False)
+            print "Cancelling download '%s'"%(self.abbreviateFile(uri))
             textEdit.setText("Cancelled: '%s'<br>"%(self.abbreviateFile(uri)))
-            self.MODULE.XnatIo.cancelDownload(uri)
-            self.MODULE.XnatView.setEnabled(True)
+            for key, item in self.downloadRows.iteritems():
+                if item['progressBar'] == progressBar:
+                    item['progressBar'].setEnabled(False)
+                    self.MODULE.XnatIo.cancelDownload(key)
+
+            
         cancelButton.connect('pressed()', cancelClick)
         cancelButton.setFixedWidth(60)
-        cancelButton.setFixedHeight(15)
-        cancelRow = qt.QHBoxLayout()
-        cancelRow.addStretch()
-        cancelRow.addWidget(cancelButton)
-        layout.addRow(cancelRow)
+        cancelButton.setFixedHeight(19)
+
+
+
+        #-------------------
+        # Progress bar row
+        #-------------------
+        progressRow = qt.QHBoxLayout()
+        progressRow.addWidget(progressBar)
+        progressRow.addStretch()
+        progressRow.addWidget(cancelButton)
+        layout.addRow(progressRow)
         
         
         downloadRow = {
             'queuePosition': len(self.downloadRows),
-            'size': -1, 
+            'size': 0, 
             'downloaded': 0,
             'textEdit': textEdit,
+            'pathDict': XnatUtils.getXnatPathDict(uri),
             'progressBar': progressBar,
-            'widget': rowWidget
+            'widget': rowWidget,
+            'cancelButton': cancelButton
         }
 
         self.downloadRows[uri] = downloadRow
@@ -178,30 +245,52 @@ class XnatDownloadPopup(XnatPopup):
             dynamically update, we have to update this ourselves.
         """
         
-
+        #-------------------
+        # Clear all of the inner widgets
+        #-------------------
         if self.innerWidget:
             del self.innerWidget
         if self.innerWidgetLayout:
             del self.innerWidgetLayout
         if self.scrollWidget:
             del self.scrollWidget
-        
+
+
+        #-------------------
+        # Reset the inner widget layout
+        #-------------------
         self.innerWidgetLayout = qt.QFormLayout()
         self.innerWidgetLayout.setVerticalSpacing(10)
 
-        
-        for key, item in self.downloadRows.iteritems():
-            self.innerWidgetLayout.addRow(item['widget'])
 
-       
         
+        #-------------------
+        # Sort download rows by their queue positions,
+        # add them to the innerWidgetLayout.
+        #-------------------
+        sortedRows = [None] * len(self.downloadRows)
+        for key, item in self.downloadRows.iteritems():
+            print len(sortedRows), item['queuePosition']
+            sortedRows[item['queuePosition']] = key
+        for key in sortedRows:
+            self.innerWidgetLayout.addRow(self.downloadRows[key]['widget'])
+
+
+            
+        #-------------------
+        # Remake the inner widget
+        #-------------------     
         self.innerWidget = qt.QWidget()
         self.innerWidget.setLayout(self.innerWidgetLayout)
         self.innerWidget.setObjectName('innerWidget')
         self.innerWidget.setStyleSheet('#innerWidget {width: 100%;}')
         self.innerWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
 
-        
+
+
+        #-------------------
+        # Remake the scroll widget
+        #------------------- 
         self.scrollWidget = qt.QScrollArea()
         self.scrollWidget.setWidget(self.innerWidget)
         self.scrollWidget.verticalScrollBar().setStyleSheet('width: 15px')
@@ -211,7 +300,10 @@ class XnatDownloadPopup(XnatPopup):
         self.scrollWidget.setWidgetResizable(True)
       
 
-    
+        
+        #-------------------
+        # Clear the master widget and add the new contents.
+        #-------------------     
         delWidget = self.masterLayout.itemAt(0)
         while (delWidget):
             self.masterLayout.removeItem(delWidget)
@@ -225,29 +317,51 @@ class XnatDownloadPopup(XnatPopup):
         
 
 
+        
     def setText(self, uriKey, text):
         """
         """
         self.downloadRows[uriKey]['textEdit'].setText(text)
 
 
+        
 
-    def setSize(self, uriKey, size):
+    def setSize(self, uriKey, size = 0):
         """
         """
-        self.downloadRows[uriKey]['size'] = self.recalcMem(size)
+        
+        if size > 0:
+            self.downloadRows[uriKey]['size'] = self.recalcMem(size)
+            self.downloadRows[uriKey]['progressBar'].setMaximum(100)
 
+
+        
         
     def updateDownload(self, uriKey, downloaded = 0):
         """
         """
         self.downloadRows[uriKey]['downloaded'] = self.recalcMem(downloaded)
-        self.downloadRows[uriKey]['textEdit'].setText("Downloading: <i>'%s'</i><br><br>%sMB out of %sMB<br>"%(self.abbreviateFile(uriKey),  
-                                                                                                      self.downloadRows[uriKey]['downloaded'], 
-                                                                                                      self.downloadRows[uriKey]['size']))
-        self.downloadRows[uriKey]['progressBar'].setValue((self.downloadRows[uriKey]['downloaded']/self.downloadRows[uriKey]['size']) * 100)
+
+        downloadSize = str(self.downloadRows[uriKey]['size']) + 'MB'
+        if downloadSize == '0MB':
+            downloadSize = '[Unknown Size]'
+        self.downloadRows[uriKey]['textEdit'].setText("Downloading: <i>'%s'</i><br>%sMB out of %s<br>"%(self.abbreviateFile(uriKey),  
+                                                                                                          self.downloadRows[uriKey]['downloaded'], 
+                                                                                                          downloadSize))
+
+        if self.downloadRows[uriKey]['size'] > 0:
+            self.downloadRows[uriKey]['progressBar'].setValue((self.downloadRows[uriKey]['downloaded'] / self.downloadRows[uriKey]['size']) * 100)
+
         
 
+        
+    def changeRowKey(self, oldKey, newKey):
+        """
+        """
+        self.downloadRows[newKey] = self.downloadRows.pop(oldKey)
+
+
+        
         
     def resizeEvent(self):
         """ Overloaded callback when the user
@@ -255,9 +369,6 @@ class XnatDownloadPopup(XnatPopup):
         """ 
         if self.scrollWidget != None:
             self.scrollWidget.resize(self.width, self.height)
-    
-        
-            
 
 
         
@@ -269,7 +380,33 @@ class XnatDownloadPopup(XnatPopup):
         return filename if len(filename) < maxLen else '...' + filename[-1 * (maxLen-3):]
 
 
-    
+
+    def setComplete(self, uriKey):
+        """
+        """
+        self.downloadRows[uriKey]['widget'].setEnabled(False)
+        self.downloadRows[uriKey]['textEdit'].setText("Completed: <i>'%s'</i><br>"%(self.abbreviateFile(uriKey)))
+        self.downloadRows[uriKey]['progressBar'].setMinimum(0)
+        self.downloadRows[uriKey]['progressBar'].setMaximum(100)
+        self.downloadRows[uriKey]['progressBar'].setValue(100)  
+        
+
+
+    def setDisabled(self, uriKey):
+        """
+        """
+        self.downloadRows[uriKey]['widget'].setEnabled(False)
+
+
+
+    def disableProgressBar(self, uriKey):
+        """
+        """
+        self.downloadRows[uriKey]['cancelButton'].setEnabled(False)
+        self.downloadRows[uriKey]['progressBar'].setEnabled(False)
+        self.downloadRows[uriKey]['progressBar'].setMinimum(0)
+        self.downloadRows[uriKey]['progressBar'].setMaximum(100)
+
         
 
 
@@ -278,7 +415,7 @@ class XnatDownloadPopup(XnatPopup):
             display.
         """
         if (self.memDisplay.lower() == 'mb'):
-            return math.ceil(self.MODULE.utils.bytesToMB(size) * 100)/100
+            return math.ceil(XnatUtils.bytesToMB(size) * 100)/100
         return size      
 
 
@@ -291,52 +428,11 @@ class XnatDownloadPopup(XnatPopup):
             self.downloadRows[uriKey]['size'] = size
             self.downloadRows[uriKey]['progressBar'].setMinimum(0)
             self.downloadRows[uriKey]['progressBar'].setMaximum(100)
-            #3size = self.recalcMem(size)
-            #self.lines[2].setText(self.lines[2].text.replace('[Unknown total]', str(size)))
 
 
 
             
-    def updateText(self, downloadedBytes):
-        """ Updates the progress bar in the popup accordingly with 
-            'downloadedBytes' argument.
-        """
 
-        #-------------------
-        # Format the downloaded bytes to human-readable and
-        # display.
-        #-------------------        
-        if downloadedBytes > 0:
-            self.downloadedBytes = int(downloadedBytes)
-            size = self.downloadedBytes
-            #
-            # Memory display
-            #
-            size = self.recalcMem(size)
-            #
-            # Update display
-            #
-            self.lines[2].setText('%s MB out '%(str(size)) + self.lines[2].text.split('out')[1][1:])
-
-
-            
-        #-------------------
-        # If we know the size of downloaded files, change
-        # that label accordingly.
-        #-------------------
-        if self.downloadFileSize:
-            #
-            # Calculate download pct
-            #
-            pct = float(float(self.downloadedBytes) / float(self.downloadFileSize))
-            #
-            # Output to Python command prompt
-            #print "%s %s Downloaded: %s\tDownloadSize: %s\tPct: %s"%(self.MODULE.utils.lf(), self.lines[0].text, self.downloadedBytes , self.downloadFileSize, pct)
-            #
-            #
-            # Update progress bar
-            #
-            self.progBar.setValue(pct * 100)
             
 
         

@@ -1,31 +1,24 @@
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
 import sys
-import shutil
-import zipfile
-import urllib2
-from datetime import datetime
 
 
-from XnatFileInfo import *
-from XnatUtils import *
-from XnatScenePackager import *
-from XnatTimer import *
-from XnatSessionManager import *
-from XnatMrmlParser import *
+
+from XnatLoader import *
+from XnatLoader_Analyze import *
+from XnatLoader_Dicom import *
+from XnatLoader_File import *
+from XnatLoader_Mrb import *
 from XnatPopup import *
 
 
 
-
 comment = """
-XnatWorkflow is a parent class to various loader classes:
-XnatSceneLoadWorkflow, XnatLoadWorkflow, XnatFileLoadWorkflow.  
+XnatLoadWorkflow is effectively a factory for various loader classes.  
 Loader types are determined by the treeViewItem being clicked in the 
-XnatLoadWorkflow function 'beginWorkflow'.  Functions of XnatLoadWorkflow
-are generic in nature and pertain to string construction for querying
-and downloading files.
+XnatLoadWorkflow function 'beginWorkflow'.  
 
 TODO:
 """
@@ -35,7 +28,7 @@ TODO:
 
 class XnatLoadWorkflow(object):
     """ Parent Load workflow class to: XnatDicomLoadWorkflow, 
-        XnatSceneLoadWorkflow, and XnatFileLoadWorkflow.
+        XnatMrbLoadWorkflow, and XnatFileLoadWorkflow.
     """
 
     
@@ -48,124 +41,101 @@ class XnatLoadWorkflow(object):
         self.currRemoteHost = None
 
 
+        self.skipEmptySceneCheck = False
+        self._src = None
+
+
+        
+        #--------------------------------
+        # Popups
+        #--------------------------------
         self.areYouSureDialog = qt.QMessageBox()
         self.areYouSureDialog.setIcon(4)
-        
         self.areYouSureDialog.setText("You are about to load all readable scans from '**HERE**'.\n" +  
                                       "This may take several minutes.\n" +
                                       "Are you sure you want to continue?")
         self.areYouSureDialog.addButton(qt.QMessageBox.Yes)
         self.areYouSureDialog.addButton(qt.QMessageBox.No)
-        self.areYouSureDialog.connect('buttonClicked(QAbstractButton*)', self.loadMultipleScans)
+        self.areYouSureDialog.connect('buttonClicked(QAbstractButton*)', self.beginWorkflow)
 
 
-        self._dstBase = self.MODULE.GLOBALS.LOCAL_URIS['downloads']
 
-        self._src = ''
-        self._dst = ''
+        self.XnatDownloadPopup = XnatDownloadPopup()
+        
+        self.clearScenePopup = XnatClearScenePopup()
+        self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.clearSceneButtonClicked) 
+
+        self.preDownloadPopup = XnatTextPopup('Checking files...')
+        self.postDownloadPopup = XnatTextPopup('Processing.  Data will load automatically.')
+
+
+        self.setIOCallbacks()
+
+
+
+    def setIOCallbacks(self):
+        """
+        """
+        
+        #--------------------------------
+        # XnatIO Callbacks
+        #--------------------------------
+
+        # Download cancelled
+        def downloadCancelled(_xnatSrc):
+            zeroCount = 0
+            for key, state in self.downloadState.iteritems():
+                if state == 0: zeroCount += 1
+            if zeroCount == len(self.downloadState):
+                self.XnatDownloadPopup.hide()
+            slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloadCancelled', downloadCancelled)
+
+
+        # Downloading
+        def downloading(_xnatSrc, size = 0):
+            self.XnatDownloadPopup.updateDownload(_xnatSrc.split('?format=zip')[0], size)
+            slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloading', downloading)
+
+
+        # download start
+        def downloadStarted(_xnatSrc, size = 0):
+            self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
+            slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloadStarted', downloadStarted)
+
+        # download finished
+        def downloadFinished(_xnatSrc):
+            self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
+            slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloadFinished', downloadFinished)
+
 
         
-
-
         
-    def initLoad(self):
-        """ As stated.
-        """
-
-
-
-        
-    def setup(self):
-        """ As stated.
-        """
-        pass
-
-
-
-     
-    def loadFinish(self):
-        """ As stated.
-        """
-        pass
-
-
-    
-    @property
-    def loadArgs(self):
-        return {'src': self._src, 'dst': self._dst}
-
-
     
     def terminateLoad(self, warnStr):
         """ Notifies the user that they will terminate the load.
             Reenables the viewer UI.
         """
         qt.QMessageBox.warning( None, warnStr[0], warnStr[1])
-        self.MODULE.XnatView.setEnabled(True)
 
 
 
-        
-    def getLoadables_byDir(self, rootDir):
-        """ Returns the loadable filenames (determined by filetype) 
-            by walking through a directory provided in the 'rootDir'
-            argument.
+
+    def clearSceneButtonClicked(self, button):
         """
-        allImages = []
-        mrmls = []
-        dicoms = []   
-        for folder, subs, files in os.walk(rootDir):
-            for file in files:
-                extension =  os.path.splitext(file)[1].lower() 
-                
-                #
-                # Check for DICOM extensions
-                #
-                if self.MODULE.utils.isDICOM(ext = extension):
-                    dicoms.append(os.path.join(folder,file))   
-
-                #
-                # Check for mrml extension
-                #
-                if self.MODULE.utils.isMRML(ext = extension): 
-                    mrmls.append(os.path.join(folder,file))  
-
-        #
-        # Returns loadables.
-        #
-        return {'MRMLS':mrmls, 'ALLIMAGES': allImages, 'DICOMS': dicoms}
-
-
-
-    
-    def getLoadables_byList(self, fileList):
-        """ Returns the loadable filenames (determined by filetype) 
-            in filename list.
         """
-        allImages = []
-        mrmls = []
-        dicoms = []
-        others = []    
+        if 'yes' in button.text.lower():
+            self.MODULE.XnatView.sessionManager.clearCurrentSession()
+            slicer.app.mrmlScene().Clear(0)
+            self.skipEmptySceneCheck = True
+            self.beginWorkflow()
 
+            
 
-        
-        #------------------------
-        # Cycle through lit to determine loadability.
-        #------------------------
-        for file in fileList:
-            file = str(file)
-            if self.MODULE.utils.isDICOM(file):
-                dicoms.append(file)                   
-            if self.MODULE.utils.isMRML(file): 
-                mrmls.append(file)
-            else:
-                others.append(file)
-        return {'MRMLS':mrmls, 'ALLIMAGES': allImages, 'DICOMS': dicoms, 'OTHERS': others, 'ALLNONMRML': allImages + dicoms + others}
-   
-
-    
-
-    def beginWorkflow(self, button = None):
+    def beginWorkflow(self, src = None):
         """ This function is the first to be called
             when the user clicks on the "load" button (right arrow).
             The class that calls 'beginWorkflow' has no idea of the
@@ -174,152 +144,74 @@ class XnatLoadWorkflow(object):
             XnatLoadWorkflow) will be called on in this function.
         """
 
+
+        if not self._src:
+            self._src = src
+
+
+            
         #------------------------
         # Show clearSceneDialog
         #------------------------
-        if not button and not self.MODULE.utils.isCurrSceneEmpty():           
-            self.MODULE.XnatView.initClearDialog()
-            self.MODULE.XnatView.clearSceneDialog.connect('buttonClicked(QAbstractButton*)', self.beginWorkflow) 
-            self.MODULE.XnatView.clearSceneDialog.show()
+        if '/scans/' in self._src:
+            splitter = self._src.split('/scans/')
+            self._src = splitter[0] + '/scans/' + splitter[1].split('/')[0] + '/files'
+
+
+            
+        #------------------------
+        # Show clearSceneDialog
+        #------------------------
+        if not XnatUtils.isCurrSceneEmpty() and not self.skipEmptySceneCheck:
+            self.clearScenePopup.show()
             return
-        
-
-        
-        #------------------------
-        # Clear the scene and current session if button was 'yes'.
-        #
-        # NOTE: The user doesn't have to clear the scene at all in
-        # order to proceed with the workflow.
-        #------------------------
-        if (button and 'yes' in button.text.lower()):
-            self.MODULE.XnatView.sessionManager.clearCurrentSession()
-            slicer.app.mrmlScene().Clear(0)
 
 
-            
-        #------------------------  
-        # Acquire vars: current treeItem, the XnatPath, and the remote URI for 
-        # getting the file.
-        #------------------------
-        currItem = self.MODULE.XnatView.currentItem()
-        pathObj = self.MODULE.XnatView.getXnatUriObject(currItem)
-        _src = self.MODULE.XnatSettingsFile.getAddress(self.MODULE.XnatLoginMenu.hostDropdown.currentText) + '/data' + pathObj['childQueryUris'][0]
-
-
-        
-        #------------------------    
-        # If the '_src' is at the scan level, we have to 
-        # adjust it a little bit: it needs a '/files' prefix.
-        #------------------------
-        if '/scans/' in _src and os.path.dirname(_src).endswith('scans'):
-            _src += '/files'
-
-
-            
+    
         #------------------------    
         # Clear download queue
         #------------------------
         self.MODULE.XnatIo.clearDownloadQueue()
 
-        ########################################################
-        #
-        #
-        # DOWNLOAD TYPES
-        #
-        #
-        ########################################################
-
-
-
         
+
+        #------------------------
+        # Set Download finished callbacks
+        #------------------------        
         downloadFinishedCallbacks = []
         def runDownloadFinishedCallbacks():
+            self.XnatDownloadPopup.hide()
+            self.postDownloadPopup.show()
             for callback in downloadFinishedCallbacks:
                 print "DOWNLOAD FINISHED!"
                 callback()
                 slicer.app.processEvents()
+            self.postDownloadPopup.hide()
 
-
-
+        
+        #------------------------
+        # Show download popup
+        #------------------------  
         print "Initializing download..."
-        
-        self.MODULE.XnatDownloadPopup.show()
+        self.preDownloadPopup.show()
+
+
         
         #------------------------
-        # '/files/' LEVEL 
+        # Get loaders, add to queue
+        #------------------------  
+        for loader in self.loaderFactory(self._src):
+            self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
+            downloadFinishedCallbacks.append(loader.load)             
+
+
         #------------------------
-        if '/files/' in _src:
-
-            #
-            # SLICER .MRB
-            #
-            if '/Slicer/files/' in _src:
-                self.MODULE.XnatDownloadPopup.addDownloadRow(_src)
-                loader =  self.MODULE.XnatSceneLoadWorkflow
-                slicer.app.processEvents()
-                loader.setLoadArgs(_src)
-                self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
-                downloadFinishedCallbacks.append(loader.load) 
-
-        elif '/scans/' in _src:
-            #loader =  self.MODULE.XnatDicomLoadWorkflow
-            self.MODULE.XnatDownloadPopup.addDownloadRow(_src)   
-            slicer.app.processEvents()     
-            splitScan =  _src.split('/scans/')   
-            scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
-            print scanSrc
-            contents = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])
-            print contents
-            return
-
-
-        self.MODULE.XnatIo.startDownloadQueue(runDownloadFinishedCallbacks)
+        # Run loaders
+        #------------------------ 
+        self.preDownloadPopup.hide()
+        self.XnatDownloadPopup.show()
+        self.MODULE.XnatIo.startDownloadQueue(onQueueFinished = runDownloadFinishedCallbacks)
       
-
-    
-            
-        #------------------------
-        # SCAN FILE (NOT THE FOLDER)
-        #------------------------
-        if '/files/' in _src and '/scans/' in _src:
-            currScan = _src.split('/scans/')[1].split('/files/')[0]
-            self.loadScan(os.path.dirname(_src), dst.split('downloads/')[0] + 'downloads/' + currScan)
-            #return
-
-            
-        
-        #------------------------
-        # SCAN-folder download
-        #------------------------
-        elif '/scans/' in _src:
-            if not '/files/' in _src:
-
-                scanSrc = _src.split('/scans/')[0] + '/scans/files'
-                contents = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])
-                print contents
-                return
-                self.MODULE.XnatDownloadPopup.setTotalDownloads(1)
-                self.currentDownloadState = 'single'
-                self.loadScan(_src, dst)
- 
-
-
-        #------------------------
-        # EXPERIMENT-level download
-        #------------------------
-        elif not '/scans/' in _src and '/experiments/' in _src and _src.endswith('scans'): 
-            self.currentDownloadState = 'multiple'
-            self._src = _src
-            self.dst = dst
-            self.areYouSureDialog.setText(self.areYouSureDialog.text.replace('**HERE**', self._src.replace('/scans','').split('data/')[1])) 
-            #
-            # Hitting yes in this dialog will send you to 'loadMultipleScans'
-            #
-            self.areYouSureDialog.show()
-            
-
-
-                
             
         #------------------------
         # Enable XnatView
@@ -330,88 +222,101 @@ class XnatLoadWorkflow(object):
 
 
         
-    def loadMultipleScans(self, button):
-        """
-        """
- 
-        if not 'yes' in button.text.lower(): 
-            return
-        exptContents =  self.MODULE.XnatIo.getFolderContents(self._src, self.MODULE.utils.XnatMetadataTags_experiments) 
+    def loaderFactory(self, _src):
+        """ Returns the appropriate set of loaders after analyzing the
+            '_src' argument.
 
-        self.MODULE.XnatDownloadPopup.setTotalDownloads(len(exptContents['ID']))
-        
-        for _id in exptContents['ID']:
-            appender = '/' + _id + '/files'
-            src = self._src + appender
-            dst = self.dst + appender
-            self.MODULE.XnatDownloadPopup.setCheckFileNameNotExtension(False)
-            self.loadScan(src, dst)        
+            Arguments:
+            _src The URI to create loaders from.
 
-
-        
-    def loadScan(self, src, dst):
-        """
-        """
-
-        #
-        # Open the download popup immediately for better UX.
-        #
-        self.MODULE.XnatDownloadPopup.reset(animated = False)
-        fileDisplayName = self.MODULE.utils.makeDisplayableFileName(src)
-        self.MODULE.XnatDownloadPopup.setText("Initializing download for:", "'%s'"%(fileDisplayName))
-        self.MODULE.XnatDownloadPopup.show()
-
-        if '/files/' in src:
-            if '/scans/' in src:
-                src = os.path.dirname(src)
+            Returns:
+            A loader list.
             
-        contents = self.MODULE.XnatIo.getFolderContents(src, metadataTags = ['URI'])
-        print "\n\nCONTETNS", contents
-        contentNames = contents['URI']
-        analyzeCount = 0
-        dicomCount = 0
-        loadableFileCount = 0
+        """
 
-        for fileName in contentNames:
-            if self.MODULE.utils.isAnalyze(fileName):
-                analyzeCount += 1
-            elif self.MODULE.utils.isDICOM(fileName):
-                print "IS DICOM"
-                dicomCount += 1
-            elif self.MODULE.utils.isRecognizedFileExt(fileName):
-                loadableFileCount += 1
-
-                
-        print "DICOM count", dicomCount, src, dst
-        # 'XnatSceneLoadWorkflow' for Slicer files
-        if src.endswith(self.MODULE.utils.defaultPackageExtension): 
-            loader = self.MODULE.XnatSceneLoadWorkflow
-
-        # 'XnatAnalyzeWorkflow' for Analyze files
-        elif analyzeCount > 0:
-            loader =  self.MODULE.XnatAnalyzeLoadWorkflow
-
-        # 'XnatDicomLoadWorkflow' for DICOM files
-        elif dicomCount > 0:      
-            loader =  self.MODULE.XnatDicomLoadWorkflow
-
-        # 'XxnatFileLoadWorkflow' for other files
-        else:
-            loader =  self.MODULE.XnatFileLoadWorkflow
+        print "\n\nLOADER FACTORY"
+        loaders = []
 
 
-        #
-        # Call the 'loader's 'initLoad' function.
-        #
-        # NOTE: Again, the 'loader' is a subclass of this one.
-        #
-        args = {"xnatSrc": src, 
-                "localDst": dst, 
-                "uris": contents['URI'],
-                "folderContents": None}
-
-        #
-        # Begin the LOAD process!
-        #
-        loadSuccessful = loader.initLoad(args) 
         
+        #------------------------
+        # Open popup
+        #------------------------
+        if '/scans/' in _src or '/files/' in _src:
+            print "OPENING POPUP ROW", _src
+            self.XnatDownloadPopup.addDownloadRow(_src)
+            
+
+
+            
+            
+        #------------------------
+        # '/files/' LEVEL 
+        #------------------------
+        if '/files/' in _src:
+            
+            # MRB
+            if '/Slicer/files/' in _src:
+                print "FOUND SLICER FILE"
+                loaders.append(XnatLoader_Mrb(self.MODULE, _src))
+                
+
+
+
+        #------------------------
+        # '/scans/' LEVEL 
+        # 
+        # Basically, look at the contents of the scan folder
+        # and return the appropriate loader
+        #------------------------
+        elif '/scans/' in _src:
+
+            # uri manipulation
+            splitScan =  _src.split('/scans/')   
+            scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
+            print "SPLIT SCAN:", splitScan, '\n\t',scanSrc
+            # query xnat for folder contents
+            contentUris = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])['URI']
+            print "CONTENT URIS", contentUris
+            # get file uris and sort them by type
+            loadables = XnatUtils.sortLoadablesByType(contentUris)
+            print "LOADABLES", loadables
+            # cycle through the loadables and
+            # create the loader for each loadable list.
+            for loadableType, loadableList in loadables.iteritems():
+                if len(loadableList) > 0:
+                    if loadableType == 'analyze':
+                        loaders.append(XnatLoader_Analyze(self.MODULE, _src, loadables[loadableType]))
+                    if loadableType == 'dicom':      
+                        loaders.append(XnatLoader_Dicom(self.MODULE, _src, loadables[loadableType]))
+                    if loadableType == 'misc':
+                        loaders.append(XnatLoader_File(self.MODULE, _src, loadables[loadableType]))
+
+
+                        
+        #------------------------
+        # '/experiments/' LEVEL 
+        #
+        # Basically, recurse this function after querying for the 
+        # scans in it.
+        #------------------------
+        elif '/experiments/' in _src and not '/scans/' in _src and not '/resources/' in _src:
+
+            # Uri manipulation
+            splitExpt = _src.split('/experiments/')
+            exptSrc = splitExpt[0] + '/experiments/' + splitExpt[1].split('/')[0] + '/scans'
+            print "SPLIT Expt:", splitExpt, '\n\t',exptSrc
+            # Query for Scan IDs from XNAT.
+            contents = self.MODULE.XnatIo.getFolderContents(exptSrc, metadataTags = ['ID'])
+            print "SCAN IDS", contents
+            # Recurse this function for every scan.
+            for scanId in contents['ID']:
+                scanSrc = exptSrc + '/' + scanId + '/files'
+                print "\n\nLOADING SCAN SOURCE", scanSrc
+                loaders += self.loaderFactory(scanSrc)
+
+            # Return loaders
+            return loaders
+                
+            
+        return loaders

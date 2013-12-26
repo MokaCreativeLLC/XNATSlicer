@@ -69,7 +69,7 @@ class XnatDeleteWorkflow(object):
             #
             # Construct the full delete string based on type of tree item deleted
             #
-            delStr = self.MODULE.XnatView.constructXnatUri()
+            delStr = self.MODULE.XnatView.getXnatUri()
             print "delStr", delStr
 
             if not '/files/' in delStr:

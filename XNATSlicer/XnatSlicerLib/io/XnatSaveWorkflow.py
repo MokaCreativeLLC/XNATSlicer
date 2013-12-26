@@ -1,3 +1,4 @@
+from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
@@ -77,7 +78,7 @@ class XnatSaveWorkflow(object):
             #
             # Construct new sessionArgs
             #
-            fullPath = self.MODULE.XnatView.constructXnatUri(self.MODULE.XnatView.getParents(self.MODULE.XnatView.currentItem()))
+            fullPath = self.MODULE.XnatView.getXnatUri()
             remoteURI = self.MODULE.XnatSettingsFile.getAddress(self.MODULE.XnatLoginMenu.hostDropdown.currentText) + fullPath
             sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = fullPath)
             sessionArgs['sessionType'] = "scene upload - unlinked"
@@ -137,14 +138,14 @@ class XnatSaveWorkflow(object):
         #
         # Construct the .mrb uri.
         #
-        mrbUri = projectDir + self.MODULE.utils.defaultPackageExtension
+        mrbUri = projectDir + XnatUtils.defaultPackageExtension
         
         #
         # Remove any mrb files with the same name, 
         # if they exist.
         #
         if os.path.exists(mrbUri): 
-            self.MODULE.utils.removeFile(mrbUri) 
+            XnatUtils.removeFile(mrbUri) 
 
         #
         # Compress the save diectory to the mrb uri.
@@ -155,7 +156,7 @@ class XnatSaveWorkflow(object):
         # Remove the uncompressed directory, as we
         # don't need it any more. 
         #       
-        self.MODULE.utils.removeDirsAndFiles(projectDir)
+        XnatUtils.removeDirsAndFiles(projectDir)
 
 
 

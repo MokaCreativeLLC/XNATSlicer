@@ -7,6 +7,8 @@ import urllib2
 
 from XnatView import *
 from XnatTimer import *
+from XnatUtils import *
+from GLOB import *
 
 
 comment = """
@@ -66,7 +68,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # If no saved font, resort to default.
         #
         else:
-            self.currentFontSize = self.MODULE.GLOBALS.FONT_SIZE
+            self.currentFontSize = GLOB_FONT_SIZE
         self.itemFonts = {}
         self.itemFonts['folders'] = qt.QFont("Arial", self.currentFontSize, 25, False)
         self.itemFonts['file'] = qt.QFont("Arial", self.currentFontSize, 75, False)
@@ -78,8 +80,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #----------------------
         # Tree-related globals
         #----------------------
-        self.dirText = None     
-        self.currLoadable = None        
+        self.dirText = None           
 
 
         
@@ -88,12 +89,6 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #----------------------
         self.lastButtonClicked = None 
 
-        
-        
-        #----------------------
-        # Clear Scene dialog
-        #----------------------
-        self.initClearDialog()
 
 
         
@@ -140,8 +135,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             XNAT metadata values.
         """
         self.columns = {}
-        for key in self.MODULE.utils.XnatMetadataTags_all:
-            self.columns[key] = {}
+        for key, level in GLOB_DEFAULT_XNAT_METADATA.iteritems():
+            for metadata in level:
+                if not metadata in self.columns:
+                    self.columns[metadata] = {}
 
 
             
@@ -196,10 +193,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         
         #---------------------- 
         # Merge 'self.columnKeyOrder' with
-        # the self.MODULE.GLOBALS.DEFAULT_XNAT_METADATA
+        # the GLOB_DEFAULT_XNAT_METADATA
         #---------------------- 
         self.columnKeyOrder = dict(self.columnKeyOrder.items() + 
-                                   self.MODULE.GLOBALS.DEFAULT_XNAT_METADATA.items())
+                                   GLOB_DEFAULT_XNAT_METADATA.items())
         
 
 
@@ -207,7 +204,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Create a union of all the self.columnKeyOrder 
         # arrays (i.e. 'allHeaders')
         #---------------------- 
-        allHeaders = self.MODULE.utils.uniqify(self.columnKeyOrder['ALL'] + 
+        allHeaders = XnatUtils.uniqify(self.columnKeyOrder['ALL'] + 
                                                 # NOTE: Leaving this out as it will become part of MERGED_LABELS
                                                 # via self.getMergedLabelByLevel, which determines the relevant
                                                 # metadata tag for the given XNAT level.
@@ -391,7 +388,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                 #print "VALUE: ", value
             except Exception, e:
                 value = '(Empty)'
-                #print self.MODULE.utils.lf(), str(e)
+                #print XnatUtils.lf(), str(e)
 
             #
             # Only allow metadata with a corresponding column.
@@ -402,8 +399,8 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                 #
                 # Convert date tags to human readable
                 #
-                if key in self.MODULE.GLOBALS.DATE_TAGS:
-                    value = self.MODULE.utils.makeDateReadable(value)
+                if key in GLOB_DATE_TAGS:
+                    value = XnatUtils.makeDateReadable(value)
                 widgetItem.setText(mergedInfoColumnNumber, widgetItem.text(mergedInfoColumnNumber) + self.columns[key]['displayname'] + ': ' + value + ' ')
                 widgetItem.setFont(mergedInfoColumnNumber, self.itemFonts['folders'])  
 
@@ -685,23 +682,9 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
 
 
 
-            
-    def initClearDialog(self):
-        """ Initiates/resets dialog for window to clear 
-            the current scene.
-        """
-        try: 
-            self.clearSceneDialog.delete()
-        except: pass
-        self.clearSceneDialog = qt.QMessageBox()
-        self.clearSceneDialog.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.No)
-        self.clearSceneDialog.setDefaultButton(qt.QMessageBox.No)
-        self.clearSceneDialog.setText("Clear the current scene?")
-
-
 
     
-    def constructXnatUri(self, parents = None):
+    def getXnatUri(self, parents = None):
         """ Constructs a directory structure based on the default Xnat 
             organizational scheme, utilizing the tree hierarchy. Critical to 
             communication with Xnat. Ex. parents = [exampleProject, testSubj, 
@@ -727,21 +710,17 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Construct preliminary URI based on the 'parents' array.
         #------------------------
         XnatDepth = 0        
-        for item in parents: 
-            #         
+        for item in parents:     
+             
             # For resource folders
-            #
             if 'resources' in item.text(self.columns['XNAT_LEVEL']['location']).strip(" "): 
                 isResource = True    
-            #
+                
             # For masked slicer folders
-            #
-            elif ((self.MODULE.utils.slicerFolderName in item.text(self.columns['XNAT_LEVEL']['location'])) 
-                  and self.applySlicerFolderMask): 
+            elif 'slicer' in item.text(self.columns['XNAT_LEVEL']['location']).lower() and self.applySlicerFolderMask: 
                 isSlicerFile = True
-            #
+
             # Construct directory string
-            #
             dirStr += "%s/%s/"%(item.text(self.columns['XNAT_LEVEL']['location']).strip(" "), 
                                 item.text(self.columns['MERGED_LABEL']['location']))
             XnatDepth+=1
@@ -752,19 +731,16 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Modify if URI has 'resources' in it.
         #------------------------
         if isResource:    
-            #     
-            # Append "files" if resources folder 
-            #         
+
+            # Append "files" if resources folder          
             if 'resources' in parents[-1].text(self.columns['XNAT_LEVEL']['location']).strip(" "):
                 dirStr += "files" 
-            #
+
             # Cleanup if at files level 
-            #           
             elif 'files'  in parents[-1].text(self.columns['XNAT_LEVEL']['location']).strip(" "):
                 dirStr = dirStr[:-1]  
-            #
-            # If on a files      
-            #    
+
+            # If on a files         
             else:
                 dirStr =  "%s/files/%s"%(os.path.dirname(dirStr), 
                                          os.path.basename(dirStr))  
@@ -774,19 +750,18 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Modify URI for Slicer files.
         #------------------------
         if isSlicerFile:
-            #print self.MODULE.utils.lf() + "IS SLICER FILE!" 
-            self.currLoadable = "scene"
             dirStr = ("%s/resources/%s/files/%s"%(os.path.dirname(os.path.dirname(os.path.dirname(dirStr))),
-                                                  self.MODULE.utils.slicerFolderName,
+                                                  GLOB_SLICER_FOLDER_NAME,
                                                   os.path.basename(os.path.dirname(dirStr))))   
 
             
         #------------------------
         # For all other URIs.
         #------------------------
-        else:
-            if XnatDepth < 4: 
-                dirStr += self.MODULE.utils.xnatDepthDict[XnatDepth] 
+        elif XnatDepth < 4: 
+            dirStr += GLOB_XNAT_LEVELS[XnatDepth] 
+
+            
         return dirStr
 
 
@@ -853,105 +828,40 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             NOTE: Consider refactoring into specific methods.
         """
 
-        #print "MANAGE TREE NODE"
-        #print item, self.currentItem()
+        #------------------------
+        # Get the item level
+        #------------------------
+        xnatLevelColumnNumber = self.columns['XNAT_LEVEL']['location']
+        itemLevel = item.text(xnatLevelColumnNumber).strip(" ")
 
-        
+
+        #------------------------
+        # Set the value of 'item'
+        #------------------------        
         if item == None and self.currentItem() != None:
             item = self.currentItem()
         elif item == None and self.currentItem() == None:
             return
 
 
-
-            
-        #self.setCurrentItem(item)
-        self.currLoadable = None
-
-        
-
-        #------------------------
-        # Check if at saveable/loadable level 
-        #------------------------
-        xnatLevelColumnNumber = self.columns['XNAT_LEVEL']['location']
-        isProject = 'project' in item.text(xnatLevelColumnNumber).strip(" ")
-        isSubject = 'subjects' in item.text(xnatLevelColumnNumber).strip(" ")
-        isResource = 'resources' in item.text(xnatLevelColumnNumber).strip(" ")
-        isExperiment = 'experiments' in item.text(xnatLevelColumnNumber).strip(" ")
-        isScan = 'scans' in item.text(xnatLevelColumnNumber).strip(" ")
-        isFile = 'files' in item.text(xnatLevelColumnNumber).strip(" ")
-        isSlicerFile = self.MODULE.utils.slicerFolderName.replace("/","") in item.text(xnatLevelColumnNumber).strip(" ")
-
-
-
             
         #------------------------
         # Enable load/save at the default save level
         #------------------------
-        self.MODULE.XnatButtons.setEnabled('save', False)
-        self.MODULE.XnatButtons.setEnabled('load', False)
-        self.MODULE.XnatButtons.setEnabled('delete', True)
-        self.MODULE.XnatButtons.setEnabled('addProj', True)
-        if isExperiment or isScan:
-            self.MODULE.XnatButtons.setEnabled('save', True)
-            self.MODULE.XnatButtons.setEnabled('load', True)
-        elif isFile or isSlicerFile or isResource:
-            self.MODULE.XnatButtons.setEnabled('save', True)
-            self.MODULE.XnatButtons.setEnabled('load', True)
         
-
-
+        if 'experiments' in itemLevel or 'scans' in itemLevel or 'files' in itemLevel or 'slicer' in itemLevel.lower():
+            self.MODULE.XnatButtons.setEnabled('save', True)
+            self.MODULE.XnatButtons.setEnabled('load', True)
+        else:
+            self.MODULE.XnatButtons.setEnabled('save', False)
+            self.MODULE.XnatButtons.setEnabled('load', False)
             
-        #------------------------
-        # If mask is enabled, determine if item is a slicer file
-        #------------------------
-        if self.applySlicerFolderMask:
-            if item.text(xnatLevelColumnNumber) == self.MODULE.utils.slicerFolderName:
-                isFile = True    
-
-
-                
-        #------------------------
-        # Determine how to load the file by applying a 
-        # type to the node.  This sets the self.currLoadable variable.
-        #------------------------
-        if isFile or isSlicerFile:
-            ext = item.text(self.columns['MERGED_LABEL']['location']).rsplit(".")
-            #
-            # Check extension
-            #
-            if (len(ext)>1):
-                #
-                # Recognizable extensions  
-                #      
-                if self.MODULE.utils.isRecognizedFileExt(ext[1]):
-                    #
-                    # Scene package
-                    #
-                    for ext_ in self.MODULE.utils.packageExtensions:
-                        if ext_.replace(".","") in ext[1]: 
-                            #
-                            # Set currloadable to scene   
-                            #                     
-                            self.currLoadable = "scene"
-                    #
-                    # Generic file
-                    #
-                    else:
-                        self.currLoadable = "file"
- 
-
-
-                    
-        #------------------------
-        # If the user is at the default load/save level, 
-        # set default loader to DICOM.     
-        #------------------------
-        if self.MODULE.utils.defaultXnatSaveLevel in item.text(xnatLevelColumnNumber).strip(" "):
-            self.currLoadable = "mass_dicom" 
+        self.MODULE.XnatButtons.setEnabled('delete', True)
+        self.MODULE.XnatButtons.setEnabled('addProj', True)            
 
 
 
+        
         #------------------------
         # Resize columns.
         #------------------------
@@ -964,16 +874,13 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # the node level to construct the dictionary that
         # feeds the 'Details' GroupBox.
         #------------------------
-        columnTags = self.MODULE.utils.getMetadataTagsByXnatLevel(item.text(xnatLevelColumnNumber).strip(" "))
-        detailsDict = self.getRowValues(item)
+        detailsDict = self.getRowValues(item)  
+        detailsDict['XNAT_LEVEL'] = itemLevel
 
 
-                
         #------------------------
-        # Run the callbacks that feeds the dictionary
-        # into the Details GroupBox.
-        #------------------------    
-        detailsDict['XNAT_LEVEL'] = item.text(xnatLevelColumnNumber).strip(" ")
+        # Callback
+        #------------------------
         self.runNodeChangedCallbacks(detailsDict)
 
         
@@ -985,14 +892,6 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             communicating with XNAT and the qTreeWidget.
         """
         pathObj = {}
-        pathObj['pathDict'] = {
-            'projects' : None,
-            'subjects' : None,
-            'experiments' : None,
-            'scans' : None,
-            'Slicer' : None
-        }
-
 
         
         #-------------------------
@@ -1000,38 +899,39 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # based on the locaiton of the treeNode.
         #-------------------------
         pathObj['parents'] = self.getParents(item)
-        xnatDir = self.constructXnatUri(pathObj['parents'])
 
-        if '/scans/' in xnatDir: 
-            if '/files/' in xnatDir:
-                if xnatDir.endswith('/'):
-                    if not xnatDir.endswith('files/'):
-                        xnatDir = xnatDir[:-1]
 
-        #pathObj['childQueryUris'] = [xnatDir if not '/scans/' in xnatDir else xnatDir + "files"]
-        pathObj['childQueryUris'] = []
-        childQuery = xnatDir
-        print "XNAT DIR", xnatDir
-        if '/scans/' in childQuery: 
-            if not '/files/' in childQuery:
-                childQuery = xnatDir + "files"
-        pathObj['childQueryUris'].append(childQuery)
+        
+        #-------------------------
+        # Get the workable xnatUri from the parents
+        #-------------------------      
+        xnatUri = self.getXnatUri(pathObj['parents'])
+        if '/scans/' in xnatUri and '/files/' in xnatUri and xnatUri.endswith('/'):
+            if not xnatUri.endswith('files/'):
+                xnatUri = xnatUri[:-1]
+
+                
+
+        #-------------------------
+        # Get the workable xnatUri from the parents
+        #------------------------- 
+        print "\n\nXNAT URI", xnatUri
+        pathObj['childQueryUris'] = [xnatUri + "files" if '/scans/' in xnatUri and not '/files/' in xnatUri else xnatUri]
             
 
         
+        #-------------------------
+        # Curr Uri
+        #-------------------------         
         pathObj['currUri'] = os.path.dirname(pathObj['childQueryUris'][0])  
-        pathObj['currLevel'] = xnatDir.split('/')[-1] if not '/scans/' in xnatDir else 'files'
+        pathObj['currLevel'] = xnatUri.split('/')[-1] if not '/scans/' in xnatUri else 'files'
 
 
         
         #------------------------
         # Construct URI dictionary by splitting the currUri from slashes.
         #------------------------
-        splitter = [ s for s in pathObj['currUri'].split("/") if len(s) > 0 ]
-        for i in range(0, len(splitter)):
-            key = splitter[i]
-            if key in pathObj['pathDict'] and i < len(splitter) - 1:
-                pathObj['pathDict'][key] = splitter[i+1]
+        pathObj['pathDict'] = XnatUtils.getXnatPathDict(pathObj['currUri'])
 
             
 
@@ -1051,7 +951,6 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             pathObj['slicerMetadataTag'] = 'Name'
 
 
-            #print "PATH OBJ", pathObj
         return pathObj
 
 
@@ -1067,7 +966,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             try:
                 child = item.child(x)
                 #ext = child.text(self.columns['MERGED_LABEL']['location']).rsplit(".", 1)[1]            
-                if self.MODULE.utils.isDICOM(child.text(self.columns['MERGED_LABEL']['location'])):
+                if XnatUtils.isDICOM(child.text(self.columns['MERGED_LABEL']['location'])):
                     print "found dicom"
                     dicomCount +=1
             except Exception, e:
@@ -1148,7 +1047,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         elif isinstance(childName, list) and len(childName) > 1:
             errorString = "Error: invalid 'childName' argument.  "  
             errorString +="It should be an array of length 1 or a string."
-            raise Exception(self.MODULE.utils.lf() + errorString)
+            raise Exception(XnatUtils.lf() + errorString)
             #print childName
 
         
@@ -1169,7 +1068,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #------------------------
         # Break apart pathStr to its Xnat categories
         #------------------------
-        pathDict = self.MODULE.utils.makeXnatUriDictionary(pathStr)
+        pathDict = XnatUtils.getXnatPathDict(pathStr)
         #print "PATH DICT1", pathDict
 
         
@@ -1194,9 +1093,6 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         self.setCurrentItem(foundProjects[0])
 
 
-    
-        
-        print "PATH DICT2", pathDict
         #------------------------
         # Proceed accordingly to its lower levels
         #------------------------
@@ -1276,7 +1172,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Get folder contents via metadata.  
         # Set nodeNames from metadata.
         #-------------------- 
-        metadata = self.MODULE.XnatIo.getFolderContents(pathObj['childQueryUris'], self.MODULE.utils.XnatMetadataTagsByLevel(currXnatLevel), queryArguments)
+        metadata = self.MODULE.XnatIo.getFolderContents(pathObj['childQueryUris'], XnatUtils.getMetadataTagsByLevel(currXnatLevel), queryArguments)
 
 
 
@@ -1310,7 +1206,8 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Special case for children with Slicer URIs
         #--------------------
         if 'slicerQueryUris' in pathObj:
-            slicerMetadata = self.MODULE.XnatIo.getFolderContents(pathObj['slicerQueryUris'], self.MODULE.utils.XnatMetadataTagsByLevel('files'))
+            slicerMetadata = self.MODULE.XnatIo.getFolderContents(pathObj['slicerQueryUris'], XnatUtils.getMetadataTagsByLevel('files'))
+            print "SLICER METADATA", slicerMetadata
             #
             # Proceed only if the relevant metadata to retrieve Slicer
             # files exists 
@@ -1335,7 +1232,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                         if (key == 'Size'):
                             for i in range(0, len(metadata[key])):
                                 if metadata[key][i]:
-                                    metadata[key][i] = '%i MB'%(int(round(self.MODULE.utils.bytesToMB(metadata[key][i]))))
+                                    metadata[key][i] = '%i MB'%(int(round(XnatUtils.bytesToMB(metadata[key][i]))))
                 metadata['XNAT_LEVEL'] = metadata['XNAT_LEVEL'] + ['Slicer' for x in range(len(slicerChildNames))]  
                 
 
@@ -1377,8 +1274,8 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         returnName = None
         index = 0
         for name in names:
-            #print name, self.MODULE.utils.isDICOM(name)
-            if self.MODULE.utils.isDICOM(name):
+            #print name, XnatUtils.isDICOM(name)
+            if XnatUtils.isDICOM(name):
                 returnName = name
                 break
             index += 1
@@ -1411,7 +1308,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         """
         """
 
-        #print self.MODULE.utils.lf(), "REFRESH COLUMNS"
+        #print XnatUtils.lf(), "REFRESH COLUMNS"
         #--------------------
         # Reset the the 'currentItem' so that
         # the appropriate events can get called.
@@ -1578,7 +1475,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             Qt::MatchRecursive	64	Searches the entire hierarchy.
         """
 
-        #print self.MODULE.utils.lf(), "Disconnecting item expanded."
+        #print XnatUtils.lf(), "Disconnecting item expanded."
         self.disconnect("itemExpanded(QTreeWidgetItem *)", self.onTreeItemExpanded)
         #SEARCH_TIMER = XnatTimer(self.MODULE)
 
@@ -1845,7 +1742,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Reconnect the event listeners for expandning
         # the QTreeWidgetItems.
         #
-        #print self.MODULE.utils.lf(), "Re-connecting item expanded."
+        #print XnatUtils.lf(), "Re-connecting item expanded."
         self.connect("itemExpanded(QTreeWidgetItem *)", self.onTreeItemExpanded)
         self.resizeColumns()
 

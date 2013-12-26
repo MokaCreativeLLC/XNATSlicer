@@ -1,3 +1,5 @@
+from GLOB import *
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -7,6 +9,8 @@ import sys
 from AnimatedCollapsible import *
 from XnatMetadataEditor import *
 
+from GLOB import *
+from XnatUtils import *
 
 
 
@@ -121,14 +125,14 @@ class XnatMetadataManager(qt.QFrame):
         # XnatDefaultMetadataEditor, along with the relevant buttons for
         # very folder in XNAT_LEVELS.
         #--------------------
-        for xnatLevel in self.MODULE.GLOBALS.XNAT_LEVELS:
+        for xnatLevel in GLOB_XNAT_LEVELS:
 
             #
             # Set DEFAULT label per xnat level.
             #
             self.labels[xnatLevel] = []
             self.labels[xnatLevel].append(qt.QLabel('<b>DEFAULT<b>'))
-            self.labels[xnatLevel][0].setFont(self.MODULE.GLOBALS.LABEL_FONT_BOLD)
+            self.labels[xnatLevel][0].setFont(GLOB_LABEL_FONT_BOLD)
 
             
             #
@@ -159,7 +163,7 @@ class XnatMetadataManager(qt.QFrame):
             # Set DEFAULT label per xnat level.
             #
             self.labels[xnatLevel].append(qt.QLabel('<b>CUSTOM<b>'))
-            self.labels[xnatLevel][1].setFont(self.MODULE.GLOBALS.LABEL_FONT_BOLD)
+            self.labels[xnatLevel][1].setFont(GLOB_LABEL_FONT_BOLD)
             self.collapsibleLayouts[xnatLevel].addWidget(self.labels[xnatLevel][1], 0, 1)
 
             
@@ -171,9 +175,9 @@ class XnatMetadataManager(qt.QFrame):
             # class hides these buttons as they are not necessary for
             # its workflow.
             #
-            self.editCustomButtons[xnatLevel] = self.MODULE.utils.generateButton(iconOrLabel = "Edit custom tags for '%s'"%(xnatLevel), 
+            self.editCustomButtons[xnatLevel] = XnatUtils.generateButton(iconOrLabel = "Edit custom tags for '%s'"%(xnatLevel), 
                                                                                toolTip = "Adds a custom metadata tag to display in the 'Info' column.", 
-                                                                               font = self.MODULE.GLOBALS.LABEL_FONT,
+                                                                               font = GLOB_LABEL_FONT,
                                                                                size = qt.QSize(180, 20), 
                                                                                enabled = True)
             self.collapsibleLayouts[xnatLevel].addWidget(self.editCustomButtons[xnatLevel], 0, 2)
@@ -332,7 +336,7 @@ class XnatMetadataManager(qt.QFrame):
 
                     
             except Exception, e:
-                print self.MODULE.utils.lf()
+                print XnatUtils.lf()
                 print str(e)
 
 

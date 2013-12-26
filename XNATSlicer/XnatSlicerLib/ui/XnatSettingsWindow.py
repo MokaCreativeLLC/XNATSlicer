@@ -1,3 +1,4 @@
+from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -136,7 +137,7 @@ class XnatSettingsWindow(FingerTabWidget):
                     #print "\n\tUpdating Manager for: ", key
                     manager.update()
         except Exception, e:
-            print self.MODULE.utils.lf(), "XnatMetadataManagerObject error."
+            print XnatUtils.lf(), "XnatMetadataManagerObject error."
             print str(e)
 
             
