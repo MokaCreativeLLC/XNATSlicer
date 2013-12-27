@@ -191,7 +191,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         progressBar.setFixedHeight(17)
         progressBar.setFixedWidth(600)
         progressBar.setMinimum(0)
-        progressBar.setMaximum(0)
+        progressBar.setMaximum(100)
         progressBar.setAlignment(0x0084)
         
 
@@ -202,18 +202,6 @@ class XnatDownloadPopup(XnatEmptyPopup):
         cancelButton = qt.QPushButton()
         cancelButton.setText("Cancel")
         cancelButton.setFont(GLOB_LABEL_FONT) 
-        def cancelClick():
-            rowWidget.setEnabled(False)
-            print "Cancelling download '%s'"%(self.abbreviateFile(uri))
-            textEdit.setText("Cancelled<br>%s<br>"%(self.abbreviateFile(uri)))
-            for key, item in self.downloadRows.iteritems():
-                if item['progressBar'] == progressBar:
-                    item['progressBar'].setEnabled(False)
-                    self.cancelCallback(key)
-                    #self.MODULE.XnatIo.cancelDownload(key)
-
-            
-        cancelButton.connect('pressed()', cancelClick)
         cancelButton.setFixedWidth(60)
         cancelButton.setFixedHeight(19)
 
@@ -228,7 +216,11 @@ class XnatDownloadPopup(XnatEmptyPopup):
         progressRow.addWidget(cancelButton)
         layout.addRow(progressRow)
         
-        
+
+
+        #-------------------
+        # Row dict
+        #-------------------
         downloadRow = {
             'queuePosition': len(self.downloadRows),
             'size': 0, 
@@ -241,7 +233,27 @@ class XnatDownloadPopup(XnatEmptyPopup):
         }
 
 
-        textEdit.setText("Checking<br>%s<br>Please wait...<br>"%(self.makeDownloadPath(downloadRow['pathDict'])))
+        
+        #-------------------
+        # default text
+        #-------------------
+        dlStr = self.makeDownloadPath(downloadRow['pathDict'])
+        textEdit.setText("QUEUED<br>%s<br>Please wait...<br>"%(dlStr))
+
+
+        #-------------------
+        # Cancel callback
+        #-------------------
+        def cancelClick():
+            rowWidget.setEnabled(False)
+            print "Cancelling download '%s'"%(dlStr)
+            textEdit.setText(textEdit.toHtml().replace('DOWNLOADING', 'CANCELLED'))
+            for key, item in self.downloadRows.iteritems():
+                if item['progressBar'] == progressBar:
+                    item['progressBar'].setEnabled(False)
+                    item['progressBar'].setMaximum(100)
+                    self.cancelCallback(key)
+        cancelButton.connect('pressed()', cancelClick)
 
         self.downloadRows[uri] = downloadRow
         self.remakeWidget()
@@ -335,13 +347,16 @@ class XnatDownloadPopup(XnatEmptyPopup):
 
         
 
-    def setSize(self, uriKey, size = 0):
+    def setSize(self, uriKey, size = -1):
         """
         """
         print self.downloadRows
-        if size > 0:
+        if size > -1:
             self.downloadRows[uriKey]['size'] = self.recalcMem(size)
             self.downloadRows[uriKey]['progressBar'].setMaximum(100)
+        else:
+            self.downloadRows[uriKey]['progressBar'].setMinimum(0)
+            self.downloadRows[uriKey]['progressBar'].setMaximum(0)
 
 
             
@@ -370,7 +385,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         downloadSize = str(self.downloadRows[uriKey]['size']) + 'MB'
         if downloadSize == '0MB':
             downloadSize = '[Unknown Size]'
-        self.downloadRows[uriKey]['textEdit'].setText("Downloading<br>%s<br>%sMB out of %s<br>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict']),  
+        self.downloadRows[uriKey]['textEdit'].setText("DOWNLOADING<br>%s<br>%sMB out of %s<br>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict']),  
                                                                                                  self.downloadRows[uriKey]['downloaded'], 
                                                                                                  downloadSize))
 
@@ -407,33 +422,31 @@ class XnatDownloadPopup(XnatEmptyPopup):
         return filename if len(filename) < maxLen else '...' + filename[-1 * (maxLen-3):]
 
 
+        
 
     def setComplete(self, uriKey):
         """
         """
         self.downloadRows[uriKey]['widget'].setEnabled(False)
         self.downloadRows[uriKey]['textEdit'].setText("Completed<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
-        self.downloadRows[uriKey]['progressBar'].setMinimum(0)
-        self.downloadRows[uriKey]['progressBar'].setMaximum(100)
-        self.downloadRows[uriKey]['progressBar'].setValue(100)  
+        self.setProgressBarValue(uriKey, 100)
         
 
+        
 
-    def setDisabled(self, uriKey):
+    def setEnabled(self, uriKey, enabled = True):
         """
         """
-        self.downloadRows[uriKey]['widget'].setEnabled(False)
+        self.downloadRows[uriKey]['widget'].setEnabled(enabled)
 
 
 
-    def disableProgressBar(self, uriKey):
+    def setProgressBarValue(self, uriKey, value, _min = 0, _max = 100):
         """
         """
-        self.downloadRows[uriKey]['cancelButton'].setEnabled(False)
-        self.downloadRows[uriKey]['progressBar'].setEnabled(False)
-        self.downloadRows[uriKey]['progressBar'].setMinimum(0)
-        self.downloadRows[uriKey]['progressBar'].setMaximum(100)
-
+        self.downloadRows[uriKey]['progressBar'].setMinimum(_min)
+        self.downloadRows[uriKey]['progressBar'].setMaximum(_max)
+        self.downloadRows[uriKey]['progressBar'].setValue(value)
         
 
 

@@ -120,8 +120,9 @@ class XnatLoader_Dicom(XnatLoader):
 
             # Update the download popup
             self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(folderUri, 
-                                                  "Using cached instance of:<br><i>'%s'</i>"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.disableProgressBar(folderUri)
+                                                  "USING CACHED<br>'%s'"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
             self.extractedFiles = cachedFiles
             slicer.app.processEvents()
             return True
@@ -141,16 +142,11 @@ class XnatLoader_Dicom(XnatLoader):
         if self.useCached:
             print self.extractedFiles
             return self.loadDicomsFromDatabase(self.extractedFiles)
-            
-        #--------------------    
-        # If the zipfile does not exist, then exit.
-        # (This is the result of the Cancel button in 
-        # the download modal being clicked.) 
-        #--------------------
-        if not os.path.exists(self._dst):
-            print "%s exiting workflow..."%(XnatUtils.lf())  
-            return False
 
+
+        if not XnatLoader.load(self):
+            return 
+        
 
         
         #--------------------

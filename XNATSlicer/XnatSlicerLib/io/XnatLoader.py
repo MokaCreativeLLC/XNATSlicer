@@ -59,6 +59,21 @@ class XnatLoader(object):
 
 
 
+    def load(self):
+        """
+        """
+        #--------------------    
+        # If the zipfile does not exist, then exit.
+        # (This is the result of the Cancel button in 
+        # the download modal being clicked.) 
+        #--------------------
+        if not os.path.exists(self._dst):
+            print "%s exiting workflow..."%(self._src)  
+            return False
+        return True
+
+        
+
     def extractDst(self):
         """
         """
@@ -76,7 +91,9 @@ class XnatLoader(object):
         #
         # Decompress zips.
         #
-        print self._dst, self.extractPath
+        # return if self._dst == None (result of a cancel)
+        if not os.path.exists(self._dst):
+            return
         XnatUtils.decompressFile(self._dst, self.extractPath)
 
         #

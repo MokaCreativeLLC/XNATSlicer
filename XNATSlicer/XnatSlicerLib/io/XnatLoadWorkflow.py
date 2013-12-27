@@ -85,13 +85,13 @@ class XnatLoadWorkflow(object):
 
 
         #--------------------------------
-        # download start
+        # START
         #--------------------------------
         def downloadStarted(_xnatSrc, size = 0):
             print "\n\nDOWNLOAD START", self.XnatDownloadPopup.downloadRows, "\n\n"
-            if size > 0:
-                self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
-                slicer.app.processEvents()
+            #if size > 0:
+            self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
+            slicer.app.processEvents()
         self.MODULE.XnatIo.setCallback('downloadStarted', downloadStarted)
 
         
@@ -107,7 +107,7 @@ class XnatLoadWorkflow(object):
         
 
         #--------------------------------
-        # download finished
+        # FINISHED
         #--------------------------------
         def downloadFinished(_xnatSrc):
             self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
@@ -117,15 +117,12 @@ class XnatLoadWorkflow(object):
 
 
         #--------------------------------
-        # Download cancelled
+        # CANCELLED
         #--------------------------------
         def downloadCancelled(_xnatSrc):
-            zeroCount = 0
-            for key, state in self.MODULE.XnatIo.downloadState.iteritems():
-                if state == 0: zeroCount += 1
-            if zeroCount == len(self.MODULE.XnatIo.downloadState):
+            if len(self.MODULE.XnatIo.downloadQueue) == 0:
                 self.XnatDownloadPopup.hide()
-            slicer.app.processEvents()
+                slicer.app.processEvents()
         self.MODULE.XnatIo.setCallback('downloadCancelled', downloadCancelled)
 
         

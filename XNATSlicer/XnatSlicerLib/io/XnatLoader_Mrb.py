@@ -42,16 +42,7 @@ class XnatLoader_Mrb(XnatLoader):
 
 
         
-        #-------------------------   
-        # If the package does not exist, then exit.
-        # (This is the result of the 'Cancel' button 
-        # being pressed in download modal) 
-        #-------------------------
-        if not os.path.exists(self._dst):
-            print "%s exiting workflow..."%(XnatUtils.lf())  
-            self.MODULE.XnatView.setEnabled(True) 
-            return False       
-
+        if not XnatLoader.load(self): return     
 
         
         #-------------------------

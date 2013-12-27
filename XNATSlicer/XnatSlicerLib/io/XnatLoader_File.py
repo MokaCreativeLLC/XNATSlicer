@@ -24,5 +24,6 @@ class XnatLoader_File(XnatLoader):
     def load(self):
         """ 
         """
+        if not XnatLoader.load(self): return 
         XnatUtils.loadNodeFromFile(self._dst)
 

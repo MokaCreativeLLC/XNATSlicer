@@ -38,7 +38,6 @@ class XnatIo(object):
         """ Parent init.
         """
         self.downloadQueue = []        
-        self.downloadState = {}
         self.callbacks = {
             'downloadCancelled': [],
             'downloading': [],
@@ -275,22 +274,6 @@ class XnatIo(object):
         return float(mb)
         
 
-        
-        
-        
-    def cancelDownload(self, uri):
-        """ Set's the download state to 0.  The open buffer in the 'GET' method
-            will then read this download state, and cancel out.
-        """
-        print "\n\nXNAT IO CANCEL DOWNLOAD", uri
-        print self.downloadState
-        self.downloadState[uri] = 0
-        self.runCallbacks('downloadCancelled', uri)
-        self.clearDownloadQueue()
-       
-        
-
-
 
         
     def downloadFailed(self, message):
@@ -298,10 +281,10 @@ class XnatIo(object):
             of the faile download.
         """
         self.runCallbacks('downloadFailed', message)
+
     
 
-        
-
+                            
     
     def get(self, _xnatSrc, _dst, showProgressIndicator = True):
         """ This method is in place for the main purpose of downlading
@@ -315,12 +298,6 @@ class XnatIo(object):
         """
 
         print "XnatIo: GET:", _xnatSrc, '\n', _dst
-        
-        #-------------------- 
-        # A download state of '1' indicates
-        # that the user hasn't cancelled the download.
-        #-------------------- 
-        self.downloadState[_xnatSrc.split("?format=zip")[0]] = 1
 
         
         
@@ -443,7 +420,7 @@ class XnatIo(object):
             if showProgressIndicator:
                 
                 # Callbacks
-                size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else 0
+                size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else -1
                 self.runCallbacks('downloadStarted', _xnatSrc, size)
                 #self.runCallbacks('downloading', _xnatSrc, size)
                                   
@@ -455,24 +432,23 @@ class XnatIo(object):
             while 1:     
                        
                 #
-                # If download cancelled, exit loop.
-                #
-                #print "DOWNLOAD STATE",self.downloadState
-                strippedSrc = _xnatSrc.split('?format=zip')[0]
-                if not strippedSrc in self.downloadState or self.downloadState[strippedSrc] == 0:
+                # DOWNLOAD CANCELLED
+                #              
+                if not self.inDownloadQueue(_xnatSrc):
                     print "Exiting download of '%s'"%(_xnatSrc)
                     fileToWrite.close()
-                    #if slicer and slicer.app: slicer.app.processEvents()
                     os.remove(fileToWrite.name)
                     self.runCallbacks('downloadCancelled', _xnatSrc)
                     break
 
-                
-                # Read buffer by size.  If there's nothing
-                # more to read, we exit the loop and close
-                # the XnatDownloadPopup.
+
+                #
+                # DOWNLOAD FINISHED
+                #
                 buffer = response.read(buffer_size)
                 if not buffer: 
+                    # Pop from the queue
+                    self.removeFromDownloadQueue(_xnatSrc)
                     self.runCallbacks('downloadFinished', _xnatSrc)
                     break
 
@@ -906,7 +882,7 @@ class XnatIo(object):
         """
         for key in self.callbacks:
             self.callbacks[key] = []
-        self.downloadState = {}
+
 
 
 
@@ -917,7 +893,6 @@ class XnatIo(object):
         self.downloadQueue = []
         self.clearCallbacks()
         
-
 
         
         
@@ -938,8 +913,11 @@ class XnatIo(object):
             onQueueStarted()
             
         for i in range(0, len(self.downloadQueue)):
-            if self.downloadQueue[i]['dst'] != None:
-                self.getFile(self.downloadQueue[i]['src'], self.downloadQueue[i]['dst'])
+            try:
+                if self.downloadQueue[i]['dst'] != None:
+                    self.getFile(self.downloadQueue[i]['src'], self.downloadQueue[i]['dst'])
+            except Exception, e:
+                print "Download queue warning: '%s'"%(str(e))
 
         if onQueueFinished:
             onQueueFinished()
@@ -950,5 +928,48 @@ class XnatIo(object):
             
         
 
+    def inDownloadQueue(self, _xnatSrc):
+        """
+        """
+        for dl in self.downloadQueue:
+            if _xnatSrc in dl['src']:
+                return True
+        return False
 
+
+
+    
+    def removeFromDownloadQueue(self, _xnatSrc):
+        """
+        """
+        for dl in self.downloadQueue:
+            if _xnatSrc in dl['src']:
+                self.downloadQueue.pop(self.downloadQueue.index(dl))
+                return
+        
+
+            
+    def cancelDownload(self, _xnatSrc):
+        """ Set's the download state to 0.  The open buffer in the 'GET' method
+            will then read this download state, and cancel out.
+        """
+        print "\n\nXNAT IO CANCEL DOWNLOAD", _xnatSrc
+
+        #-------------------- 
+        # Pop from queue
+        #--------------------
+        self.removeFromDownloadQueue(_xnatSrc) 
+                
+        #-------------------- 
+        # Clear queue if there is nothing
+        # left in it.
+        #-------------------- 
+        if len(self.downloadQueue) == 0:
+            self.clearDownloadQueue()
+
+
+        #-------------------- 
+        # Callbacks
+        #-------------------- 
+        self.runCallbacks('downloadCancelled', _xnatSrc)    
 
