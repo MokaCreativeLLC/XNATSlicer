@@ -155,7 +155,7 @@ class XnatSlicerWidget:
         #--------------------------------
         self.XnatIo = XnatIo()
         def jsonError(host, user, response):
-            return XnatError(self.host, self.user, response)
+            return XnatError(host, user, response)
         self.XnatIo.setCallback('jsonError', jsonError)
 
         

@@ -286,6 +286,7 @@ class XnatIo(object):
         print self.downloadState
         self.downloadState[uri] = 0
         self.runCallbacks('downloadCancelled', uri)
+        self.clearDownloadQueue()
        
         
 
@@ -313,11 +314,13 @@ class XnatIo(object):
                        
         """
 
+        print "XnatIo: GET:", _xnatSrc, '\n', _dst
+        
         #-------------------- 
         # A download state of '1' indicates
         # that the user hasn't cancelled the download.
         #-------------------- 
-        self.downloadState[_xnatSrc] = 1
+        self.downloadState[_xnatSrc.split("?format=zip")[0]] = 1
 
         
         
@@ -442,7 +445,7 @@ class XnatIo(object):
                 # Callbacks
                 size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else 0
                 self.runCallbacks('downloadStarted', _xnatSrc, size)
-                self.runCallbacks('downloading', _xnatSrc, size)
+                #self.runCallbacks('downloading', _xnatSrc, size)
                                   
  
             
@@ -454,7 +457,9 @@ class XnatIo(object):
                 #
                 # If download cancelled, exit loop.
                 #
-                if self.downloadState[_xnatSrc] == 0:
+                #print "DOWNLOAD STATE",self.downloadState
+                strippedSrc = _xnatSrc.split('?format=zip')[0]
+                if not strippedSrc in self.downloadState or self.downloadState[strippedSrc] == 0:
                     print "Exiting download of '%s'"%(_xnatSrc)
                     fileToWrite.close()
                     #if slicer and slicer.app: slicer.app.processEvents()
@@ -896,12 +901,21 @@ class XnatIo(object):
 
 
 
+    def clearCallbacks(self):
+        """
+        """
+        for key in self.callbacks:
+            self.callbacks[key] = []
+        self.downloadState = {}
+
 
 
     def clearDownloadQueue(self):
         """
         """
         print "CLEAR DOWNLOAD QUEUE"
+        self.downloadQueue = []
+        self.clearCallbacks()
         
 
 
@@ -910,7 +924,7 @@ class XnatIo(object):
     def addToDownloadQueue(self, srcDstDict):
         """
         """
-        print "ADD TO DOWNLOAD QUEUE"
+        print "ADD TO DOWNLOAD QUEUE", srcDstDict, '\n\n'
         self.downloadQueue.append(srcDstDict)
 
 
@@ -930,7 +944,7 @@ class XnatIo(object):
         if onQueueFinished:
             onQueueFinished()
 
-            
+        self.clearDownloadQueue()
         #if slicer and slicer.app: slicer.app.processEvents()
 
             

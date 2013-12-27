@@ -61,6 +61,7 @@ class XnatLoadWorkflow(object):
 
 
         self.XnatDownloadPopup = XnatDownloadPopup()
+        self.XnatDownloadPopup.setCancelCallback(self.MODULE.XnatIo.cancelDownload)
         
         self.clearScenePopup = XnatClearScenePopup()
         self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.clearSceneButtonClicked) 
@@ -69,48 +70,63 @@ class XnatLoadWorkflow(object):
         self.postDownloadPopup = XnatTextPopup('Processing.  Data will load automatically.')
 
 
-        self.setIOCallbacks()
 
 
-
-    def setIOCallbacks(self):
+    def resetIOCallbacks(self):
+        """ Clears and sets the IO callbacks for the MODULE.XnatIO.
+            Callbacks labeleled accordingly.
         """
-        """
+
+        #--------------------------------
+        # Clear IO Download queue
+        #--------------------------------
+        self.MODULE.XnatIo.clearDownloadQueue()
+
+
+
+        #--------------------------------
+        # download start
+        #--------------------------------
+        def downloadStarted(_xnatSrc, size = 0):
+            print "\n\nDOWNLOAD START", self.XnatDownloadPopup.downloadRows, "\n\n"
+            if size > 0:
+                self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
+                slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloadStarted', downloadStarted)
+
         
+
         #--------------------------------
-        # XnatIO Callbacks
-        #--------------------------------
-
-        # Download cancelled
-        def downloadCancelled(_xnatSrc):
-            zeroCount = 0
-            for key, state in self.downloadState.iteritems():
-                if state == 0: zeroCount += 1
-            if zeroCount == len(self.downloadState):
-                self.XnatDownloadPopup.hide()
-            slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloadCancelled', downloadCancelled)
-
-
         # Downloading
+        #--------------------------------
         def downloading(_xnatSrc, size = 0):
             self.XnatDownloadPopup.updateDownload(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
         self.MODULE.XnatIo.setCallback('downloading', downloading)
 
+        
 
-        # download start
-        def downloadStarted(_xnatSrc, size = 0):
-            self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
-            slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloadStarted', downloadStarted)
-
+        #--------------------------------
         # download finished
+        #--------------------------------
         def downloadFinished(_xnatSrc):
             self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
             slicer.app.processEvents()
         self.MODULE.XnatIo.setCallback('downloadFinished', downloadFinished)
 
+
+
+        #--------------------------------
+        # Download cancelled
+        #--------------------------------
+        def downloadCancelled(_xnatSrc):
+            zeroCount = 0
+            for key, state in self.MODULE.XnatIo.downloadState.iteritems():
+                if state == 0: zeroCount += 1
+            if zeroCount == len(self.MODULE.XnatIo.downloadState):
+                self.XnatDownloadPopup.hide()
+            slicer.app.processEvents()
+        self.MODULE.XnatIo.setCallback('downloadCancelled', downloadCancelled)
 
         
         
@@ -171,7 +187,7 @@ class XnatLoadWorkflow(object):
         #------------------------    
         # Clear download queue
         #------------------------
-        self.MODULE.XnatIo.clearDownloadQueue()
+        self.resetIOCallbacks()
 
         
 
@@ -186,8 +202,11 @@ class XnatLoadWorkflow(object):
                 print "DOWNLOAD FINISHED!"
                 callback()
                 slicer.app.processEvents()
+                self._src = None
             self.postDownloadPopup.hide()
+            self.MODULE.XnatIo.clearDownloadQueue()
 
+            
         
         #------------------------
         # Show download popup
@@ -205,6 +224,7 @@ class XnatLoadWorkflow(object):
             downloadFinishedCallbacks.append(loader.load)             
 
 
+            
         #------------------------
         # Run loaders
         #------------------------ 
@@ -212,7 +232,8 @@ class XnatLoadWorkflow(object):
         self.XnatDownloadPopup.show()
         self.MODULE.XnatIo.startDownloadQueue(onQueueFinished = runDownloadFinishedCallbacks)
       
-            
+
+        
         #------------------------
         # Enable XnatView
         #------------------------
@@ -245,6 +266,7 @@ class XnatLoadWorkflow(object):
         if '/scans/' in _src or '/files/' in _src:
             print "OPENING POPUP ROW", _src
             self.XnatDownloadPopup.addDownloadRow(_src)
+            print self.XnatDownloadPopup.downloadRows
             
 
 

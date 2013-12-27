@@ -69,8 +69,8 @@ class XnatLoader_Dicom(XnatLoader):
             self._dst = self._dstBase + fileDirs[0] + '.zip'
 
             
-        if self.MODULE.XnatDownloadPopup:
-            self.MODULE.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), self._src.replace('?format=zip', ''))
+        if self.MODULE.XnatLoadWorkflow.XnatDownloadPopup:
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), self._src.replace('?format=zip', ''))
 
 
             
@@ -120,7 +120,7 @@ class XnatLoader_Dicom(XnatLoader):
 
             # Update the download popup
             self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(folderUri, 
-                                                  "Using cached instance of:<br><i>'%s'</i>"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.abbreviateFile(folderUri)))
+                                                  "Using cached instance of:<br><i>'%s'</i>"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
             self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.disableProgressBar(folderUri)
             self.extractedFiles = cachedFiles
             slicer.app.processEvents()
