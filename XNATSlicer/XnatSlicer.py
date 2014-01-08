@@ -183,7 +183,7 @@ class XnatSlicerWidget:
         self.XnatIo = XnatIo()
         def jsonError(host, user, response):
             return XnatError(host, user, response)
-        self.XnatIo.setCallback('jsonError', jsonError)
+        self.XnatIo.onEvent('jsonError', jsonError)
 
         
 
@@ -688,8 +688,9 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo.setup(host = self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
-                          user = self.XnatLoginMenu.usernameLine.text, password=self.XnatLoginMenu.passwordLine.text)
+        self.XnatIo.setup(self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
+                          self.XnatLoginMenu.usernameLine.text,
+                          self.XnatLoginMenu.passwordLine.text)
 
         
 
