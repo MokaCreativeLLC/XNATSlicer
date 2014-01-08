@@ -1,4 +1,5 @@
 from XnatUtils import *
+from SlicerUtils import *
 from XnatLoader import *
 
 
@@ -25,5 +26,5 @@ class XnatLoader_File(XnatLoader):
         """ 
         """
         if not XnatLoader.load(self): return 
-        XnatUtils.loadNodeFromFile(self._dst)
+        SlicerUtils.loadNodeFromFile(self._dst)
 

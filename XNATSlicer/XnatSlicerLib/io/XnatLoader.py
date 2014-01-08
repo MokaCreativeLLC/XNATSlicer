@@ -1,27 +1,23 @@
-from GLOB import *
-from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
 import sys
 import shutil
 
+from GLOB import *
+from MokaUtils import *
+from XnatUtils import *
 from XnatFileInfo import *
 from XnatSessionManager import *
 
-comment = """
-XnatLoader is the parent class to the various XnatLoader classes.
-
-TODO:
-"""
 
 
 
 class XnatLoader(object):
-    """ Class description above.  Inherits from XnatLoadWorkflow.
+    """ 
+    XnatLoader is the parent class to the various XnatLoader classes.
     """
 
-        
         
     def __init__(self, MODULE, _src, fileUris = None):
         """ 
@@ -31,6 +27,7 @@ class XnatLoader(object):
         self._dst = ''
         self.fileUris = fileUris
         self._dstBase = GLOB_LOCAL_URIS['downloads']
+        self.useCached = None
 
 
         
@@ -40,8 +37,8 @@ class XnatLoader(object):
         """ 
         self._src = self._src + "?format=zip"
         self._dst = os.path.join(self._dstBase , 'projects' + self._src.replace('?formate=zip', '').split('projects')[1].split('/files')[0] + '/files.zip')
-        print "SRC:", self._src
-        print "DST:", self._dst
+        #print "SRC:", self._src
+        #print "DST:", self._dst
 
 
         
@@ -68,7 +65,7 @@ class XnatLoader(object):
         # the download modal being clicked.) 
         #--------------------
         if not os.path.exists(self._dst):
-            print "%s exiting workflow..."%(self._src)  
+            #print "%s exiting workflow..."%(self._src)  
             return False
         return True
 
@@ -86,7 +83,7 @@ class XnatLoader(object):
         # Remove existing zipfile extract path if it exists
         #
         if os.path.exists(self.extractPath): 
-            XnatUtils.removeDirsAndFiles(self.extractPath)
+            shutil.rmtree(self.extractPath)
 
         #
         # Decompress zips.
@@ -94,17 +91,17 @@ class XnatLoader(object):
         # return if self._dst == None (result of a cancel)
         if not os.path.exists(self._dst):
             return
-        XnatUtils.decompressFile(self._dst, self.extractPath)
+        MokaUtils.file.decompress(self._dst, self.extractPath)
 
         #
         # Add to files in the decompressed destination 
         # to downloadedDicoms list.
         #
-        print "%s Inventorying downloaded files..."%(XnatUtils.lf())  
+        #print "%s Inventorying downloaded files..."%(MokaUtils.debug.lf())  
         self.extractedFiles = []
         for root, dirs, files in os.walk(self.extractPath):
             for relFileName in files:          
-                self.extractedFiles.append(XnatUtils.adjustPathSlashes(os.path.join(root, relFileName)))
+                self.extractedFiles.append(MokaUtils.path.adjustPathSlashes(os.path.join(root, relFileName)))
 
 
         #

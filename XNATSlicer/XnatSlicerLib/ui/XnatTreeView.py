@@ -8,25 +8,25 @@ import urllib2
 from XnatView import *
 from XnatTimer import *
 from XnatUtils import *
+from MokaUtils import *
 from GLOB import *
 
-
-comment = """
-XnatTreeView is a subclass of both the XnatView class and the
-qt.QTreeWidget class.  It presents XNAT file system accessed
-in a tree-node hierarchy, with customized columns masks to avoid 
-visual clutter and maximize interactibility.
-
-The view classes (and subclasses) ultimately communicate
-with the load and save workflows.   
-
-TODO:
-"""
 
 
 
 class XnatTreeView(XnatView, qt.QTreeWidget):
-    """ Inherits the XnatView class and the qt.QTreeWidget class. 
+    """ 
+    XnatTreeView is a subclass of both the XnatView class and the
+    qt.QTreeWidget class.  It presents XNAT file system accessed
+    in a tree-node hierarchy, with customized columns masks to avoid 
+    visual clutter and maximize interactibility.
+    
+    The view classes (and subclasses) ultimately communicate
+    with the load and save workflows.   
+    
+    TODO:
+
+    Inherits the XnatView class and the qt.QTreeWidget class. 
     """  
     
     def setup(self):
@@ -204,7 +204,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Create a union of all the self.columnKeyOrder 
         # arrays (i.e. 'allHeaders')
         #---------------------- 
-        allHeaders = XnatUtils.uniqify(self.columnKeyOrder['ALL'] + 
+        allHeaders = MokaUtils.list.uniqify(self.columnKeyOrder['ALL'] + 
                                                 # NOTE: Leaving this out as it will become part of MERGED_LABELS
                                                 # via self.getMergedLabelByLevel, which determines the relevant
                                                 # metadata tag for the given XNAT level.
@@ -236,7 +236,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                 #
                 headerLabels.append( self.columns[header]['displayname'])
             except Exception, e:
-                #print e, "column init stuff"
+                ##print e, "column init stuff"
                 continue
         self.setHeaderLabels(headerLabels)
 
@@ -302,7 +302,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # have already been populated.
         #------------------
         if xnatMetadata != None:
-            #print "\n\n@@@@@@@@@@@@@@@@@@@@@@@@", widgetItem.text(0), xnatMetadata
+            ##print "\n\n@@@@@@@@@@@@@@@@@@@@@@@@", widgetItem.text(0), xnatMetadata
             for key in xnatMetadata:
 
                 
@@ -359,7 +359,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         infoMetadata = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.XnatTreeViewSettings.ON_METADATA_CHECKED_TAGS['info'] + widgetItem.text(xnatLevelColumnNumber))
 
 
-        #print "MERGED INFO TEXT:", widgetItem.text(mergedInfoColumnNumber)
+        ##print "MERGED INFO TEXT:", widgetItem.text(mergedInfoColumnNumber)
         #
         # Clear the text
         #
@@ -369,32 +369,32 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             printStr = ''
             for i in range(0, 40):
                 printStr += '\n\t' + self.headerItem().text(i) + ": " +  widgetItem.text(i)
-                #print printStr
+                MokaUtils.debug.lf(printStr)
 
-        #debugPrint()
+        debugPrint()
 
         
         #
         # Aggregate the text as we cycle through
         # the infoMetadata
         #
-        #print "INFO METADATA", infoMetadata
+        ##print "INFO METADATA", infoMetadata
         for key in infoMetadata:
             
             try:
-                #print "COLUMN: ", self.columns
-                #print "KEY: ", self.columns[key]
+                ##print "COLUMN: ", self.columns
+                ##print "KEY: ", self.columns[key]
                 value = widgetItem.text(self.columns[key]['location'])
-                #print "VALUE: ", value
+                ##print "VALUE: ", value
             except Exception, e:
                 value = '(Empty)'
-                #print XnatUtils.lf(), str(e)
+                MokaUtils.debug.lf(str(e))
 
             #
             # Only allow metadata with a corresponding column.
             #
             if key in self.columns:
-                #print "WIDGET", widgetItem.text(0), key, self.columns[key]
+                ##print "WIDGET", widgetItem.text(0), key, self.columns[key]
 
                 #
                 # Convert date tags to human readable
@@ -473,7 +473,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         try:
             self.currentItem().parent().removeChild(self.currentItem())
         except Exception, e:
-            print "Deleting top level (%s"%(str(e))
+            #print "Deleting top level (%s"%(str(e))
             self.removeItemWidget(self.currentItem(), 0)
             
     
@@ -505,7 +505,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         
             
     def filter_accessed(self):
-        #print "FILTER ACCESSED"
+        ##print "FILTER ACCESSED"
         self.sortItems(self.columns['last_accessed_497']['location'], 1)
         #self.MODULE.XnatTreeViewSettings.setButtonDown(category = 'sort' , name = 'accessed', isDown = True, callSignals = False)
 
@@ -538,7 +538,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             parents and filtering.
         """
 
-        #print "LOAD PROJECTS", filters
+        ##print "LOAD PROJECTS", filters
         #----------------------
         # Add projects only if they are specified 
         # in the arguments.
@@ -915,7 +915,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #-------------------------
         # Get the workable xnatUri from the parents
         #------------------------- 
-        print "\n\nXNAT URI", xnatUri
+        #print "\n\nXNAT URI", xnatUri
         pathObj['childQueryUris'] = [xnatUri + "files" if '/scans/' in xnatUri and not '/files/' in xnatUri else xnatUri]
             
 
@@ -967,10 +967,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                 child = item.child(x)
                 #ext = child.text(self.columns['MERGED_LABEL']['location']).rsplit(".", 1)[1]            
                 if XnatUtils.isDICOM(child.text(self.columns['MERGED_LABEL']['location'])):
-                    print "found dicom"
+                    #print "found dicom"
                     dicomCount +=1
             except Exception, e:
-                print str(e)
+                #print str(e)
                 pass        
         if dicomCount == item.childCount():
                 return True
@@ -1041,14 +1041,14 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             argument based on the 'MERGED_LABEL' column.
         """
 
-        #print "childName:", childName
+        ##print "childName:", childName
         if isinstance(childName, list) and len(childName) == 1:
             childName = childName[0]
         elif isinstance(childName, list) and len(childName) > 1:
             errorString = "Error: invalid 'childName' argument.  "  
             errorString +="It should be an array of length 1 or a string."
-            raise Exception(XnatUtils.lf() + errorString)
-            #print childName
+            raise Exception(MokaUtils.debug.lf() + errorString)
+            ##print childName
 
         
         for i in range(0, item.childCount()):
@@ -1069,7 +1069,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Break apart pathStr to its Xnat categories
         #------------------------
         pathDict = XnatUtils.getXnatPathDict(pathStr)
-        #print "PATH DICT1", pathDict
+        ##print "PATH DICT1", pathDict
 
         
         #------------------------
@@ -1078,7 +1078,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         foundProjects = self.findItems(pathDict['projects'], 0)
             
         if not self.findItems(pathDict['projects'], 0) or len(foundProjects) == 0: 
-            #print "IT SHOULD LOAD PROJECTS"
+            ##print "IT SHOULD LOAD PROJECTS"
             self.MODULE.XnatIo.projectCache = None
             self.begin(skipAnim = True)
             slicer.app.processEvents()
@@ -1172,7 +1172,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Get folder contents via metadata.  
         # Set nodeNames from metadata.
         #-------------------- 
-        metadata = self.MODULE.XnatIo.getFolderContents(pathObj['childQueryUris'], XnatUtils.getMetadataTagsByLevel(currXnatLevel), queryArguments)
+        metadata = self.MODULE.XnatIo.getFolder(pathObj['childQueryUris'], XnatUtils.getMetadataTagsByLevel(currXnatLevel), queryArguments)
 
 
 
@@ -1183,7 +1183,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #--------------------        
         xnatLabel = self.getMergedLabelTagByLevel(currXnatLevel)
         if not xnatLabel in metadata:
-            #print "NO XNAT LABEL"
+            ##print "NO XNAT LABEL"
             return
 
 
@@ -1206,8 +1206,8 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Special case for children with Slicer URIs
         #--------------------
         if 'slicerQueryUris' in pathObj:
-            slicerMetadata = self.MODULE.XnatIo.getFolderContents(pathObj['slicerQueryUris'], XnatUtils.getMetadataTagsByLevel('files'))
-            print "SLICER METADATA", slicerMetadata
+            slicerMetadata = self.MODULE.XnatIo.getFolder(pathObj['slicerQueryUris'], XnatUtils.getMetadataTagsByLevel('files'))
+            #print "SLICER METADATA", slicerMetadata
             #
             # Proceed only if the relevant metadata to retrieve Slicer
             # files exists 
@@ -1232,7 +1232,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                         if (key == 'Size'):
                             for i in range(0, len(metadata[key])):
                                 if metadata[key][i]:
-                                    metadata[key][i] = '%i MB'%(int(round(XnatUtils.bytesToMB(metadata[key][i]))))
+                                    metadata[key][i] = '%i MB'%(int(round(MokaUtils.convert.bytesToMB(metadata[key][i]))))
                 metadata['XNAT_LEVEL'] = metadata['XNAT_LEVEL'] + ['Slicer' for x in range(len(slicerChildNames))]  
                 
 
@@ -1270,17 +1270,17 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
 
             NOTE: Consider moving this to XnatUtils.py.
         """
-        #print("CONDENSE DICOMS")
+        ##print("CONDENSE DICOMS")
         returnName = None
         index = 0
         for name in names:
-            #print name, XnatUtils.isDICOM(name)
+            ##print name, XnatUtils.isDICOM(name)
             if XnatUtils.isDICOM(name):
                 returnName = name
                 break
             index += 1
 
-            #print "RETURN", returnName, [returnName.rsplit('.',1)[0]]
+            ##print "RETURN", returnName, [returnName.rsplit('.',1)[0]]
         return [returnName.rsplit('.',1)[0]], index
 
 
@@ -1308,7 +1308,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         """
         """
 
-        #print XnatUtils.lf(), "REFRESH COLUMNS"
+        ##print MokaUtils.debug.lf(), "REFRESH COLUMNS"
         #--------------------
         # Reset the the 'currentItem' so that
         # the appropriate events can get called.
@@ -1338,12 +1338,12 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             tree nodes that meet the serach criteria need to be
             unhighlighted.
         """
-        #print self.browser.utils.lf(), "Begin"
+        ##print self.browser.utils.lf(), "Begin"
         root = self.invisibleRootItem()
         childCount = root.childCount()
         for i in range(childCount):
             item = root.child(i)
-            #print '\n\n\n', item.text()
+            ##print '\n\n\n', item.text()
             self.populateColumns(item)
             self.runNodeChangedCallbacks(self.getRowValues())
 
@@ -1392,7 +1392,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             if parentXnatLevel == 'scans':
                 if self.isDICOMFolder(parentItem):                
                     children, childIndex = self.condenseDicomsToOneName(children)
-                    #print "CHILDREN", children
+                    ##print "CHILDREN", children
                     condensed = True
                     
         
@@ -1402,7 +1402,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #------------------------
         treeItems = []
         for i in range(0, len(children)):
-            #print "\n\nCHILDREN: ", children[i]
+            ##print "\n\nCHILDREN: ", children[i]
 
             
             treeNode = qt.QTreeWidgetItem(parentItem)
@@ -1418,17 +1418,17 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             #
             treeNodeMetadata = {}
             for key in metadata:
-                #print '\n\n', key, i, len(metadata[key]), metadata, len(children), children
+                ##print '\n\n', key, i, len(metadata[key]), metadata, len(children), children
                 if i < len(metadata[key]):
                     treeNodeMetadata[key] = metadata[key][i]
                 if childIndex > -1:
                     treeNodeMetadata[key] = metadata[key][childIndex]
-                    #print "\n\nTREE NODE METADATA", treeNodeMetadata
+                    ##print "\n\nTREE NODE METADATA", treeNodeMetadata
 
             #
             # Register the condensed tree node name, if it's there.
             #
-            #print "\n\nTREE NODE METADATA2", treeNodeMetadata, condensed
+            ##print "\n\nTREE NODE METADATA2", treeNodeMetadata, condensed
                 
             treeNode = self.populateColumns(treeNode, treeNodeMetadata)
             #
@@ -1475,7 +1475,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             Qt::MatchRecursive	64	Searches the entire hierarchy.
         """
 
-        #print XnatUtils.lf(), "Disconnecting item expanded."
+        ##print MokaUtils.debug.lf(), "Disconnecting item expanded."
         self.disconnect("itemExpanded(QTreeWidgetItem *)", self.onTreeItemExpanded)
         #SEARCH_TIMER = XnatTimer(self.MODULE)
 
@@ -1710,7 +1710,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
                         # if it doesn't exist.
                         #
                         item = self.findChild(subject, experimentName)
-                        #print "\t\t*************FIND CHILD: ", subject.text(0), experimentName, item
+                        ##print "\t\t*************FIND CHILD: ", subject.text(0), experimentName, item
                         if not item:
                             self.makeTreeItems(parentItem = subject, children = experimentName, metadata = metadata, expandible = [0]) 
                         
@@ -1742,7 +1742,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Reconnect the event listeners for expandning
         # the QTreeWidgetItems.
         #
-        #print XnatUtils.lf(), "Re-connecting item expanded."
+        ##print MokaUtils.debug.lf(), "Re-connecting item expanded."
         self.connect("itemExpanded(QTreeWidgetItem *)", self.onTreeItemExpanded)
         self.resizeColumns()
 

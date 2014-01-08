@@ -112,7 +112,7 @@ class XnatNodeDetails(qt.QWidget):
         detailsDict = detailsDict[0]
         detailsText = ''
 
-        #print "\n\n\t\tDETAILS DICT", detailsDict, '\n\n\n'
+        ##print "\n\n\t\tDETAILS DICT", detailsDict, '\n\n\n'
         
         
         #--------------------
@@ -149,7 +149,7 @@ class XnatNodeDetails(qt.QWidget):
             if key in visibleTags:
 
                 if key in GLOB_DATE_TAGS:
-                    print value
+                    #print value
                     value = XnatUtils.makeDateReadable(value)
                     
                 detailsStr = "<b>%s</b>:  %s"%(key, value)

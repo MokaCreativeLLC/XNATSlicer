@@ -62,15 +62,17 @@ class XnatView(object):
         projectContents = None
         if self.MODULE.XnatIo.projectCache == None:
             self.clear()
-            projectContents = self.MODULE.XnatIo.getFolderContents(queryUris = ['/projects'], 
+            projectContents = self.MODULE.XnatIo.getFolder(queryUris = ['/projects'], 
                                                                               metadataTags = GLOB_DEFAULT_XNAT_METADATA['projects'],
                                                                               queryArguments = ['accessible'])
             #
             # If the class name of the Json is 'XnatError'
             # return out, with the error.
             #
-            if projectContents.__class__.__name__ == 'XnatError':
-                qt.QMessageBox.warning( None, "Login error", projectContents.errorMsg)
+            if projectContents == None:
+                hostName = self.MODULE.XnatLoginMenu.hostDropdown.currentText
+                hostUrl = self.MODULE.XnatSettingsFile.getAddress(hostName)
+                qt.QMessageBox.warning( None, "Login error", "Invalid username and/or password for the XNAT host '%s' (%s)" %(hostName, hostUrl))
                 self.MODULE.onLoginFailed()
                 return
 

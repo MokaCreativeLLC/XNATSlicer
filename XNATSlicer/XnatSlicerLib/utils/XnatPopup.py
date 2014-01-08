@@ -4,39 +4,40 @@ from __main__ import vtk, qt, ctk, slicer
 
 import math
 from XnatUtils import *
+from MokaUtils import *
 
-comment =  """
-XnatPopup and its children are used for any needed popup interaction with XNAT.
-It's a generic class that allows the user to create popups for any number
-of purposes.  The popups are QWidgets but could be more specific QWindow classes
-as well.
-
-This file contains the subclasses of XnatPopup as well: XnatDownloadPopup.
-
-
-MODALITIES:
-(from: http://harmattan-dev.nokia.com/docs/library/html/qt4/qt.html#WindowModality-enum)
-
-0   Qt::NonModal		    The window is not modal and does not block input to other windows.
-
-1   Qt::WindowModal		    The window is modal to a single window hierarchy and blocks input to 
-                            its parent window, all grandparent windows, and all siblings of its 
-                            parent and grandparent windows.
-                            
-2   Qt::ApplicationModal	The window is modal to the application and blocks input to all windows.
-
-
-TODO:
-"""
 
 
 
 
 class XnatClearScenePopup(qt.QMessageBox):
     """
+    XnatPopup and its children are used for any needed popup interaction with XNAT.
+    It's a generic class that allows the user to create popups for any number
+    of purposes.  The popups are QWidgets but could be more specific QWindow classes
+    as well.
+    
+    This file contains the subclasses of XnatPopup as well: XnatDownloadPopup.
+    
+    
+    MODALITIES:
+    (from: http://harmattan-dev.nokia.com/docs/library/html/qt4/qt.html#WindowModality-enum)
+    
+    0   Qt::NonModal		    The window is not modal and does not block input to other windows.
+    
+    1   Qt::WindowModal		    The window is modal to a single window hierarchy and blocks input to 
+    its parent window, all grandparent windows, and all siblings of its 
+    parent and grandparent windows.
+    
+    2   Qt::ApplicationModal	The window is modal to the application and blocks input to all windows.
+    
     """
+
+
     def __init__(self, title = "Clear current scene", modality = 1):
 
+        """
+        """
         #--------------------
         # Call parent init.
         #--------------------
@@ -53,11 +54,13 @@ class XnatClearScenePopup(qt.QMessageBox):
     
 
 class XnatEmptyPopup(qt.QWidget):
-    """ Popup class for XNAT-relevant interactions
+    """ 
+    Popup class for XNAT-relevant interactions
     """
     
     def __init__(self, title = "XnatPopup", modality = 1):
-        """ Init function.
+        """ 
+        Init function.
         """
         #--------------------
         # Call parent init.
@@ -100,15 +103,25 @@ class XnatEmptyPopup(qt.QWidget):
         
 class XnatTextPopup(XnatEmptyPopup):
     """
+    A sublcass of XnatPopup that displays text.
     """
     def __init__(self, text = 'Empty Text', title = ''):
-        """ Init funnction.
+        """ 
+        @param text: The rich text value to display.
+        @type text: string
+
+        @param title: The window title.
+        @type title: string
         """
         super(XnatTextPopup, self).__init__(title = title)
-        self.setFixedHeight(100)
+
+        self.setFixedHeight(70)
         self.textEdit = qt.QTextEdit(text)
         self.textEdit.setAlignment(0x0084)
         self.textEdit.setStyleSheet('border: none')
+
+        emptyRow = qt.QLabel('')
+        self.masterLayout.addRow(emptyRow)
         self.masterLayout.addRow(self.textEdit)
 
         
@@ -116,12 +129,18 @@ class XnatTextPopup(XnatEmptyPopup):
         
         
 class XnatDownloadPopup(XnatEmptyPopup):
-    """ Subclass of the XnatPopup class pertaining
-        specifically to downloading files.
+    """ 
+    Subclass of the XnatPopup class pertaining
+    specifically to downloading files.
     """
 
     def __init__(self, title = "XNAT Download Queue", memDisplay = "MB"):
-        """ Init funnction.
+        """ 
+        @param title: The window title.
+        @type title: string
+
+        @param memDisplay: The memory value to display.
+        @type memDisplay: string
         """
         super(XnatDownloadPopup, self).__init__(title = title)
         self.memDisplay = memDisplay
@@ -129,7 +148,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.downloadRows = {}
 
         self.setFixedWidth(710)
-        self.setMinimumHeight(300)
+        self.setMinimumHeight(260)
         self.setStyleSheet('padding: 0px')
 
         self.innerWidget = None
@@ -140,6 +159,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.masterLayout.setContentsMargins(0,0, 0, 0)
         self.hide()
         self.cancelCallback = None
+
+        self.rowWidgetHeight = 75
         #self.show()
         #for i in range(0, 10):
         #    self.addDownloadRow('projects/fooProject/subjects/fooSuject/experiments/fooExperiments/scans/fooScan/%s/files/foo_%s.dcm'%(i, i))
@@ -165,7 +186,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         rowWidget = qt.QWidget()
         rowWidget.setObjectName('downloadRowWidget')
         rowWidget.setStyleSheet('#downloadRowWidget {border: 1px solid rgb(160,160,160); border-radius: 2px; width: 100%;}')
-        rowWidget.setFixedHeight(75)
+        rowWidget.setFixedHeight(self.rowWidgetHeight)
         rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
         layout = qt.QFormLayout()
         rowWidget.setLayout(layout)
@@ -246,7 +267,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         #-------------------
         def cancelClick():
             rowWidget.setEnabled(False)
-            print "Cancelling download '%s'"%(dlStr)
+            #print "Cancelling download '%s'"%(dlStr)
             textEdit.setText(textEdit.toHtml().replace('DOWNLOADING', 'CANCELLED'))
             for key, item in self.downloadRows.iteritems():
                 if item['progressBar'] == progressBar:
@@ -291,7 +312,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         #-------------------
         sortedRows = [None] * len(self.downloadRows)
         for key, item in self.downloadRows.iteritems():
-            print len(sortedRows), item['queuePosition']
+            #print len(sortedRows), item['queuePosition']
             sortedRows[item['queuePosition']] = key
         for key in sortedRows:
             self.innerWidgetLayout.addRow(self.downloadRows[key]['widget'])
@@ -334,6 +355,13 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.innerWidget.update()
         self.masterLayout.addRow(self.scrollWidget)
         self.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
+
+        calcHeight = (self.rowWidgetHeight + 12)* len(self.downloadRows)
+        if calcHeight < 800:
+            self.setMinimumHeight(calcHeight)
+        else:
+            self.setMinimumHeight(800)
+
         self.update()
         
 
@@ -350,7 +378,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
     def setSize(self, uriKey, size = -1):
         """
         """
-        print self.downloadRows
+        #print self.downloadRows
         if size > -1:
             self.downloadRows[uriKey]['size'] = self.recalcMem(size)
             self.downloadRows[uriKey]['progressBar'].setMaximum(100)
@@ -455,7 +483,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
             display.
         """
         if (self.memDisplay.lower() == 'mb'):
-            return math.ceil(XnatUtils.bytesToMB(size) * 100)/100
+            return math.ceil(MokaUtils.convert.bytesToMB(size) * 100)/100
         return size      
 
 

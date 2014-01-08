@@ -268,7 +268,7 @@ class XnatLoginMenu(qt.QWidget):
     def onPasswordLineFocused(self):  
         """ Event function for when the password line is edited.
         """     
-        #print "PWD FOCUSED"
+        ##print "PWD FOCUSED"
         if self.defaultPasswordText in str(self.passwordLine.text): 
             self.passwordLine.setText("")
         self.passwordLine.setStyleSheet("color: black")
@@ -282,7 +282,7 @@ class XnatLoginMenu(qt.QWidget):
             Loads the stored username into the username line, 
             if it's there.
         """
-        #print "USR FOCUSED"
+        ##print "USR FOCUSED"
         self.currHostName = self.hostDropdown.currentText
         if self.hostDropdown.currentText:    
             self.populateCurrUser()

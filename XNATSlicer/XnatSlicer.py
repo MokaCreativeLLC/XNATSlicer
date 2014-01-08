@@ -15,6 +15,14 @@ sys.path.append(os.path.join(MODULE_PATH, 'Testing'))
 LIB_PATH = os.path.join(MODULE_PATH, "XnatSlicerLib")
 sys.path.append(LIB_PATH)
 #
+# Include _external folder.
+#
+sys.path.append(os.path.join(LIB_PATH, '_external'))
+#
+# Include MokaUtils folder.
+#
+sys.path.append(os.path.join(LIB_PATH, '_external/MokaUtils'))
+#
 # Include ui folder.
 #
 sys.path.append(os.path.join(LIB_PATH, 'ui'))
@@ -37,6 +45,9 @@ sys.path.append(os.path.join(LIB_PATH, 'io'))
 
 
 import GLOB
+import math
+from MokaUtils import *
+from SlicerUtils import *
 from XnatFileInfo import *
 from XnatFolderMaker import *
 from XnatLoadWorkflow import *
@@ -76,25 +87,34 @@ from VariableItemListWidget import *
 
 
 comment = """
-XnatSlicer.py contains the central classes for managing 
-all of the XnatSlicer functions and abilities.  XnatSlicer.py
-is the point where the module talks to Slicer, arranges the gui, and
-registers it to the Slicer modules list.  It is where all of the 
-XnatSlicerLib classes and methods converge.
+Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
+All rights reserved.
 
-TODO:
+Redistribution and use in source and binary forms, with or without modification, are permitted 
+provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
 
 
 class XnatSlicer:
-  """ The class that ultimately registers the module
-      with Slicer.
+  """ 
+  This is the class that interfaces with Slicer.
+  This is not to be confused with the actual XnatSlicerWidget class
+  which is below this one.
   """
   
   def __init__(self, parent):
-      """ Init function.
+      """ 
+      Init function.
+
+      @param parent: The parent widget to attach to.
+      @type parent: qt.QWidget
       """
 
       #--------------------------------
@@ -131,12 +151,19 @@ class XnatSlicer:
           
 
 class XnatSlicerWidget:
-    """  The class that manages all of the XNATSlicer-specific
-         libraries.
+    """  
+    XnatSlicer.py contains the central classes for managing 
+    all of the XnatSlicer functions and abilities.  XnatSlicer.py
+    is the point where the module talks to Slicer, arranges the gui, and
+    registers it to the Slicer modules list.  It is where all of the 
+    XnatSlicerLib classes and methods converge.
     """
     
     def __init__(self, parent = None):
-        """ Init function.
+        """ 
+        Init function.
+        @param parent: The parent widget to attach to.
+        @type parent: qt.QWidget
         """
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -309,9 +336,13 @@ class XnatSlicerWidget:
 
       
     def onReload(self, moduleName = "XnatSlicer"):
-      """ Generic reload method for any scripted module.
-          ModuleWizard will subsitute correct default moduleName.
-          Provided by Slicer.
+      """ 
+      This is a generic reload method for any scripted module.
+      ModuleWizard will subsitute correct default moduleName.
+      Provided by Slicer.
+
+      @param moduleName: 
+      @type moduleName: string
       """
       
       widgetName = moduleName + "Widget"
@@ -368,8 +399,9 @@ class XnatSlicerWidget:
 
       
     def onReloadAndTest(self, moduleName = "ScriptedExample"):
-        """ Also provided by Slicer.  Runs the tests on the
-            reload.
+        """ 
+        Also provided by Slicer.  Runs the tests on the
+        reload.
         """
         try:
             self.onReload()
@@ -387,7 +419,13 @@ class XnatSlicerWidget:
 
         
     def sceneClosedListener(self, caller, event):
-        """Actions for when the user closes a scene from the GUI.
+        """
+        Actions for when the user closes a scene from the GUI.
+
+        @param caller: The object calling the event.
+        @type caller: vtk.vtkObject
+        @param event: The unsigned long int value of the vent.
+        @type event: number
         """ 
         #print("'Close Scene' called. Resetting Xnat session data.")    
         self.XnatView.sessionManager.clearCurrentSession()  
@@ -396,9 +434,15 @@ class XnatSlicerWidget:
 
         
     def sceneImportedListener(self, caller, event): 
-        """Actions for when the user imports a scene from the GUI.
-           NOTE: This technically is not used, as the user must refer to files from an 
-           XNAT location. Nonetheless, it is implemented in the event that it is needed.
+        """
+        Actions for when the user imports a scene from the GUI.
+        NOTE: This technically is not used, as the user must refer to files from an 
+        XNAT location. Nonetheless, it is implemented in the event that it is needed.
+
+        @param caller: The object calling the event.
+        @type caller: vtk.vtkObject
+        @param event: The unsigned long int value of the vent.
+        @type event: number
         """
         if self.XnatView.lastButtonClicked == None:
             #print("'Import Data' called. Resetting Xnat session data.")
@@ -408,7 +452,8 @@ class XnatSlicerWidget:
             
             
     def initGUI(self):  
-        """ As stated.
+        """ 
+        Initializes the GUI of the XNATSlicer widget.
         """
                 
         #--------------------------------
@@ -573,9 +618,17 @@ class XnatSlicerWidget:
 
         
     def cleanCacheDir(self, maxSize):
-        """ Empties contents of the temp directory based upon maxSize
+        """ 
+        Empties contents of the temp directory based on the maxSize argument.
+
+        @param maxSize: The maximum size in MB allowed for the cache directory.
+        @type maxSize: An number >= 0.
         """
-        import math
+
+        if maxSize < 0:
+          raise Exception("'maxSize' argument must be greater than or equal to 0!")
+
+
         folder = GLOB_CACHE_URI
         folder_size = 0
 
@@ -596,16 +649,18 @@ class XnatSlicerWidget:
         #--------------------------------
         folder_size = math.ceil(folder_size/(1024*1024.0))
         if folder_size > maxSize:
-            XnatUtils.removeFilesInDir(folder)    
+          shutil.rmtree(folder)
+          os.mkdir(folder)
 
 
 
 
                 
     def beginXnat(self):
-        """ Opens the view class linked to the Xnat REST API.
-            Runs a test for the relevant libraries (i.e. SSL)
-            before allowing the login process to begin.
+        """ 
+        Opens the XnatView class to allow for user interaction.
+        Runs a test for the relevant libraries (i.e. SSL)
+        before allowing the login process to begin.
         """
 
         #--------------------
@@ -648,11 +703,18 @@ class XnatSlicerWidget:
 
 
     def calculateCollapsibleTargetHeights(self, state):
-        """ Determines the target heights for the various
-            collapsibles to animate to by quickly expanding
-            the collapsibles, recording their geometries, then
-            quickly compressing them.  The user should not 
-            notice this calculation.
+        """ 
+        Determines the target heights for the various
+        collapsibles to animate to by quickly expanding
+        the collapsibles, recording their geometries, then
+        quickly compressing them.  The user should not 
+        notice this calculation.
+
+        @param state: The state to base the height calculations
+            on.  Anything that isn't 'onLoginSuccessful' will 
+            default not be calculated (failed states don't require
+            calculation).
+        @type state: string
         """
 
         #--------------------
@@ -728,8 +790,10 @@ class XnatSlicerWidget:
             
 
     def onLoginSuccessful(self):
-        """ Enables the relevant collapsible 
-            group boxes. 
+        """ 
+        Enables the relevant collapsible 
+        group boxes for the user to interact with: 
+        Viewer, Details and Tools
         """
 
         heights = self.calculateCollapsibleTargetHeights('onLoginSuccessful')
@@ -795,8 +859,8 @@ class XnatSlicerWidget:
         
         
     def onLoginFailed(self):
-        """ Disable the relevant collapsible 
-            group boxes. 
+        """ 
+        Disables and collapses the interactible widgets.
         """
 
         #--------------------
@@ -845,8 +909,8 @@ class XnatSlicerWidget:
             
 
     def onLoginButtonClicked(self):
-        """ Event function for when the login button is clicked.
-            Steps below.
+        """ 
+        Event function for when the login button is clicked.
         """        
 
         #--------------------
@@ -880,7 +944,8 @@ class XnatSlicerWidget:
 
 
     def onDeleteClicked(self, button=None):
-        """ Starts Delete workflow.
+        """ 
+        Starts Delete workflow (i.e. XnatDeleteWorkflow)
         """  
 
         xnatDeleteWorkflow = XnatDeleteWorkflow(self, self.XnatView.getCurrItemName())
@@ -890,7 +955,8 @@ class XnatSlicerWidget:
 
             
     def onSaveClicked(self):        
-        """ Starts Save workflow.
+        """ 
+        Starts Save workflow (i.e XnatSaveWorkflow)
         """     
         
         self.lastButtonClicked = "save" 
@@ -901,40 +967,39 @@ class XnatSlicerWidget:
         
 
     def onTestClicked(self):        
-        """ Starts Save workflow.
+        """ 
+        Starts Test workflow.
         """     
         self.lastButtonClicked = "test" 
         self.XnatView.setEnabled(True)
         #self.tester.runTest()
 
 
-
-        
-    def getFullXnatUrl(self, uri):
-        if uri.startswith('/'):
-            uri = uri[1:]
-        if uri.startswith('projects'):
-            return self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText) + '/data/archive/' + uri
-        
-
-        
         
     def onLoadClicked(self):
-        """ Starts Load workflow.
+        """ 
+        Starts Load workflow (i.e. XnatLoadWorkflow).
         """
         
         self.lastButtonClicked = "load"
         self.XnatLoadWorkflow = XnatLoadWorkflow(self)
-        self.XnatLoadWorkflow.beginWorkflow(self.getFullXnatUrl(self.XnatView.getXnatUri()))
 
+        url = self.XnatView.getXnatUri()
+        if url.startswith('/'):
+            url = url[1:]
+        if url.startswith('projects'):
+            url = self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText) + '/data/archive/' + url
 
+        self.XnatLoadWorkflow.beginWorkflow(url)
 
 
 
 
     def onFilterButtonClicked(self):
-        """ As stated.  Handles the toggling of filter
-            buttons relative to one another. O(4n).
+        """ 
+        As stated.  Handles the toggling of filter
+        buttons relative to one another in the XnatView
+        class.
         """
 
 

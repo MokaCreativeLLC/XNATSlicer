@@ -12,26 +12,23 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from GLOB import *
 from XnatUtils import *
+from MokaUtils import *
 from XnatTimer import *
 from XnatFileInfo import *
 
 
 
 
-comment = """
-XnatScenePackager is used for the Save / upload process.  When 
-sending a scene to XNAT, the class calls the necessary slicer.app API 
-functions to get all of the scene's files into a .zip (or .mrb).  
-
-TODO : 
-"""
-
-
-
-
 class XnatScenePackager(object):
-    """Class containing methods for packaging scenes pertinent to the 
-       XNATSlicer workflow.
+    """
+    Class containing methods for packaging scenes pertinent to the 
+    XNATSlicer workflow.
+    
+    XnatScenePackager is used for the Save / upload process.  When 
+    sending a scene to XNAT, the class calls the necessary slicer.app API 
+    functions to get all of the scene's files into a .zip (or .mrb).  
+    
+    TODO : 
     """
        
     def __init__(self, MODULE = None):
@@ -60,7 +57,7 @@ class XnatScenePackager(object):
         # Create a directory for saving locally.
         #-------------------
         saveDirectory = os.path.join(GLOB_LOCAL_URIS['uploads'], packageName)
-        #print XnatUtils.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
+        ##print MokaUtils.debug.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
 
 
 
@@ -69,9 +66,9 @@ class XnatScenePackager(object):
         # with the same name if it exists
         #-------------------
         try:
-            #print XnatUtils.lf() + ("%s does not exist. Making it."%(saveDirectory)) 
+            ##print MokaUtils.debug.lf() + ("%s does not exist. Making it."%(saveDirectory)) 
             if os.path.exists(saveDirectory): 
-                XnatUtils.removeDirsAndFiles(saveDirectory)
+                shutil.rmtree(saveDirectory)
         except Exception, e: 
             pass
 
@@ -93,7 +90,7 @@ class XnatScenePackager(object):
         try: 
             os.makedirs(saveDirectory + "/Data")
         except Exception, e: 
-            print XnatUtils.lf() +  "Likely the dir already exists: " + str(e)
+            MokaUtils.debug.lf( "Likely the dir already exists: " + str(e))
 
 
 
@@ -122,8 +119,8 @@ class XnatScenePackager(object):
         # Return appropriate dictionary with the mrml file
         # and the save directory.
         #-------------------
-        return {'path':XnatUtils.adjustPathSlashes(saveDirectory), 
-                'mrml': XnatUtils.adjustPathSlashes(mrml)}
+        return {'path':MokaUtils.path.adjustPathSlashes(saveDirectory), 
+                'mrml': MokaUtils.path.adjustPathSlashes(mrml)}
 
 
 

@@ -239,9 +239,10 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
     def eventFilter(self, ob, event):
         """ Event filter to for searchLine events.
         """
-        print event
-        if event.type() == qt.QEvent.FocusIn:
-            print "CLICL!"
+        str(event)
+        #print event
+        #if event.type() == qt.QEvent.FocusIn:
+            #print "CLICL!"
 
 
         

@@ -244,7 +244,7 @@ class XnatMetadataManager(qt.QFrame):
         """ Sets the item type provided by the 'itemType'
             argument within the XnatMetadataEditors.
         """
-        #print "\t (Metadata Manager) METADATA SET ITEM TYPE", itemType
+        ##print "\t (Metadata Manager) METADATA SET ITEM TYPE", itemType
         self.currItemType = itemType
         for key, metadataEditor in self.defaultMetadataEditors.iteritems():
             metadataEditor.setItemType(itemType)
@@ -336,8 +336,7 @@ class XnatMetadataManager(qt.QFrame):
 
                     
             except Exception, e:
-                print XnatUtils.lf()
-                print str(e)
+                MokaUtils.debug.lf(str(e))
 
 
                 

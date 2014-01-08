@@ -191,3 +191,8 @@ GLOB_DEFAULT_XNAT_METADATA =  {
 
     
 GLOB_DATE_TAGS =  [ 'last_accessed_497', 'insert_date']
+
+GLOB_DEFAULT_SLICER_EXTENSION = ".mrb"
+GLOB_SLICER_PACKAGE_EXTENSIONS = [".zip", ".mrb"]
+
+GLOB_DEFAULT_SCENE_NAME =  "SlicerScene_"

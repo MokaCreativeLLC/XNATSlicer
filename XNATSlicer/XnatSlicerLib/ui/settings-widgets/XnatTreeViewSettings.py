@@ -159,7 +159,7 @@ class XnatTreeViewSettings(XnatSettings):
                 self.MODULE.XnatView.changeFontSize(int(size))
                 self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(size)]})
             except Exception, e:
-                #print XnatUtils.lf(), str(e)
+                ##print MokaUtils.debug.lf(), str(e)
                 pass
 
 

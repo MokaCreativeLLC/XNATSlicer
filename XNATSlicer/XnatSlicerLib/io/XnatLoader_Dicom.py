@@ -88,7 +88,7 @@ class XnatLoader_Dicom(XnatLoader):
         # and their directories.
         #--------------------
         abbrevUris = [ fileUri.split(splitter)[1] for fileUri in fileUris if XnatUtils.isDICOM(fileUri) ]
-        print "abbrevUris", abbrevUris
+        #print "abbrevUris", abbrevUris
                 
 
 
@@ -114,7 +114,7 @@ class XnatLoader_Dicom(XnatLoader):
         # If all URIs are in the database, use cache, exit.
         #--------------------    
         if len(cachedFiles) == len(abbrevUris):
-            print XnatUtils.lf(), "DICOMs to download are already in the cache!"
+            #print MokaUtils.debug.lf(), "DICOMs to download are already in the cache!"
             self._dst = None
             folderUri = self._src.replace('?format=zip', '')
 
@@ -124,7 +124,7 @@ class XnatLoader_Dicom(XnatLoader):
             self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
             self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
             self.extractedFiles = cachedFiles
-            slicer.app.processEvents()
+            #slicer.app.processEvents()
             return True
           
         return False
@@ -140,7 +140,6 @@ class XnatLoader_Dicom(XnatLoader):
         """
 
         if self.useCached:
-            print self.extractedFiles
             return self.loadDicomsFromDatabase(self.extractedFiles)
 
 
@@ -183,7 +182,7 @@ class XnatLoader_Dicom(XnatLoader):
             #
             errorString = str(e)
             if 'uninitialized ctkDICOMItem' in errorString:
-                print (XnatUtils.lf(), "The slicer.dicomDabase is unitialized (%s).  Initializing it."%(errorString))
+                #print (MokaUtils.debug.lf(), "The slicer.dicomDabase is unitialized (%s).  Initializing it."%(errorString))
                 slicer.dicomDatabase.initialize()
                 dicomIndexer.addListOfFiles(slicer.dicomDatabase, self.extractedFiles)
 
@@ -198,12 +197,13 @@ class XnatLoader_Dicom(XnatLoader):
 
     
     def loadDicomsFromDatabase(self, dicomFiles):
-        """  Loads a set of dicom database files from the slicer.dicomDatabase
-             into Slicer without prompting the user to input anything.  
-             The 'loadable' with the hightest priority has the highest 
-             file count.
+        """ 
+        Loads a set of dicom database files from the slicer.dicomDatabase
+        into Slicer without prompting the user to input anything.  
+        The 'loadable' with the hightest priority has the highest 
+        file count.
         """
-    
+
         #--------------------
         # Create dictionary of downloaded DICOMS
         # for quick retrieval when comparing with files
@@ -283,7 +283,7 @@ class XnatLoader_Dicom(XnatLoader):
 
             NOTE:
         """
-        #print(XnatUtils.lf(), "DICOMS successfully loaded.")
+        ##print(MokaUtils.debug.lf(), "DICOMS successfully loaded.")
         sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self.xnatSrc)
         sessionArgs['sessionType'] = "dicom download"
         self.MODULE.XnatView.startNewSession(sessionArgs)

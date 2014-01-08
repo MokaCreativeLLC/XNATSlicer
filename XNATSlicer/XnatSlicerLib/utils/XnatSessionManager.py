@@ -65,8 +65,9 @@ class XnatSessionArgs(dict):
 
         
     def makeSessionArgs_byPath(self, filePath):
-        """ Consructs a number of the session values
-            by one argument, 'filePath'.
+        """ 
+        Consructs a number of the session values
+        by one argument, 'filePath'.
         """
         saveLevelDir, slicerDir = XnatUtils.getSaveTuple(filePath) 
         self['host'] = self.MODULE.XnatLoginMenu.hostDropdown.currentText
@@ -84,9 +85,10 @@ class XnatSessionArgs(dict):
     def printAll(self, prefStr=None):
         """ As stated. For debugging purposes.
         """
-        if prefStr: print (('%s')%(prefStr))
+        if prefStr: 
+            MokaUtils.debug.lf(('%s')%(prefStr))
         for k,v in self.iteritems():
-            print "[\'%s\']=\t%s"%(k,v)
+            MokaUtils.debug.lf( "[\'%s\']=\t%s"%(k,v))
 
 
 
@@ -124,7 +126,7 @@ class XnatSessionManager(object):
     def clearCurrentSession(self):
         """ As stated.
         """
-        #print(XnatUtils.lf() + "Clearing current session")
+        ##print(MokaUtils.debug.lf() + "Clearing current session")
         self.sessionArgs = None
 
 
@@ -138,7 +140,7 @@ class XnatSessionManager(object):
             fileLines.append("%s:\t\t%s\n"%(item, self.sessionArgs[item]))
         
         fileLines.append("\n\n")
-        #print(XnatUtils.lf() + "Session log file: %s"%(self.sessionFileName))
+        ##print(MokaUtils.debug.lf() + "Session log file: %s"%(self.sessionFileName))
         f = open(self.sessionFileName, 'a')
         f.writelines(fileLines)            
         f.close()

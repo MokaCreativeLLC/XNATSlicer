@@ -87,7 +87,7 @@ class XnatTimer(object):
         if processName:
             self.processName = processName
             self.timerStrs.append('\n' + processName + '\n') 
-            print('\n\n\n' + processName)
+            #print('\n\n\n' + processName)
 
             
         if self.debugStr: 
@@ -96,7 +96,7 @@ class XnatTimer(object):
             
         str  = ("%s <--Start timer %s"%(self.prev, currStr))
         self.timerStrs.append(str + '\n')
-        print str
+        #print str
 
 
         

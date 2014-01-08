@@ -172,7 +172,7 @@ class XnatSearchBar(qt.QFrame):
         """
 
 
-        #print "SEARCH LINE FOCUSED"
+        ##print "SEARCH LINE FOCUSED"
         #--------------------------------
         # Clear the default string in the searchLine
         # once the user clicks on the line
@@ -210,7 +210,7 @@ class XnatSearchBar(qt.QFrame):
             self.MODULE.XnatView.defaultFilterFunction()
             self.MODULE.XnatView.refreshColumns()
         except Exception, e:
-            #print XnatUtils.lf(), str(e)
+            ##print MokaUtils.debug.lf(), str(e)
             pass
 
 

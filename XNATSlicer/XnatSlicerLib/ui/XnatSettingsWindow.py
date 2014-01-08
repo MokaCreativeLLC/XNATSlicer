@@ -11,20 +11,13 @@ from FingerTabWidget import *
 
 
 
-
-comment = """
-XnatSettingsWindow is the window for user-inputted XNAT settings, 
-such as the Host Manager, Tree View Settings, etc.
-
-TODO:
-"""
-
-
-        
-
 class XnatSettingsWindow(FingerTabWidget):
-    """ Popup window for managing user-inputted XnatSettings, 
-        such as host names and default users.
+    """ 
+    Popup window for managing user-inputted XnatSettings, 
+    such as host names and default users.
+
+    XnatSettingsWindow is the window for user-inputted XNAT settings, 
+    such as the Host Manager, Tree View Settings, etc.
     """
     
     def __init__(self, parent, MODULE):  
@@ -127,18 +120,17 @@ class XnatSettingsWindow(FingerTabWidget):
 
 
         
-        #print "(Settings Window) SETTINGS WINDOW UPDATE:"
+        ##print "(Settings Window) SETTINGS WINDOW UPDATE:"
         #--------------------
         # Remove the metadata editor from the previous settings.
         #--------------------       
         try:
             for i in range(0, len(self.tabButtons)):
                 for key, manager in self.settingsWidgets[i]['widget'].XnatMetadataManagers.iteritems(): 
-                    #print "\n\tUpdating Manager for: ", key
+                    ##print "\n\tUpdating Manager for: ", key
                     manager.update()
         except Exception, e:
-            print XnatUtils.lf(), "XnatMetadataManagerObject error."
-            print str(e)
+            MokaUtils.debug.lf("XnatMetadataManagerObject error.", str(e))
 
             
 
@@ -195,7 +187,7 @@ class XnatSettingsWindow(FingerTabWidget):
             
         for i in range(0, len(self.settingsWidgets)):
             sDict = self.settingsWidgets[i]
-            #print "***********", sDict, settingName
+            ##print "***********", sDict, settingName
             if sDict['name'] == settingName:
                 self.setCurrentIndex(i)
                 return

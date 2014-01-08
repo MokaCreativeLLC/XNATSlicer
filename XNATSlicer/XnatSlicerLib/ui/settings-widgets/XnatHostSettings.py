@@ -8,6 +8,7 @@ import sys
 
 from GLOB import *
 from XnatUtils import *
+from MokaUtils import *
 
 from XnatSettings import *
 
@@ -126,7 +127,7 @@ class XnatHostSettings(XnatSettings):
         try:
             self.setButtonStates(self.hostTable.currentRowItems['name'])
         except:
-            print "No row items selected"
+            #print "No row items selected"
             return
         
         
@@ -137,7 +138,7 @@ class XnatHostSettings(XnatSettings):
             quality of the host (provided by the 'hostName'
             argument).  Some hosts cannot be modified.
         """
-        #print hostName, self.MODULE.XnatSettingsFile.isModifiable(hostName) 
+        ##print hostName, self.MODULE.XnatSettingsFile.isModifiable(hostName) 
         if self.MODULE.XnatSettingsFile.isModifiable(hostName):
             self.deleteButton.setEnabled(True)
             self.editButton.setEnabled(True)
@@ -438,7 +439,7 @@ class HostTable(qt.QTableWidget):
     def printAll(self):
         """ Prints the row/column count of the hostTable.
         """
-        print XnatUtils.lf(), "PRINT ALL:", self.rowCount, self.columnCount 
+        MokaUtils.debug.lf("PRINT ALL:", self.rowCount, self.columnCount)
 
 
         
@@ -481,7 +482,7 @@ class HostTable(qt.QTableWidget):
                 
                 return returner
         except Exception, e:
-            print "Skipping (Ref: '%s')"%(str(e))
+            MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
 
 
         

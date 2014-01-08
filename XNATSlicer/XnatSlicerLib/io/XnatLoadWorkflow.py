@@ -4,31 +4,24 @@ from __main__ import vtk, ctk, qt, slicer
 import os
 import sys
 
-
-
 from XnatLoader import *
 from XnatLoader_Analyze import *
 from XnatLoader_Dicom import *
 from XnatLoader_File import *
 from XnatLoader_Mrb import *
 from XnatPopup import *
-
-
-
-comment = """
-XnatLoadWorkflow is effectively a factory for various loader classes.  
-Loader types are determined by the treeViewItem being clicked in the 
-XnatLoadWorkflow function 'beginWorkflow'.  
-
-TODO:
-"""
-
+from SlicerUtils import *
 
 
 
 class XnatLoadWorkflow(object):
-    """ Parent Load workflow class to: XnatDicomLoadWorkflow, 
-        XnatMrbLoadWorkflow, and XnatFileLoadWorkflow.
+    """ 
+    XnatLoadWorkflow is effectively a factory for various loader classes.  
+    Loader types are determined by the XnatView item being clicked in the 
+    XnatLoadWorkflow function 'beginWorkflow'.  
+    
+    Parent Load workflow class to: XnatDicomLoadWorkflow, 
+    XnatMrbLoadWorkflow, and XnatFileLoadWorkflow.
     """
 
     
@@ -66,8 +59,41 @@ class XnatLoadWorkflow(object):
         self.clearScenePopup = XnatClearScenePopup()
         self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.clearSceneButtonClicked) 
 
-        self.preDownloadPopup = XnatTextPopup('Checking files...')
-        self.postDownloadPopup = XnatTextPopup('Processing.  Data will load automatically.')
+        self.preDownloadPopup = XnatTextPopup('<b>Checking files...</b>')
+        self.postDownloadPopup = XnatTextPopup('<b>Processing.  Data will load automatically.</b>')
+
+
+
+    def sortLoadablesByType(self, fileUris):
+        """
+        Sorts a list of file uris by XNATSlicer loadable types.  Generally used 
+        when multi-folder downloading is in effect.
+
+        @param fileUris: The list of iles to sort..
+        @type: list(string)
+
+        @return: A dictionary where each key specifies the loadable type.
+        @rtype: dict
+        """
+        
+        filesByType = {
+            'analyze': [],
+            'dicom': [],
+            'misc': [],
+            'unknown': []
+        }
+
+        for fileUri in fileUris:
+            if XnatUtils.isAnalyze(fileUri):
+                filesByType['analyze'].append(fileUri)
+            elif XnatUtils.isDICOM(fileUri):
+                filesByType['dicom'].append(fileUri)
+            elif XnatUtils.isMiscLoadable(fileUri):
+                filesByType['misc'].append(fileUri)
+            else:
+                filesByType['unknown'].append(fileUri)
+
+        return filesByType
 
 
 
@@ -88,7 +114,7 @@ class XnatLoadWorkflow(object):
         # START
         #--------------------------------
         def downloadStarted(_xnatSrc, size = 0):
-            print "\n\nDOWNLOAD START", self.XnatDownloadPopup.downloadRows, "\n\n"
+            #print "\n\nDOWNLOAD START", self.XnatDownloadPopup.downloadRows, "\n\n"
             #if size > 0:
             self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
@@ -175,7 +201,7 @@ class XnatLoadWorkflow(object):
         #------------------------
         # Show clearSceneDialog
         #------------------------
-        if not XnatUtils.isCurrSceneEmpty() and not self.skipEmptySceneCheck:
+        if not SlicerUtils.isCurrSceneEmpty() and not self.skipEmptySceneCheck:
             self.clearScenePopup.show()
             return
 
@@ -196,7 +222,7 @@ class XnatLoadWorkflow(object):
             self.XnatDownloadPopup.hide()
             self.postDownloadPopup.show()
             for callback in downloadFinishedCallbacks:
-                print "DOWNLOAD FINISHED!"
+                #print "DOWNLOAD FINISHED!"
                 callback()
                 slicer.app.processEvents()
                 self._src = None
@@ -208,7 +234,7 @@ class XnatLoadWorkflow(object):
         #------------------------
         # Show download popup
         #------------------------  
-        print "Initializing download..."
+        #print "Initializing download..."
         self.preDownloadPopup.show()
 
 
@@ -217,7 +243,8 @@ class XnatLoadWorkflow(object):
         # Get loaders, add to queue
         #------------------------  
         for loader in self.loaderFactory(self._src):
-            self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
+            if not loader.useCached:
+                self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
             downloadFinishedCallbacks.append(loader.load)             
 
 
@@ -252,7 +279,7 @@ class XnatLoadWorkflow(object):
             
         """
 
-        print "\n\nLOADER FACTORY"
+        #print "\n\nLOADER FACTORY"
         loaders = []
 
 
@@ -261,9 +288,9 @@ class XnatLoadWorkflow(object):
         # Open popup
         #------------------------
         if '/scans/' in _src or '/files/' in _src:
-            print "OPENING POPUP ROW", _src
+            #print "OPENING POPUP ROW", _src
             self.XnatDownloadPopup.addDownloadRow(_src)
-            print self.XnatDownloadPopup.downloadRows
+            #print self.XnatDownloadPopup.downloadRows
             
 
 
@@ -276,7 +303,7 @@ class XnatLoadWorkflow(object):
             
             # MRB
             if '/Slicer/files/' in _src:
-                print "FOUND SLICER FILE"
+                #print "FOUND SLICER FILE"
                 loaders.append(XnatLoader_Mrb(self.MODULE, _src))
                 
 
@@ -293,13 +320,13 @@ class XnatLoadWorkflow(object):
             # uri manipulation
             splitScan =  _src.split('/scans/')   
             scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
-            print "SPLIT SCAN:", splitScan, '\n\t',scanSrc
+            #print "SPLIT SCAN:", splitScan, '\n\t',scanSrc
             # query xnat for folder contents
-            contentUris = self.MODULE.XnatIo.getFolderContents(scanSrc, metadataTags = ['URI'])['URI']
-            print "CONTENT URIS", contentUris
+            contentUris = self.MODULE.XnatIo.getFolder(scanSrc, metadataTags = ['URI'])['URI']
+            #print "CONTENT URIS", contentUris
             # get file uris and sort them by type
-            loadables = XnatUtils.sortLoadablesByType(contentUris)
-            print "LOADABLES", loadables
+            loadables = self.sortLoadablesByType(contentUris)
+            #print "LOADABLES", loadables
             # cycle through the loadables and
             # create the loader for each loadable list.
             for loadableType, loadableList in loadables.iteritems():
@@ -324,14 +351,14 @@ class XnatLoadWorkflow(object):
             # Uri manipulation
             splitExpt = _src.split('/experiments/')
             exptSrc = splitExpt[0] + '/experiments/' + splitExpt[1].split('/')[0] + '/scans'
-            print "SPLIT Expt:", splitExpt, '\n\t',exptSrc
+            #print "SPLIT Expt:", splitExpt, '\n\t',exptSrc
             # Query for Scan IDs from XNAT.
-            contents = self.MODULE.XnatIo.getFolderContents(exptSrc, metadataTags = ['ID'])
-            print "SCAN IDS", contents
+            contents = self.MODULE.XnatIo.getFolder(exptSrc, metadataTags = ['ID'])
+            #print "SCAN IDS", contents
             # Recurse this function for every scan.
             for scanId in contents['ID']:
                 scanSrc = exptSrc + '/' + scanId + '/files'
-                print "\n\nLOADING SCAN SOURCE", scanSrc
+                #print "\n\nLOADING SCAN SOURCE", scanSrc
                 loaders += self.loaderFactory(scanSrc)
 
             # Return loaders

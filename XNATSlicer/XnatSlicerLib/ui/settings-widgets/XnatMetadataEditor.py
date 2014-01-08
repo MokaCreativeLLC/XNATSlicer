@@ -180,7 +180,7 @@ class XnatMetadataEditor(qt.QFrame):
         # have one itemType (checkbox or label)
         # for now.
         #--------------------
-        #print "\t\t(Meadata Editor) EDITOR SET ITEM TYPE", self.__class__.__name__
+        ##print "\t\t(Meadata Editor) EDITOR SET ITEM TYPE", self.__class__.__name__
         self.currItemType = itemType
 
 
@@ -227,7 +227,7 @@ class XnatMetadataEditor(qt.QFrame):
         # Loop through all the listWidget's items
         # and set their flags accordingly.
         #--------------------
-        #print "EDITOR SUPER UPDATE"
+        ##print "EDITOR SUPER UPDATE"
         self.setItemType(self.currItemType)
 
 
@@ -286,7 +286,7 @@ class XnatMetadataEditor(qt.QFrame):
         # purpose of calling the appropriate XnatSettingsFile
         # section metadata.
         #--------------------
-        #print "item clicked", item.text(), item.flags()
+        ##print "item clicked", item.text(), item.flags()
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
 
 
@@ -313,7 +313,7 @@ class XnatMetadataEditor(qt.QFrame):
                 # Get all checked metadata items from
                 # the list.
                 #
-                #print item.text(), "Checked!"
+                ##print item.text(), "Checked!"
                 checkedMetadataItems = []
                 for i in range(0, self.listWidget.count):
                     currItem = self.listWidget.item(i)

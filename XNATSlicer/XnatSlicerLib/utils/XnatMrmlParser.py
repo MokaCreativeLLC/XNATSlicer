@@ -47,7 +47,7 @@ class XnatMrmlParser(object):
         """
 
         
-        #print (XnatUtils.lf(), "Changing values in the mrml.") 
+        ##print (MokaUtils.debug.lf(), "Changing values in the mrml.") 
         dicoms = []
         compLines = []
 
@@ -66,7 +66,7 @@ class XnatMrmlParser(object):
         if filename == newFilename:
             bkpFN = filename.split(".")[0] + ".BKP"
             shutil.copy(filename,bkpFN)
-            XnatUtils.removeFile(filename)
+            os.remove(filename)
             slicer.app.processEvents()
             filename = bkpFN
 
@@ -93,7 +93,7 @@ class XnatMrmlParser(object):
                     #
                     if replaceValues == {}:
                         if os.path.basename(os.path.dirname(value)).lower() == "data":
-                            #print XnatUtils.lf() + " CHANGING NAME WITH DATA FORMAT: 
+                            ##print MokaUtils.debug.lf() + " CHANGING NAME WITH DATA FORMAT: 
                             # %s\tOLD: %s\tNEW:%s"%(subelement.attrib[name], value, "./Data/" + os.path.basename(value))
                             subelement.attrib[name] = "./Data/%s"%(os.path.basename(value))
 
@@ -119,7 +119,7 @@ class XnatMrmlParser(object):
         #------------------------
         # return the dicom files, if necessary
         #------------------------
-        #print (XnatUtils.lf(), "Done writing new mrml!")
+        ##print (MokaUtils.debug.lf(), "Done writing new mrml!")
         return {"dicoms": dicoms}        
 
 

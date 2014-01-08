@@ -4,14 +4,13 @@ set(MODULE_NAME XNATSlicer)
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
   XnatSlicer.py
-  XnatSlicerLib/io/XnatAnalyzeLoadWorkflow.py
-  XnatSlicerLib/io/XnatDeleteWorkflow.py
-  XnatSlicerLib/io/XnatDicomLoadWorkflow.py
-  XnatSlicerLib/io/XnatFileLoadWorkflow.py
-  XnatSlicerLib/io/XnatIo.py
+  XnatSlicerLib/io/XnatLoader_Mrb.py
+  XnatSlicerLib/io/XnatLoader_Dicom.py
+  XnatSlicerLib/io/XnatLoader_Analyze.py
+  XnatSlicerLib/io/XnatLoader_File.py
+  XnatSlicerLib/io/XnatLoader.py
   XnatSlicerLib/io/XnatLoadWorkflow.py
   XnatSlicerLib/io/XnatSaveWorkflow.py
-  XnatSlicerLib/io/XnatSceneLoadWorkflow.py
   XnatSlicerLib/ui/custom-qt-widgets/AnimatedCollapsible.py
   XnatSlicerLib/ui/custom-qt-widgets/FingerTabWidget.py
   XnatSlicerLib/ui/custom-qt-widgets/HoverButton.py
@@ -35,7 +34,7 @@ set(MODULE_PYTHON_SCRIPTS
   XnatSlicerLib/ui/XnatViewer.py
   XnatSlicerLib/utils/XnatError.py
   XnatSlicerLib/utils/XnatFileInfo.py
-  XnatSlicerLib/utils/XnatGlobals.py
+  XnatSlicerLib/utils/GLOB.py
   XnatSlicerLib/utils/XnatMrmlParser.py
   XnatSlicerLib/utils/XnatPopup.py
   XnatSlicerLib/utils/XnatScenePackager.py
@@ -43,6 +42,9 @@ set(MODULE_PYTHON_SCRIPTS
   XnatSlicerLib/utils/XnatSettingsFile.py
   XnatSlicerLib/utils/XnatTimer.py
   XnatSlicerLib/utils/XnatUtils.py
+  XnatSlicerLib/_external/MokaUtils/MokaUtils.py
+  XnatSlicerLib/_external/XnatIo.py
+  XnatSlicerLib/utils/SlicerUtils.py
   )
 
 set(MODULE_PYTHON_RESOURCES

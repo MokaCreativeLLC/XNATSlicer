@@ -389,7 +389,7 @@ class XnatFolderMaker(qt.QWidget):
             #
             # Make folder in XnatIo, processEvents
             #
-            print ("%s creating %s "%(XnatUtils.lf(), xnatUri))
+            #print ("%s creating %s "%(MokaUtils.debug.lf(), xnatUri))
             self.MODULE.XnatIo.makeFolder(xnatUri)
             slicer.app.processEvents()
             

@@ -1,27 +1,20 @@
 from GLOB import *
+from MokaUtils import *
 from XnatUtils import *
 from XnatLoader import *
 from XnatMrmlParser import *
 
 
 
-comment = """
-XnatLoader_Mrb is a subclass of the XnatLoader class.
-It contains specific functions for downloadloading scenes from an XNAT server, 
-and loading them into Slicer.  This is in contrast with loading DICOM sets, 
-individual files or analyze files.
-
-One of the unique aspects of loading scenes is the necessity to parse
-the scene MRML in order to convert all absolute paths to local paths. 
-
-TODO:
-"""
-
-
-
-
 class XnatLoader_Mrb(XnatLoader):
-    """ Descriptor above.
+    """
+    XnatLoader_Mrb is a subclass of the XnatLoader class.
+    It contains specific functions for downloadloading scenes from an XNAT server, 
+    and loading them into Slicer.  This is in contrast with loading DICOM sets, 
+    individual files or analyze files.
+
+    One of the unique aspects of loading scenes is the necessity to parse
+    the scene MRML in order to convert all absolute paths to local paths. 
     """
 
 
@@ -104,9 +97,9 @@ class XnatLoader_Mrb(XnatLoader):
                 z.extractall(destDir)
                 for root, subFolders, files in os.walk(destDir):
                     for file in files:
-                        fileURLs.append(XnatUtils.adjustPathSlashes(os.path.join(root,file)))
+                        fileURLs.append(MokaUtils.path.adjustPathSlashes(os.path.join(root,file)))
             except Exception, e:
-                print ("Extraction error: %s"%(str(e)))
+                MokaUtils.debug.lf("Extraction error: %s"%(str(e)))
 
 
                 
@@ -124,7 +117,7 @@ class XnatLoader_Mrb(XnatLoader):
             # MRB files decompress to a folder of the same name.  
             # Need to move all the files back to destDir.
             #
-            fileURLs = XnatUtils.moveDirContents(mrbDir, destDir) 
+            fileURLs = MokaUtils.path.moveDir(mrbDir, destDir) 
         return fileURLs
 
 
@@ -185,7 +178,7 @@ class XnatLoader_Mrb(XnatLoader):
         #-------------------------
         # Define relevant paths.
         #-------------------------
-        newRemoteDir = XnatUtils.getAncestorUri(remoteURI, "resources")
+        newRemoteDir = MokaUtils.path.getAncestorUri(remoteURI, "resources")
         filePathsToChange = {}
 
 
@@ -217,7 +210,7 @@ class XnatLoader_Mrb(XnatLoader):
         # all absolute URIs to relative.
         #-------------------------
         if len(mrmlFiles) > 0:
-            newMRMLFile = XnatUtils.appendFile(mrmlFiles[0], "-LOCALIZED")       
+            newMRMLFile = MokaUtils.path.addSuffixToFileName(mrmlFiles[0], "-LOCALIZED")       
             #
             # NOTE: Parsing of the MRML is needed because node filePaths are absolute, not relative.
             # TODO: Submit a change request for absolute path values to Slicer
@@ -265,17 +258,18 @@ class XnatLoader_Mrb(XnatLoader):
             if not os.path.exists(value):
                 try: os.makedirs(value)
                 except Exception, e: 
-                    print("Couldn't make the following directory: %s\nRef. Error: %s"%(value, str(e)))# {} for some strange reason!").format(str(value))
+                    MokaUtils.debug.lf("Couldn't make the following directory: %s\nRef. Error: %s"%(value, str(e)))# {} for some strange reason!").format(str(value))
             else:
-                #print (XnatUtils.lf() + "REMOVING EXISTING FILES IN '%s'"%(value))
-                XnatUtils.removeFilesInDir(value)
+                MokaUtils.debug.lf( "REMOVING EXISTING FILES IN '%s'"%(value))
+                shutil.rmtree(value)
+                os.mkdir(value)
 
 
                 
         #-------------------------
         # Move unpacked contents to new directory
         #-------------------------
-        XnatUtils.moveDirContents(extractDir, self.cachePathDict['localFiles'])
+        MokaUtils.path.moveDir(extractDir, self.cachePathDict['localFiles'])
 
         
 
@@ -295,7 +289,7 @@ class XnatLoader_Mrb(XnatLoader):
         try:
             os.remove(localURI)
         except Exception, e:
-            print "Can't remove the moved file -- a thread issue."
+            MokaUtils.debug.lf("Can't remove the moved file -- a thread issue.")
 
 
 
@@ -308,7 +302,7 @@ class XnatLoader_Mrb(XnatLoader):
         #-------------------------
         # Call slicer's native 'loadscene' function.
         #-------------------------
-        #print( "Loading '" + os.path.basename(self._src) + "'")
+        ##print( "Loading '" + os.path.basename(self._src) + "'")
         slicer.util.loadScene(fileName) 
 
 
@@ -319,7 +313,7 @@ class XnatLoader_Mrb(XnatLoader):
         sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self._src)
         sessionArgs['sessionType'] = "scene download"
         self.MODULE.XnatView.startNewSession(sessionArgs)
-        #print( "\nScene '%s' loaded."%(os.path.basename(fileName.rsplit(".")[0])))  
+        ##print( "\nScene '%s' loaded."%(os.path.basename(fileName.rsplit(".")[0])))  
 
 
         

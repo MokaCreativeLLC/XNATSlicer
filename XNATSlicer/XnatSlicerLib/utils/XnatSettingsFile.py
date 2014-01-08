@@ -119,7 +119,7 @@ class XnatSettingsFile:
     """ Determine if there is an XnatSettingsFile.ini file.
     """
     if not os.path.exists(self.filepath): 
-        print 'No Xnat settings found...creating new settings file: ' + self.filepath
+        #print 'No Xnat settings found...creating new settings file: ' + self.filepath
         self.createDefaultSettings()
 
 
@@ -133,7 +133,7 @@ class XnatSettingsFile:
     for name in self.defaultHosts:
          default = True if name == 'Central' else False
          modifiable = True if name != 'Central' else False
-         print modifiable, name
+         #print modifiable, name
          self.saveHost(name, self.defaultHosts[name], isModifiable = modifiable, isDefault = default)    
     self.savePaths(restPaths, "REST")
 
@@ -158,12 +158,12 @@ class XnatSettingsFile:
       """
       self.database.beginGroup(hostName)
 
-      #print "SET TAG VALUES", hostName, tagValueDict
+      ##print "SET TAG VALUES", hostName, tagValueDict
       itemsStr = ''
       for tag, items in tagValueDict.iteritems(): 
           if len(items) > 0:
               for item in items:
-                  #print item
+                  ##print item
                   itemsStr += str(item) + ','
               
               self.database.setValue(tag, itemsStr[:-1])

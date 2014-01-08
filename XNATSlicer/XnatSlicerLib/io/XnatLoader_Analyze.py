@@ -1,4 +1,6 @@
 from XnatUtils import *
+from MokaUtils import *
+from SlicerUtils import *
 from XnatLoader import *
 
 
@@ -31,21 +33,21 @@ class XnatLoader_Analyze(XnatLoader):
         splitter = '/projects/'
      
         abbreviatedUris = [self._src.split(splitter)[1].replace('?format=zip', '') + '/' + os.path.basename(fileUri) for fileUri in self.fileUris]
-        print "ABBREVIATED URIS", abbreviatedUris
+        #print "ABBREVIATED URIS", abbreviatedUris
         
         foundCount = 0
         cachedFiles = []
         for root, dirs, files in os.walk(self._dst.replace('.zip', '')):
             for f in files:
                 if XnatUtils.isAnalyze(f):
-                    print "\n\nCACHED ANALYZE", os.path.join(root, f), "\n\n", root, f
+                    #print "\n\nCACHED ANALYZE", os.path.join(root, f), "\n\n", root, f
                     uri = os.path.join(root, f)
-                    print uri.split(splitter)[1] in abbreviatedUris
+                    #print uri.split(splitter)[1] in abbreviatedUris
                     if uri.split(splitter)[1] in abbreviatedUris:
                         foundCount +=1
                         cachedFiles.append(uri)
 
-        print "FOUND", foundCount, "URS", len(abbreviatedUris)
+        #print "FOUND", foundCount, "URS", len(abbreviatedUris)
         
         if foundCount == len(abbreviatedUris):
             # Update the download popup
@@ -69,7 +71,7 @@ class XnatLoader_Analyze(XnatLoader):
         """
 
         if self.useCached:
-            print "\n\nUSING ANALYZE CHACHED", self.extractedFiles, "\n\n"
+            MokaUtils.debug.lf( "\n\nUSING ANALYZE CHACHED", self.extractedFiles, "\n\n")
             
             
         else:
@@ -77,7 +79,7 @@ class XnatLoader_Analyze(XnatLoader):
             self.extractDst()
             
         for fileName in self.extractedFiles:
-            XnatUtils.loadNodeFromFile(fileName)
+            SlicerUtils.loadNodeFromFile(fileName)
 
 
 

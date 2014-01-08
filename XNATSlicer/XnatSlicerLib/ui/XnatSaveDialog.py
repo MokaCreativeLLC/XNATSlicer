@@ -6,7 +6,10 @@ import sys
 
 import shutil
 
+
+from GLOB import *
 from XnatFileInfo import *
+from MokaUtils import *
 from XnatUtils import *
 from XnatScenePackager import *
 from XnatSessionManager import *
@@ -15,25 +18,7 @@ from XnatTimer import *
 
 
 comment = """
-There are three classes within this file:
-XnatSaveDialog (parent class), 
-XnatSaveUnlinkedDialog (sub-class), and 
-XnatFileSaveDialog (sub0class).
 
-XnatSaveDialog is a parent class that manages various 
-dialogs related to saving Xnat files.  Dialogs occur
-in a sequence, hence there are multiple dialogs to 
-be managed.  This class handles the generic functions
-related to their management: setting the number of dialogs,
-closing the dialogs, etc. The contents of the dialogs 
-are specified in the 
-
-The classes that inherit from it are:
-1) XnatSaveUnlinkedDialog
-(For saving a scene that doesn't originate from an XNAT
-host.)
-2) XnatFileSaveDialog
-(Where user enters filename of the scene to save.)
 
 TODO:        
 """
@@ -41,11 +26,29 @@ TODO:
 
 
 class XnatSaveDialog(object):
-    """ Parent class of all of the save dialogs.
+    """
+    XnatSaveDialog is a parent class that manages various 
+    dialogs related to saving Xnat files.  Dialogs occur
+    in a sequence, hence there are multiple dialogs to 
+    be managed.  This class handles the generic functions
+    related to their management: setting the number of dialogs,
+    closing the dialogs, etc. The contents of the dialogs 
+    are specified in the 
+    
+    The classes that inherit from it are:
+        1. XnatSaveUnlinkedDialog: For saving a scene that doesn't 
+           originate from an XNAT host.
+        2. XnatFileSaveDialog: Where user enters filename of the scene to save.
     """
     
     def __init__(self, MODULE, saveWorkflow):
-        """ Init function.
+        """ 
+        Init function.
+
+        @param MODULE: 
+        @type MODULE: XnatSlicerWidget
+        @param saveWorkflow:
+        @type saveWorkflow: XnatSaveWorkflow
         """
 
         self.MODULE = MODULE
@@ -278,7 +281,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
         # Set fileline text (where user enters the file
         # name) 
         #--------------------
-        self.fileLine = qt.QLineEdit(self.MODULE.XnatView.sessionManager.sessionArgs['fileName'].split(XnatUtils.defaultPackageExtension)[0])
+        self.fileLine = qt.QLineEdit(self.MODULE.XnatView.sessionManager.sessionArgs['fileName'].split(GLOB_DEFAULT_SLICER_EXTENSION)[0])
 
         
 
@@ -331,7 +334,7 @@ class XnatFileSaveDialog(XnatSaveDialog):
 
 
 
-        #print "%s"%(XnatUtils.lf())
+        ##print "%s"%(MokaUtils.debug.lf())
 
 
 
@@ -353,12 +356,12 @@ class XnatFileSaveDialog(XnatSaveDialog):
         #--------------------
         # Get filename from the text input line.
         #--------------------
-        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = XnatUtils.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
+        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = MokaUtils.string.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
         if len(self.MODULE.XnatView.sessionManager.sessionArgs['fileName']) == 0:
             import datetime
             self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] = datetime.datetime.now().strftime("%Y_%m_%d_%H-%M-%S")
             
-        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] += XnatUtils.defaultPackageExtension
+        self.MODULE.XnatView.sessionManager.sessionArgs['fileName'] += GLOB_DEFAULT_SLICER_EXTENSION
 
 
         

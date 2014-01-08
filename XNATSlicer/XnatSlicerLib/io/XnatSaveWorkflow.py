@@ -6,30 +6,28 @@ import sys
 import shutil
 import zipfile
 
+from GLOB import *
 from XnatFileInfo import *
 from XnatScenePackager import *
 from XnatTimer import *
 from XnatSaveDialog import *
+from MokaUtils import *
 
-
-
-
-comment = """
-XnatSaveWorkflow manages all of the processes needed to upload
-a file to an XNAT.  Packaging scenes are conducted here.
-
-TODO:
-"""
 
 
 
     
 class XnatSaveWorkflow(object):
-    """ Descriptor above.
+    """ 
+    XnatSaveWorkflow manages all of the processes needed to upload
+    a file to an XNAT.  Packaging scenes are conducted here.
     """
 
     def __init__(self, MODULE):
-        """ Init function.
+        """ 
+        Init function.
+
+   
         """
         
         self.MODULE = MODULE
@@ -39,20 +37,14 @@ class XnatSaveWorkflow(object):
         # Set wait window
         #------------------------
         self.waitWindow = qt.QMessageBox(1, "Uploading", "Please wait while file uploads...")
-        self.waitWindow.setWindowModality(1)
-
-        #
-        # Remove the 'OK' button from the wait window.
-        #
-        self.waitWindow.setStandardButtons(0)
-
 
 
         
     def beginWorkflow(self):
-        """ Conducts some prelimiary 
-            steps (i.e. origin identification) before uploading 
-            the scene to the XNAT host.
+        """ 
+        Conducts some prelimiary 
+        steps (i.e. origin identification) before uploading 
+        the scene to the XNAT host.
         """
 
         #------------------------
@@ -96,8 +88,9 @@ class XnatSaveWorkflow(object):
 
         
     def saveScene(self):    
-        """  Main function for saving/uploading a file
-             to an XNAT host.
+        """  
+        Main function for saving/uploading a file
+        to an XNAT host.
         """
 
         #------------------------
@@ -138,25 +131,25 @@ class XnatSaveWorkflow(object):
         #
         # Construct the .mrb uri.
         #
-        mrbUri = projectDir + XnatUtils.defaultPackageExtension
+        srcMrb = projectDir + GLOB_DEFAULT_SLICER_EXTENSION
         
         #
         # Remove any mrb files with the same name, 
         # if they exist.
         #
-        if os.path.exists(mrbUri): 
-            XnatUtils.removeFile(mrbUri) 
+        if os.path.exists(srcMrb): 
+            os.remove(srcMrb) 
 
         #
         # Compress the save diectory to the mrb uri.
         #
-        self.XnatScenePackager.convertDirectoryToZip(mrbUri, projectDir)
+        self.XnatScenePackager.convertDirectoryToZip(srcMrb, projectDir)
 
         #
         # Remove the uncompressed directory, as we
         # don't need it any more. 
         #       
-        XnatUtils.removeDirsAndFiles(projectDir)
+        shutil.rmtree(projectDir)
 
 
 
@@ -167,12 +160,12 @@ class XnatSaveWorkflow(object):
         #
         # Construct the upload string.
         #
-        uploadStr = self.MODULE.XnatView.sessionManager.sessionArgs['saveUri'] + "/" + os.path.basename(mrbUri)    
+        dstMrb = self.MODULE.XnatView.sessionManager.sessionArgs['saveUri'] + "/" + os.path.basename(srcMrb)    
 
         #
         # Upload via XnatIo
         #
-        self.MODULE.XnatIo.upload(mrbUri, uploadStr)
+        self.MODULE.XnatIo.upload(srcMrb, dstMrb)
 
         #
         # Process events.
@@ -184,7 +177,7 @@ class XnatSaveWorkflow(object):
         #------------------------
         # Update viewer
         #------------------------
-        baseName = os.path.basename(mrbUri)
+        baseName = os.path.basename(srcMrb)
 
         #
         # Create a new session
@@ -195,10 +188,10 @@ class XnatSaveWorkflow(object):
         #
         # Select the newly saved object as a node in the viewer.
         #
-        treeUri = 'projects' + uploadStr.split('projects')[1]
+        treeUri = 'projects' + dstMrb.split('projects')[1]
         self.MODULE.XnatView.selectItem_byUri(treeUri)
         self.MODULE.XnatView.setEnabled(True)
-        #print "\nUpload of '%s' complete."%(baseName)
+        MokaUtils.debug.lf("\nUpload of '%s' complete."%(baseName))
 
 
 
