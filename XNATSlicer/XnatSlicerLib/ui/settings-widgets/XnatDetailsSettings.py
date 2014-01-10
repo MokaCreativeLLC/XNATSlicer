@@ -10,39 +10,24 @@ from XnatMetadataManager import *
 
 
 
-
-comment = """
-XnatDetailsSettings is the XnatSettings pertaining to
-the 'XnatNodeDetails' class.  This class specifically
-deals with toggling the visible metadata key-value pairs
-in the 'XnatNodeDetails' window when a user clicks on a 
-note in the XnatView, and the subsequent saving of these
-settings into the XnatSettingsFile..
-
-All 'XnatSettings' subclasses
-are to be displaed in the 'XnatSettingsWindow' class.
-
-TODO:
-"""
-
-
-
-
-#--------------------
-# Define the visible metadata tags for storing info 
-# the settings file.
-#--------------------
-visibleMetadataTags = {'projects': '', 'subjects' : '', 'experiments' : '', 'scans' :'', 'files' : '', 'slicer': ''}
-for key in visibleMetadataTags:
-    visibleMetadataTags[key] = 'visibleMetadataTags_' + key
-
-
-
     
 class XnatDetailsSettings(XnatSettings):
-    """ Descriptor above.
+    """ 
+    XnatDetailsSettings is the XnatSettings pertaining to
+    the 'XnatNodeDetails' class.  This class specifically
+    deals with toggling the visible metadata key-value pairs
+    in the 'XnatNodeDetails' window when a user clicks on a 
+    note in the XnatView, and the subsequent saving of these
+    settings into the XnatSettingsFile..
+    
+    All 'XnatSettings' subclasses
+    are to bge displaed in the 'XnatSettingsWindow' class.
     """
   
+    FONT_SIZE_TAG = "DetailsFontSize"
+
+
+
     def __init__(self, title, MODULE):
         """ Init function.
         """
@@ -111,18 +96,11 @@ class XnatDetailsSettings(XnatSettings):
 
         
         #--------------------
-        # Define the 'fontSizeTag'.
-        #--------------------
-        self.fontSizeTag = "DetailsFontSize"
-
-
-        
-        #--------------------
         # See if there's a stored font in the 
         # settings file first.
         #-------------------- 
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        font = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.fontSizeTag)
+        font = self.MODULE.XnatSettingsFile.getSetting(xnatHost, XnatDetailsSettings.FONT_SIZE_TAG)
 
 
 
@@ -133,7 +111,7 @@ class XnatDetailsSettings(XnatSettings):
         #--------------------
         if len(font) == 0:
             currSize = GLOB_FONT_SIZE
-            self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(currSize)]})
+            self.MODULE.XnatSettingsFile.setSetting(xnatHost, {XnatDetailsSettings.FONT_SIZE_TAG: [str(currSize)]})
 
 
             
@@ -154,7 +132,7 @@ class XnatDetailsSettings(XnatSettings):
         def changeFontSize(size):
             try:
                 self.MODULE.XnatNodeDetails.changeFontSize(int(size))
-                self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(size)]})
+                self.MODULE.XnatSettingsFile.setSetting(xnatHost, {XnatDetailsSettings.FONT_SIZE_TAG: [str(size)]})
             except Exception, e:
                 pass
 

@@ -85,7 +85,7 @@ class XnatButtons(object):
         self.toolsLayout = qt.QHBoxLayout()
         self.toolsLayout.addWidget(self.buttons['io']['delete'])
         self.toolsLayout.addSpacing(15)
-        self.toolsLayout.addWidget(self.buttons['io']['addProj'])
+        self.toolsLayout.addWidget(self.buttons['io']['addFolder'])
         self.toolsLayout.addSpacing(15)
         self.toolsLayout.addWidget(self.buttons['io']['test'])
         self.toolsLayout.addStretch()
@@ -179,7 +179,7 @@ class XnatButtons(object):
 
 def makeButtons_io(XnatButtons):
     """ Creates buttons specifically pertaining to XNAT IO.  This
-        includes 'load', 'save', 'delete', 'addProj' and 'test'.
+        includes 'load', 'save', 'delete', 'addFolder' and 'test'.
     """
     buttons = {}
     buttons = {}
@@ -212,12 +212,12 @@ def makeButtons_io(XnatButtons):
     
     
     
-    buttons['addProj'] = XnatUtils.generateButton(iconOrLabel = 'addproj.png', 
+    buttons['addFolder'] = XnatUtils.generateButton(iconOrLabel = 'addproj.png', 
                                                   toolTip = "Add Project, Subject, or Experiment to Xnat.", 
                                                   font = GLOB_LABEL_FONT,
                                                   size = GLOB_BUTTON_SIZE_SMALL, 
                                                   enabled = False)
-    buttons['addProj'].setToolTip('Add project, subject or experiment to XNAT instance.')
+    buttons['addFolder'].setToolTip('Add project, subject or experiment to XNAT instance.')
     
     
     

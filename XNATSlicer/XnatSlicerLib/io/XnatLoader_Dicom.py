@@ -6,28 +6,21 @@ import DICOMScalarVolumePlugin
 
 
 
-
-comment = """
-XnatLoader_Dicom is the loader class for all DICOM input received
-from XNAT.  The high-level workflow of the download is as follows:
-
-1) Download a zip file of one scan or multiple scans in DICOM format.
-2) Unpack the zip file and cache accordingly.
-3) Apply these files to the slicer DICOM database.
-4) Leverage the slicer 'DICOMWidget' to parse and and load the images.
-
-NOTE: DICOMLoader makes use of Slicer's DICOM database and 
-Steve Pieper's DICOMPlugin for parsing.
-
-TODO:
-"""
-
-
-
-
 class XnatLoader_Dicom(XnatLoader):
-    """ XnatLoader_Dicom conducts the necessary steps
-        to load DICOM files into Slicer.
+    """ 
+    XnatLoader_Dicom conducts the necessary steps
+    to load DICOM files into Slicer.
+
+    XnatLoader_Dicom is the loader class for all DICOM input received
+    from XNAT.  The high-level workflow of the download is as follows:
+    
+    1) Download a zip file of one scan or multiple scans in DICOM format.
+    2) Unpack the zip file and cache accordingly.
+    3) Apply these files to the slicer DICOM database.
+    4) Leverage the slicer 'DICOMWidget' to parse and and load the images.
+    
+    NOTE: DICOMLoader makes use of Slicer's DICOM database and 
+    Steve Pieper's DICOMPlugin for parsing.
     """
 
     
@@ -41,11 +34,27 @@ class XnatLoader_Dicom(XnatLoader):
 
 
         #--------------------
-        # Check cache, 
+        # Check cache, and also see if 'useCached' is enabled 
+        # in the settings.
         #--------------------  
-        self.useCached = self.checkCache(self.fileUris)
+        useCachedSettingList = self.MODULE.XnatSettingsFile.getSetting(self.MODULE.XnatLoginMenu.hostDropdown.currentText, 
+                                                                       self.MODULE.XnatCacheSettings.USE_CACHED_IMAGES_TAG)
+        useCachedSetting = True if 'True' in useCachedSettingList[0] else False
+
+        self.useCached = self.checkCache(self.fileUris) and useCachedSetting
+
         if self.useCached: 
+            self._dst = None
+            folderUri = self._src.replace('?format=zip', '')
+
+            # Update the download popup
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(folderUri, 
+                                                  "USING CACHED<br>'%s'"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
+            self.extractedFiles = self.cachedFiles
             return
+
 
         
         #--------------------
@@ -62,6 +71,7 @@ class XnatLoader_Dicom(XnatLoader):
                     fileDirs.append(fileDir)
 
                     
+        self._oldSrc = None
         if len(fileDirs) == 1 and self._dst != None:
             self._oldSrc = self._src
             self._oldDst = self._dst
@@ -70,7 +80,9 @@ class XnatLoader_Dicom(XnatLoader):
 
             
         if self.MODULE.XnatLoadWorkflow.XnatDownloadPopup:
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), self._src.replace('?format=zip', ''))
+            if self._oldSrc:
+                self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), 
+                                                                            self._src.replace('?format=zip', ''))
 
 
             
@@ -107,24 +119,13 @@ class XnatLoader_Dicom(XnatLoader):
         # Check for string matches between the folder URI
         # and the database files 
         #--------------------
-        cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles for abbrevUri in abbrevUris if abbrevUri in dbFile]
+        self.cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles for abbrevUri in abbrevUris if abbrevUri in dbFile]
 
                     
         #--------------------   
         # If all URIs are in the database, use cache, exit.
         #--------------------    
-        if len(cachedFiles) == len(abbrevUris):
-            #print MokaUtils.debug.lf(), "DICOMs to download are already in the cache!"
-            self._dst = None
-            folderUri = self._src.replace('?format=zip', '')
-
-            # Update the download popup
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(folderUri, 
-                                                  "USING CACHED<br>'%s'"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
-            self.extractedFiles = cachedFiles
-            #slicer.app.processEvents()
+        if len(self.cachedFiles) == len(abbrevUris):
             return True
           
         return False

@@ -1,4 +1,3 @@
-from XnatUtils import *
 from __main__ import vtk, ctk, qt, slicer
 
 import os
@@ -11,7 +10,8 @@ from XnatLoader_File import *
 from XnatLoader_Mrb import *
 from XnatPopup import *
 from SlicerUtils import *
-
+from XnatUtils import *
+from MokaUtils import *
 
 
 class XnatLoadWorkflow(object):
@@ -118,7 +118,7 @@ class XnatLoadWorkflow(object):
             #if size > 0:
             self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloadStarted', downloadStarted)
+        self.MODULE.XnatIo.addEventCallback('downloadStarted', downloadStarted)
 
         
 
@@ -128,7 +128,7 @@ class XnatLoadWorkflow(object):
         def downloading(_xnatSrc, size = 0):
             self.XnatDownloadPopup.updateDownload(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloading', downloading)
+        self.MODULE.XnatIo.addEventCallback('downloading', downloading)
 
         
 
@@ -138,7 +138,7 @@ class XnatLoadWorkflow(object):
         def downloadFinished(_xnatSrc):
             self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
             slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloadFinished', downloadFinished)
+        self.MODULE.XnatIo.addEventCallback('downloadFinished', downloadFinished)
 
 
 
@@ -149,7 +149,7 @@ class XnatLoadWorkflow(object):
             if len(self.MODULE.XnatIo.downloadQueue) == 0:
                 self.XnatDownloadPopup.hide()
                 slicer.app.processEvents()
-        self.MODULE.XnatIo.setCallback('downloadCancelled', downloadCancelled)
+        self.MODULE.XnatIo.addEventCallback('downloadCancelled', downloadCancelled)
 
         
         
@@ -169,8 +169,10 @@ class XnatLoadWorkflow(object):
         if 'yes' in button.text.lower():
             self.MODULE.XnatView.sessionManager.clearCurrentSession()
             slicer.app.mrmlScene().Clear(0)
-            self.skipEmptySceneCheck = True
-            self.beginWorkflow()
+        
+        self.skipEmptySceneCheck = True
+        self.beginWorkflow()
+            
 
             
 
@@ -244,7 +246,7 @@ class XnatLoadWorkflow(object):
         #------------------------  
         for loader in self.loaderFactory(self._src):
             if not loader.useCached:
-                self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs)
+                self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs['src'], loader.loadArgs['dst'])
             downloadFinishedCallbacks.append(loader.load)             
 
 
@@ -254,7 +256,8 @@ class XnatLoadWorkflow(object):
         #------------------------ 
         self.preDownloadPopup.hide()
         self.XnatDownloadPopup.show()
-        self.MODULE.XnatIo.startDownloadQueue(onQueueFinished = runDownloadFinishedCallbacks)
+        self.MODULE.XnatIo.addEventCallback('downloadQueueFinished', runDownloadFinishedCallbacks)
+        self.MODULE.XnatIo.startDownloadQueue()
       
 
         
@@ -268,14 +271,15 @@ class XnatLoadWorkflow(object):
 
         
     def loaderFactory(self, _src):
-        """ Returns the appropriate set of loaders after analyzing the
-            '_src' argument.
-
-            Arguments:
-            _src The URI to create loaders from.
-
-            Returns:
-            A loader list.
+        """ 
+        Returns the appropriate set of loaders after analyzing the
+        '_src' argument.
+        
+        Arguments:
+        _src The URI to create loaders from.
+        
+        Returns:
+        A loader list.
             
         """
 
@@ -322,7 +326,7 @@ class XnatLoadWorkflow(object):
             scanSrc = splitScan[0] + '/scans/' + splitScan[1].split('/')[0] + '/files'
             #print "SPLIT SCAN:", splitScan, '\n\t',scanSrc
             # query xnat for folder contents
-            contentUris = self.MODULE.XnatIo.getFolder(scanSrc, metadataTags = ['URI'])['URI']
+            contentUris = self.MODULE.XnatIo.getFolder(scanSrc, metadata= ['URI'])['URI']
             #print "CONTENT URIS", contentUris
             # get file uris and sort them by type
             loadables = self.sortLoadablesByType(contentUris)
@@ -353,7 +357,7 @@ class XnatLoadWorkflow(object):
             exptSrc = splitExpt[0] + '/experiments/' + splitExpt[1].split('/')[0] + '/scans'
             #print "SPLIT Expt:", splitExpt, '\n\t',exptSrc
             # Query for Scan IDs from XNAT.
-            contents = self.MODULE.XnatIo.getFolder(exptSrc, metadataTags = ['ID'])
+            contents = self.MODULE.XnatIo.getFolder(exptSrc, metadata = ['ID'])
             #print "SCAN IDS", contents
             # Recurse this function for every scan.
             for scanId in contents['ID']:

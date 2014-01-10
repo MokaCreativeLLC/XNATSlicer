@@ -200,7 +200,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         textEdit.setStyleSheet("border: none")
         textEdit.setFixedHeight(40)
         textEdit.verticalScrollBar().hide()
-        textEdit.setFont(GLOB_LABEL_FONT)
+        textEdit.setFont(qt.QFont(GLOB_FONT_NAME, GLOB_FONT_SIZE, 10, False))
         layout.addRow(textEdit)
         
 

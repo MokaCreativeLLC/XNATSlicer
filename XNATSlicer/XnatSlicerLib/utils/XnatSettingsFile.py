@@ -8,52 +8,34 @@ from XnatSettingsWindow import *
 
 
 
-comment = """
-XnatSettingsFile is the class that manages storable settings for the
-XnatSlicer module.  The class is activated by clicking the wrench
-icon in the XnatSlicer MODULE.  XnatSettingsFile utilizes the qt.QSettings
-object to write to a settings database called 'XnatSettingsFile.ini'.  As
-the formate of the database indicates, the storage method is .ini, which
-utilizes key-value pairs under a single header.
-
-
-Ex:
-
-[Central]
-FullName=Central
-Address=https://central.xnat.org
-IsModifiable=False
-CurrUser=user
-IsDefault=True
-
-
-TODO:
-"""
-
-
-#--------------------
-# Global tags.  Do not Delete.
-#--------------------
-hostTag = 'Hosts'
-hostNameTag = 'FullName'
-hostAddressTag =   'Address'
-hostUsernameTag = 'Username'
-hostIsModifiableTag = 'IsModifiable'
-hostIsDefaultTag = 'IsDefault'
-hostCurrUserTag = 'CurrUser'
-RESTPathTag = 'RESTPath'
-pathTag = 'Paths'
-
-
-
-
-
 class XnatSettingsFile:
-  """ Manager for handing the settings file.  Stored in QSettings standard through
-      'XnatSettingsFile.ini'
+  """ 
+  XnatSettingsFile is the class that manages storable settings for the
+  XnatSlicer module.  The class is activated by clicking the wrench
+  icon in the XnatSlicer MODULE.  XnatSettingsFile utilizes the qt.QSettings
+  object to write to a settings database called 'XnatSettingsFile.ini'.  As
+  the formate of the database indicates, the storage method is .ini, which
+  utilizes key-value pairs under a single header.
+
+
+  Ex:
+
+  [Central]
+  FullName=Central
+  Address=https://central.xnat.org
+  IsModifiable=False
+  CurrUser=user
+  IsDefault=True
+
   """
 
-
+  HOST_NAME_TAG = 'FullName'
+  HOST_ADDRESS_TAG =   'Address'
+  HOST_IS_MODIFIABLE_TAG = 'IsModifiable'
+  HOST_IS_DEFAULT_TAG = 'IsDefault'
+  HOST_CURR_USER_TAG = 'CurrUser'
+  REST_PATH_TAG = 'RESTPath'
+  PATH_TAG = 'Paths'
 
   
   def __init__(self, parent = None, rootDir = None, MODULE = None):    
@@ -112,8 +94,6 @@ class XnatSettingsFile:
 
 
 
-
-        
     
   def setup(self):
     """ Determine if there is an XnatSettingsFile.ini file.
@@ -146,36 +126,58 @@ class XnatSettingsFile:
     """
     hostDict = {}        
     for key in self.database.allKeys():
-        if hostAddressTag in key:
+        if XnatSettingsFile.HOST_ADDRESS_TAG in key:
             hostDict[key.split("/")[0].strip()] = self.database.value(key)
     return hostDict
 
 
 
   
-  def setTagValues(self, hostName, tagValueDict):
+  def setSetting(self, hostName, *args):
       """ Saves the custom metadata tags to the given host.
       """
+
+
+      
       self.database.beginGroup(hostName)
 
-      ##print "SET TAG VALUES", hostName, tagValueDict
-      itemsStr = ''
-      for tag, items in tagValueDict.iteritems(): 
+
+      #--------------------
+      # For dictionary arguments
+      #--------------------
+      if isinstance(args[0], dict):
+        for tag, items in args[0].iteritems(): 
+          #
+          # Convert items to list, if necessary
+          #
+          items = items if isinstance(items, list) else [items]
           if len(items) > 0:
-              for item in items:
-                  ##print item
-                  itemsStr += str(item) + ','
-              
-              self.database.setValue(tag, itemsStr[:-1])
-
-          #
-          # If the lengh of the tag items is zero, it means
-          # we clear the field.
-          #
+            self.database.setValue(tag, ','.join(str(item) for item in items))
           else:
-              self.database.setValue(tag, '')
+            self.database.setValue(tag, '')
 
+
+
+      #--------------------
+      # For multiple arguments
+      #--------------------
+      else:
+          if len(args) > 1:
+            values = ''
+            for i in range(1, len(args)):
+              if isinstance(args[i], list):
+                values += ','.join(str(item) for item in args[i])
+              else:
+                values += ','.join(args[i])
+              
+
+            self.database.setValue(args[0], values)
+            
+          else:
+            self.database.setValue(args[0], '')
           
+
+
       self.database.endGroup()
 
 
@@ -248,20 +250,20 @@ class XnatSettingsFile:
         # Start group.
         #
         self.database.beginGroup(hostName)
-        self.database.setValue(hostNameTag, hostName)
-        self.database.setValue(hostAddressTag, hostAddress)
+        self.database.setValue(XnatSettingsFile.HOST_NAME_TAG, hostName)
+        self.database.setValue(XnatSettingsFile.HOST_ADDRESS_TAG, hostAddress)
         #
         # Set isModifiable.
         #
-        self.database.setValue(hostIsModifiableTag, str(isModifiable))
+        self.database.setValue(XnatSettingsFile.HOST_IS_MODIFIABLE_TAG, str(isModifiable))
         #
         # Set currUser.
         #
-        self.database.setValue(hostCurrUserTag, "")
+        self.database.setValue(XnatSettingsFile.HOST_CURR_USER_TAG, "")
         #
         # Set isDefault to 'False' (first pass)
         #
-        self.database.setValue(hostIsDefaultTag, str(False))
+        self.database.setValue(XnatSettingsFile.HOST_IS_DEFAULT_TAG, str(False))
         self.database.endGroup()
         #
         # (second pass) conuct the setDefault function.
@@ -277,9 +279,9 @@ class XnatSettingsFile:
     """ As stated.
     """
     if pathType == "REST":
-        currTag = RESTPathTag       
+        currTag = XnatSettingsFile.REST_PATH_TAG       
     for path in paths:
-        self.database.setValue(pathTag + currTag, path)
+        self.database.setValue(XnatSettingsFile.PATH_TAG + currTag, path)
 
 
 
@@ -288,8 +290,8 @@ class XnatSettingsFile:
     """ As stated.
     """
     if pathType == "REST":
-        currTag = RESTPathTag      
-    return self.database.value(pathTag + currTag, "")   
+        currTag = XnatSettingsFile.REST_PATH_TAG      
+    return self.database.value(XnatSettingsFile.PATH_TAG + currTag, "")   
 
 
 
@@ -297,7 +299,7 @@ class XnatSettingsFile:
   def deleteHost(self, hostName): 
     """ As stated.
     """
-    if self.database.value(hostName + "/" + hostIsModifiableTag, ""):
+    if self.database.value(hostName + "/" + XnatSettingsFile.HOST_IS_MODIFIABLE_TAG, ""):
         self.database.remove(hostName)
         return True
     return False
@@ -316,7 +318,7 @@ class XnatSettingsFile:
         #
         # Find keys that have the 'isDefault' tag (all of them)...
         #
-        if hostIsDefaultTag in key:
+        if XnatSettingsFile.HOST_IS_DEFAULT_TAG in key:
             #
             # If there's a match in with hostName, then 
             # save the 'setDefault' to database.
@@ -324,7 +326,7 @@ class XnatSettingsFile:
             tHost = key.split("/")[0].strip()
             retVal = True if hostName == tHost else False
             self.database.beginGroup(tHost)
-            self.database.setValue(hostIsDefaultTag, str(retVal))
+            self.database.setValue(XnatSettingsFile.HOST_IS_DEFAULT_TAG, str(retVal))
             self.database.endGroup()
 
 
@@ -335,7 +337,7 @@ class XnatSettingsFile:
         database keys to find the default hosts.
     """   
     for key in self.database.allKeys():
-        if hostIsDefaultTag in key and self.database.value(key) == 'True':
+        if XnatSettingsFile.HOST_IS_DEFAULT_TAG in key and self.database.value(key) == 'True':
             return key.split("/")[0].strip()
 
 
@@ -346,7 +348,7 @@ class XnatSettingsFile:
         is also a defaulted host name.
     """   
 
-    val = self.database.value(hostName + "/" + hostIsDefaultTag)
+    val = self.database.value(hostName + "/" + XnatSettingsFile.HOST_IS_DEFAULT_TAG)
     if not val or 'False' in val:
         return False
     return True
@@ -358,7 +360,7 @@ class XnatSettingsFile:
     """ As stated.  Determines if a given host
         can be modified by the user.
     """
-    val = self.database.value(hostName + "/" + hostIsModifiableTag)
+    val = self.database.value(hostName + "/" + XnatSettingsFile.HOST_IS_MODIFIABLE_TAG)
 
     if not val:
         return True
@@ -369,7 +371,7 @@ class XnatSettingsFile:
 
 
 
-  def getTagValues(self, hostName, tag):
+  def getSetting(self, hostName, tag):
     """ As stated.  Determines if a given host
         can be modified by the user.
     """
@@ -387,7 +389,7 @@ class XnatSettingsFile:
   def getAddress(self, hostName):
     """ As stated.
     """
-    return self.database.value(hostName + "/" + hostAddressTag, "")
+    return self.database.value(hostName + "/" + XnatSettingsFile.HOST_ADDRESS_TAG, "")
 
 
 
@@ -396,7 +398,7 @@ class XnatSettingsFile:
     """ As stated.
     """
     self.database.beginGroup(hostName)  
-    self.database.setValue(hostCurrUserTag, username)
+    self.database.setValue(XnatSettingsFile.HOST_CURR_USER_TAG, username)
     self.database.endGroup()
 
 
@@ -406,7 +408,7 @@ class XnatSettingsFile:
     """ As stated.
     """
     for key in self.database.allKeys():
-        if hostCurrUserTag in key and hostName in key:
+        if XnatSettingsFile.HOST_CURR_USER_TAG in key and hostName in key:
             return self.database.value(key)
  
 

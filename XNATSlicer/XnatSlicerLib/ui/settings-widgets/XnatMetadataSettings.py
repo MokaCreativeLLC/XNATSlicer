@@ -9,32 +9,26 @@ from XnatMetadataManager import *
 
 
 
-comment = """
-XnatMetadataSettings is the XnatSettings pertaining to
-the adding and removing custom metadata within a given
-XNAT instance.  While the other XnatSettings widgets
-allow the user to toggle (check) the type of metadata 
-viewable within the tools that display it, this settings
-allows the viewer to add and remove specific metadata
-pertaining to an xnat level (projects, subjects, 
-experiments, files, slicer).
-
-All 'XnatSettings' subclasses
-are to be displaed in the 'XnatSettingsWindow' class.
-
-TODO:
-"""
-
-
-
         
 class XnatMetadataSettings(XnatSettings):
-    """ Descriptor above.
+    """
+    XnatMetadataSettings is the XnatSettings pertaining to
+    the adding and removing custom metadata within a given
+    XNAT instance.  While the other XnatSettings widgets
+    allow the user to toggle (check) the type of metadata 
+    viewable within the tools that display it, this settings
+    allows the viewer to add and remove specific metadata
+    pertaining to an xnat level (projects, subjects, 
+    experiments, files, slicer).
+    
+    All 'XnatSettings' subclasses
+    are to be displaed in the 'XnatSettingsWindow' class.
     """
 
   
     def __init__(self, title, MODULE):
-        """ Init function.
+        """ 
+        Init function.
         """
         
         #--------------------

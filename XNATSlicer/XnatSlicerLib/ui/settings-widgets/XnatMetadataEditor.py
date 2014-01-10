@@ -260,7 +260,7 @@ class XnatMetadataEditor(qt.QFrame):
                 #
                 # Query the XnatSettings file for any stored value, by host.
                 #
-                savedMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
+                savedMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
 
                 #
                 # Loop through the items and check accordingly.
@@ -300,7 +300,7 @@ class XnatMetadataEditor(qt.QFrame):
             # Query the settings file for the saved 'checked'
             # metadata values.
             #
-            savedMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
+            savedMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
 
             #
             # If the item was CHECKED
@@ -330,7 +330,7 @@ class XnatMetadataEditor(qt.QFrame):
                 # Save the unioned list back to the XnatSettingsFile.
                 #
                 tagDict = {self.onMetadataCheckedTag + self.xnatLevel : mergedItems}
-                self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
+                self.MODULE.XnatSettingsFile.setSetting(xnatHost, tagDict)
 
 
 
@@ -347,7 +347,7 @@ class XnatMetadataEditor(qt.QFrame):
                 #
                 differenceItems = list(set(savedMetadataItems) - set([item.text()]))                
                 tagDict = {self.onMetadataCheckedTag + self.xnatLevel : differenceItems}
-                self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)  
+                self.MODULE.XnatSettingsFile.setSetting(xnatHost, tagDict)  
 
                 
 
@@ -508,7 +508,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # stored in the XnatSettingsFile.
         #--------------------  
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
+        customMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
 
 
 
@@ -533,7 +533,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # XnatSettingsFile.
         #--------------------        
         tagDict = {XnatUtils.makeCustomMetadataTag(self.xnatLevel) : updatedMetadataItems}
-        self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
+        self.MODULE.XnatSettingsFile.setSetting(xnatHost, tagDict)
 
 
         
@@ -557,7 +557,7 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         #--------------------
         try:
             xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-            customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
+            customMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
             self.listWidget.clear()
             self.listWidget.addItems(customMetadataItems)
             
@@ -605,10 +605,10 @@ class XnatCustomMetadataEditor(XnatMetadataEditor):
         # metadata.
         #-------------------- 
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        customMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
+        customMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, XnatUtils.makeCustomMetadataTag(self.xnatLevel))
 
         tagDict = {XnatUtils.makeCustomMetadataTag(self.xnatLevel) : [lineText] + customMetadataItems}
-        self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
+        self.MODULE.XnatSettingsFile.setSetting(xnatHost, tagDict)
 
 
         

@@ -62,9 +62,7 @@ class XnatView(object):
         projectContents = None
         if self.MODULE.XnatIo.projectCache == None:
             self.clear()
-            projectContents = self.MODULE.XnatIo.getFolder(queryUris = ['/projects'], 
-                                                                              metadataTags = GLOB_DEFAULT_XNAT_METADATA['projects'],
-                                                                              queryArguments = ['accessible'])
+            projectContents = self.MODULE.XnatIo.getFolder('projects', GLOB_DEFAULT_XNAT_METADATA['projects'], 'accessible')
             #
             # If the class name of the Json is 'XnatError'
             # return out, with the error.
@@ -86,7 +84,7 @@ class XnatView(object):
         if projectsLoaded:
             if not skipAnim:
                 self.MODULE.onLoginSuccessful()
-            self.MODULE.XnatButtons.setEnabled(buttonKey='addProj', enabled=True) 
+            self.MODULE.XnatButtons.setEnabled(buttonKey='addFolder', enabled=True) 
 
 
 

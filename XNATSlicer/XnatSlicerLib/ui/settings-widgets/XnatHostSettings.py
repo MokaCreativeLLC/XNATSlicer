@@ -1,5 +1,3 @@
-from GLOB import *
-from XnatUtils import *
 from __main__ import vtk, qt, ctk, slicer
 
 import os
@@ -9,30 +7,19 @@ import sys
 from GLOB import *
 from XnatUtils import *
 from MokaUtils import *
-
 from XnatSettings import *
-
-
-
-
-comment = """
-XnatHostSettings is the XnatSettings pertaining to
-tracking and saving the various XnatHosts, and also
-saving these settings to the XnatSlicerFile.  
-
-
-All 'XnatSettings' subclasses
-are to be displaed in the 'XnatSettingsWindow' class.
-
-
-TODO:
-"""
 
 
 
         
 class XnatHostSettings(XnatSettings):
-    """ Descriptor above.
+    """ 
+    XnatHostSettings is the XnatSettings pertaining to
+    tracking and saving the various XnatHosts, and also
+    saving these settings to the XnatSlicerFile.  
+
+    All 'XnatSettings' subclasses
+    are to be displaed in the 'XnatSettingsWindow' class.
     """
 
   

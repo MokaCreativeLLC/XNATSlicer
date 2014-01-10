@@ -60,7 +60,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # settings file.
         #
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        savedFontSize = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.XnatTreeViewSettings.fontSizeTag)
+        savedFontSize = self.MODULE.XnatSettingsFile.getSetting(xnatHost, self.MODULE.XnatTreeViewSettings.FONT_SIZE_TAG)
         if len(savedFontSize) == 1:
             self.currentFontSize = int(savedFontSize[0])
             
@@ -356,7 +356,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Acquire the metadata from the MODULE.XnatSettingsFile
         #
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        infoMetadata = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.MODULE.XnatTreeViewSettings.ON_METADATA_CHECKED_TAGS['info'] + widgetItem.text(xnatLevelColumnNumber))
+        infoMetadata = self.MODULE.XnatSettingsFile.getSetting(xnatHost, self.MODULE.XnatTreeViewSettings.ON_METADATA_CHECKED_TAGS['info'] + widgetItem.text(xnatLevelColumnNumber))
 
 
         ##print "MERGED INFO TEXT:", widgetItem.text(mergedInfoColumnNumber)
@@ -369,7 +369,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             printStr = ''
             for i in range(0, 40):
                 printStr += '\n\t' + self.headerItem().text(i) + ": " +  widgetItem.text(i)
-                MokaUtils.debug.lf(printStr)
+                #MokaUtils.debug.lf(printStr)
 
         debugPrint()
 
@@ -538,7 +538,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             parents and filtering.
         """
 
-        ##print "LOAD PROJECTS", filters
+    
         #----------------------
         # Add projects only if they are specified 
         # in the arguments.
@@ -634,9 +634,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
     
 
     def loopProjectNodes(self, callback):
-        """ Loops through all of the top level
-            treeItems (i.e. 'projects') and allows the user
-            to run a callback.
+        """ 
+        Loops through all of the top level
+        treeItems (i.e. 'projects') and allows the user
+        to run a callback.
         """
         ind = 0
         currChild = self.topLevelItem(ind)
@@ -648,26 +649,37 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
 
 
 
-    def loopChildNodes(self, currNode, callback):
+    def loopChildren(self, currNode, callback):
         """
         """
-        currChild = currNode
-        callback(currChild)
-        for i in range(0, currChild.childCount()):
-            self.loopChildNodes(currChild.child(i), callback)
+        for i in range(0, currNode.childCount()):            
+            currChild = currNode.child(i)
+            callback(currChild)
+            
+
+
+    def traverseTree(self, currNode, callback):
+        """
+        """
+        
+        for i in range(0, currNode.childCount()): 
+            currChild = currNode.child(i)
+            callback(currChild)
+            self.traverseTree(currChild, callback)
+            
+                
 
                 
-
                 
-                
-    def loopVisibleNodes(self, callback):
+    def loopVisible(self, callback):
         """ Loops through all of the top level
             treeItems (i.e. 'projects') and allows the user
             to run a callback.
         """
-        def loopChildren(node):
-            self.loopChildNodes(node, callback)
-        self.loopProjectNodes(loopChildren)
+        def looper(projNode):
+            callback(projNode)
+            self.traverseTree(projNode, callback)
+        self.loopProjectNodes(looper)
 
             
             
@@ -677,7 +689,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             of the current XNAT host.
         """     
         if self.sessionManager.sessionArgs:
-            self.MODULE.XnatIo.makeFolder(os.path.dirname(self.sessionManager.sessionArgs['saveUri']))
+            self.MODULE.XnatIo.putFolder(os.path.dirname(self.sessionManager.sessionArgs['saveUri']))
 
 
 
@@ -828,6 +840,9 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
             NOTE: Consider refactoring into specific methods.
         """
 
+        if not item:
+            return
+
         #------------------------
         # Get the item level
         #------------------------
@@ -848,16 +863,24 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         #------------------------
         # Enable load/save at the default save level
         #------------------------
-        
         if 'experiments' in itemLevel or 'scans' in itemLevel or 'files' in itemLevel or 'slicer' in itemLevel.lower():
             self.MODULE.XnatButtons.setEnabled('save', True)
             self.MODULE.XnatButtons.setEnabled('load', True)
         else:
             self.MODULE.XnatButtons.setEnabled('save', False)
             self.MODULE.XnatButtons.setEnabled('load', False)
-            
-        self.MODULE.XnatButtons.setEnabled('delete', True)
-        self.MODULE.XnatButtons.setEnabled('addProj', True)            
+           
+
+        #------------------------
+        # Since we can't really delete projects
+        # we disable the delete button at the project level.
+        #------------------------            
+        if 'projects' in itemLevel:
+            self.MODULE.XnatButtons.setEnabled('delete', False)
+        else:
+            self.MODULE.XnatButtons.setEnabled('delete', True)
+
+        self.MODULE.XnatButtons.setEnabled('addFolder', True)            
 
 
 
@@ -1292,6 +1315,7 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         if not item:
             item = self.currentItem()
 
+        rowValues = None
         if item:
             rowValues = {}
             for tag in self.columns:
@@ -1317,7 +1341,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         self.clearSelection()
         self.setCurrentItem(None)
         self.setCurrentItem(currItem)
-        self.runNodeChangedCallbacks(self.getRowValues())
+
+        rowVals = self.getRowValues()
+        if rowVals:
+            self.runNodeChangedCallbacks(rowVals)
 
         
 
@@ -1325,18 +1352,19 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         # Refresh all of the column values in the 
         # visible nodes.
         #--------------------
-        self.loopVisibleNodes(self.populateColumns)
+        self.loopVisible(self.populateColumns)
 
 
 
 
     def setDefaultFonts(self):
-        """ Restores the default fonts described
-            in the 'populateColumns' method by calling
-            on 'populateColumns.'  This method is called on 
-            after the user clears the search field and the highlighted
-            tree nodes that meet the serach criteria need to be
-            unhighlighted.
+        """ 
+        Restores the default fonts described
+        in the 'populateColumns' method by calling
+        on 'populateColumns.'  This method is called on 
+        after the user clears the search field and the highlighted
+        tree nodes that meet the serach criteria need to be
+        unhighlighted.
         """
         ##print self.browser.utils.lf(), "Begin"
         root = self.invisibleRootItem()
@@ -1351,9 +1379,10 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
     
     
     def makeTreeItems(self, parentItem = None, children = [],  metadata = {}, expandible = None):
-        """Creates a set of items to be put into the 
-           QTreeWidget based upon its parents, its children 
-           and the metadata provide.
+        """
+        Creates a set of items to be put into the 
+        QTreeWidget based upon its parents, its children 
+        and the metadata provide.
         """
 
         
@@ -1462,17 +1491,18 @@ class XnatTreeView(XnatView, qt.QTreeWidget):
         
     def searchEntered(self):
         """
-            Qt::MatchExactly	0	Performs QVariant-based matching.
-            Qt::MatchFixedString	8	Performs string-based matching. String-based comparisons are case-insensitive unless the MatchCaseSensitive flag is also specified.
-            Qt::MatchContains	1	The search term is contained in the item.
-            Qt::MatchStartsWith	2	The search term matches the start of the item.
-            Qt::MatchEndsWith	3	The search term matches the end of the item.
-            Qt::MatchCaseSensitive	16	The search is case sensitive.
-            Qt::MatchRegExp	4	Performs string-based matching using a regular expression as the search term.
-            Qt::MatchWildcard	5	Performs string-based matching using a string with wildcards as the search term.
-            Qt::MatchWrap	32	Perform a search that wraps around, so that when the search reaches the last item in the model, it 
-                                begins again at the first item and continues until all items have been examined.
-            Qt::MatchRecursive	64	Searches the entire hierarchy.
+            
+        Qt::MatchExactly	0	Performs QVariant-based matching.
+    Qt::MatchFixedString	8	Performs string-based matching. String-based comparisons are case-insensitive unless the MatchCaseSensitive flag is also specified.
+        Qt::MatchContains	1	The search term is contained in the item.
+        Qt::MatchStartsWith	2	The search term matches the start of the item.
+        Qt::MatchEndsWith	3	The search term matches the end of the item.
+        Qt::MatchCaseSensitive	16	The search is case sensitive.
+        Qt::MatchRegExp	4	Performs string-based matching using a regular expression as the search term.
+        Qt::MatchWildcard	5	Performs string-based matching using a string with wildcards as the search term.
+        Qt::MatchWrap	32	Perform a search that wraps around, so that when the search reaches the last item in the model, it 
+        begins again at the first item and continues until all items have been examined.
+        Qt::MatchRecursive	64	Searches the entire hierarchy.
         """
 
         ##print MokaUtils.debug.lf(), "Disconnecting item expanded."

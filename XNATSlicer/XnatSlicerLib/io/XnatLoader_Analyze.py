@@ -5,17 +5,12 @@ from XnatLoader import *
 
 
 
-comment = """
-XnatLoader_Analyze contains the specific load methods for analyze 
-filetypes (.hdr and .img pairings) to be downloaded from an XNAT host into Slicer.  
-
-TODO:
-"""
-
-
 
 class XnatLoader_Analyze(XnatLoader):
-    """ Class description above.  Inherits from XnatLoader.
+    """ 
+    Class description above.  Inherits from XnatLoader.
+    XnatLoader_Analyze contains the specific load methods for analyze 
+    filetypes (.hdr and .img pairings) to be downloaded from an XNAT host into Slicer.  
     """
 
     
@@ -23,7 +18,29 @@ class XnatLoader_Analyze(XnatLoader):
     def __init__(self, MODULE, _src, fileUris):
         super(XnatLoader_Analyze, self).__init__(MODULE, _src, fileUris)
         self.setZipSrcDst()
-        self.useCached = self.checkCache()
+
+
+        #--------------------
+        # Check cache, and also see if 'useCached' is enabled 
+        # in the settings.
+        #--------------------  
+        useCachedSettingList = self.MODULE.XnatSettingsFile.getSetting(self.MODULE.XnatLoginMenu.hostDropdown.currentText, 
+                                                                       self.MODULE.XnatCacheSettings.USE_CACHED_IMAGES_TAG)
+        useCachedSetting = True if 'True' in useCachedSettingList[0] else False
+
+        self.useCached = self.checkCache() and useCachedSetting
+        if self.useCached:
+            # Update the download popup
+            self._dst = None
+            popupKey = self._src.replace('?format=zip', '')
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(popupKey, 
+                                                  "USING CACHED<br>'%s'"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(popupKey)))
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(popupKey, 100)
+            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(popupKey, False)
+
+            
+            self.extractedFiles = self.cachedFiles
+                                                                    
     
 
         
@@ -36,7 +53,7 @@ class XnatLoader_Analyze(XnatLoader):
         #print "ABBREVIATED URIS", abbreviatedUris
         
         foundCount = 0
-        cachedFiles = []
+        self.cachedFiles = []
         for root, dirs, files in os.walk(self._dst.replace('.zip', '')):
             for f in files:
                 if XnatUtils.isAnalyze(f):
@@ -45,23 +62,13 @@ class XnatLoader_Analyze(XnatLoader):
                     #print uri.split(splitter)[1] in abbreviatedUris
                     if uri.split(splitter)[1] in abbreviatedUris:
                         foundCount +=1
-                        cachedFiles.append(uri)
+                        self.cachedFiles.append(uri)
 
         #print "FOUND", foundCount, "URS", len(abbreviatedUris)
         
         if foundCount == len(abbreviatedUris):
-            # Update the download popup
-
-            self._dst = None
-            popupKey = self._src.replace('?format=zip', '')
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setText(popupKey, 
-                                                  "USING CACHED<br>'%s'"%(self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.makeDownloadPath(popupKey)))
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setProgressBarValue(popupKey, 100)
-            self.MODULE.XnatLoadWorkflow.XnatDownloadPopup.setEnabled(popupKey, False)
-
-            
-            self.extractedFiles = cachedFiles
             return True
+
             
         
     def load(self):

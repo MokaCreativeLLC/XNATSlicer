@@ -165,7 +165,7 @@ class XnatSaveWorkflow(object):
         #
         # Upload via XnatIo
         #
-        self.MODULE.XnatIo.upload(srcMrb, dstMrb)
+        self.MODULE.XnatIo.putFile(srcMrb, dstMrb)
 
         #
         # Process events.

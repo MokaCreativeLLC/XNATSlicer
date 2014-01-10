@@ -78,6 +78,7 @@ from XnatHostSettings import *
 from XnatTreeViewSettings import *
 from XnatMetadataSettings import *
 from XnatDetailsSettings import *
+from XnatCacheSettings import *
 from XnatNodeDetails import *
 from XnatMetadataManager import *
 from AnimatedCollapsible import *
@@ -180,10 +181,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Xnat IO
         #--------------------------------
-        self.XnatIo = XnatIo()
-        def jsonError(host, user, response):
-            return XnatError(host, user, response)
-        self.XnatIo.onEvent('jsonError', jsonError)
+        self.XnatIo = None 
 
         
 
@@ -240,6 +238,14 @@ class XnatSlicerWidget:
         self.XnatHostSettings = XnatHostSettings('XNAT Hosts', self)
         self.XnatSettingsWindow.addSetting(self.XnatHostSettings.title, widget = self.XnatHostSettings)
         
+        #
+        # Add XnatCacheSettings (communicates to XnatTreeView)
+        # to xnatSettingsWindow
+        #
+        self.XnatCacheSettings = XnatCacheSettings('Cache Settings', self)
+        self.XnatSettingsWindow.addSetting(self.XnatCacheSettings.title, widget = self.XnatCacheSettings)
+
+
         #
         # Add XnatMetadataSettings (communicates to XnatTreeView)
         # to xnatSettingsWindow
@@ -594,7 +600,7 @@ class XnatSlicerWidget:
         self.XnatButtons.buttons['io']['load'].connect('clicked()', self.onLoadClicked)
         self.XnatButtons.buttons['io']['save'].connect('clicked()', self.onSaveClicked)
         self.XnatButtons.buttons['io']['delete'].connect('clicked()', self.onDeleteClicked)
-        self.XnatButtons.buttons['io']['addProj'].connect('clicked()', self.XnatFolderMaker.show)
+        self.XnatButtons.buttons['io']['addFolder'].connect('clicked()', self.XnatFolderMaker.show)
         self.XnatButtons.buttons['settings']['settings'].connect('clicked()', self.XnatSettingsWindow.showWindow)
         #
         # Sort Button event.
@@ -688,11 +694,14 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo.setup(self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
-                          self.XnatLoginMenu.usernameLine.text,
-                          self.XnatLoginMenu.passwordLine.text)
+        self.XnatIo = XnatIo(self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
+                             self.XnatLoginMenu.usernameLine.text,
+                             self.XnatLoginMenu.passwordLine.text)
+        def jsonError(host, user, response):
+            return XnatError(host, user, response)
+        self.XnatIo.addEventCallback('jsonError', jsonError)        
 
-        
+
 
         #--------------------
         # Begin communicator

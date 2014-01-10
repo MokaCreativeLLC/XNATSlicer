@@ -50,6 +50,8 @@ for key in infoMetadataTags:
 class XnatTreeViewSettings(XnatSettings):
     """ Descriptor above.
     """
+
+    FONT_SIZE_TAG = "TreeViewFontSize"
   
     def __init__(self, title, MODULE):
         """ Init function.
@@ -124,9 +126,9 @@ class XnatTreeViewSettings(XnatSettings):
         # Try to retrieve any saved fronts from
         # the settings file that pertains to the current host.
         #-------------------- 
-        self.fontSizeTag = "TreeViewFontSize"
+        
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
-        font = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, self.fontSizeTag)
+        font = self.MODULE.XnatSettingsFile.getSetting(xnatHost, XnatTreeViewSettings.FONT_SIZE_TAG)
 
 
 
@@ -137,7 +139,7 @@ class XnatTreeViewSettings(XnatSettings):
         #-------------------- 
         if len(font) == 0:
             currSize = GLOB_FONT_SIZE
-            self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(currSize)]})
+            self.MODULE.XnatSettingsFile.setSetting(xnatHost, {XnatTreeViewSettings.FONT_SIZE_TAG: [str(currSize)]})
 
 
             
@@ -157,7 +159,7 @@ class XnatTreeViewSettings(XnatSettings):
         def changeFontSize(size):
             try:
                 self.MODULE.XnatView.changeFontSize(int(size))
-                self.MODULE.XnatSettingsFile.setTagValues(xnatHost, {self.fontSizeTag: [str(size)]})
+                self.MODULE.XnatSettingsFile.setSetting(xnatHost, {XnatTreeViewSettings.FONT_SIZE_TAG: [str(size)]})
             except Exception, e:
                 ##print MokaUtils.debug.lf(), str(e)
                 pass

@@ -69,20 +69,12 @@ class XnatSettingsWindow(FingerTabWidget):
 
 
 
-
-
-
-
-
-        
-        
-        
     
         
     def addCancelAndDoneButton(self):
         """
         """
-        self.doneButton = qt.QPushButton("Done")
+        self.doneButton = qt.QPushButton("DONE")
         self.doneButton.connect('clicked()', self.hide)
 
 
@@ -100,8 +92,8 @@ class XnatSettingsWindow(FingerTabWidget):
         
         doneButtonRow = qt.QHBoxLayout()
         doneButtonRow.addStretch()
-        doneButtonRow.addWidget(self.cancelButton)
         doneButtonRow.addWidget(self.doneButton)
+        doneButtonRow.addWidget(self.cancelButton)
         #doneButtonRow.addSpacing(5)
 
 

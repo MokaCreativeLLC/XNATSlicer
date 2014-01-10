@@ -10,26 +10,17 @@ from VariableItemListWidget import *
 from XnatMetadataManager import *
 
 
-
-
-comment = """
-XnatSettings is a parent class to the various 
-component settings that exist within the XnatSettingsWindow: 
-XnatTreeViewSettings, XnatDetailsSettings, XnatMetadataSettings,
-XnatHostSettings, etc.  It contains a number of generic functions
-for managing generic variables and creating generic interactors
-(especially XnatMetadataSettings objects).
-
-XnatSettings inherits from qt.QScrollArea.  
-
-TODO:
-"""
-
-
-
         
 class XnatSettings(qt.QScrollArea):
-    """ Descriptor above.
+    """ 
+    XnatSettings is a parent class to the various 
+    component settings that exist within the XnatSettingsWindow: 
+    XnatTreeViewSettings, XnatDetailsSettings, XnatMetadataSettings,
+    XnatHostSettings, etc.  It contains a number of generic functions
+    for managing generic variables and creating generic interactors
+    (especially XnatMetadataSettings objects).
+    
+    XnatSettings inherits from qt.QScrollArea.  
     """
 
     def __init__(self, title, MODULE):
@@ -175,7 +166,7 @@ class XnatSettings(qt.QScrollArea):
                     # XNAT level (projects, subjects, etc...)
                     #
                     levelTag = self.ON_METADATA_CHECKED_TAGS[key] + xnatLevel
-                    savedMetadataItems = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, levelTag)
+                    savedMetadataItems = self.MODULE.XnatSettingsFile.getSetting(xnatHost, levelTag)
                     
                     #
                     # If there are no 'savedMetadataItems', from
@@ -186,7 +177,7 @@ class XnatSettings(qt.QScrollArea):
                         if self.defaultSelectedMetadata[key]:
                             defaultSelectedMetadata = self.defaultSelectedMetadata[key][xnatLevel] 
                             tagDict = {levelTag : defaultSelectedMetadata}
-                            self.MODULE.XnatSettingsFile.setTagValues(xnatHost, tagDict)
+                            self.MODULE.XnatSettingsFile.setSetting(xnatHost, tagDict)
 
 
                         
@@ -215,7 +206,9 @@ class XnatSettings(qt.QScrollArea):
                 for key in manager.collapsibles:
                     manager.collapsibles[key].show() 
                     manager.collapsibles[key].setChecked(False) 
-            self.setWidget(self.frame)
+                    
+
+        self.setWidget(self.frame)
 
         
 

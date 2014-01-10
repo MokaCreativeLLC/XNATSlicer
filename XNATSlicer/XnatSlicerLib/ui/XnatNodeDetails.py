@@ -8,24 +8,19 @@ from XnatSettings import *
 
 
 
-comment = """
-XnatNodeDetails inherits QTextEdit and is the display widget
-for the details of a selected 'node' within an XnatView.  By 'details'
-we mean, it displays all of the relevant metadata pertaining to a given 
-XNAT node, whether it's a folder (project, subject, experiment, scan)
-or a file.
-
-TODO : 
-"""
-
-
 
 class XnatNodeDetails(qt.QWidget):
-    """ Descriptor above.
+    """
+    XnatNodeDetails inherits QTextEdit and is the display widget
+    for the details of a selected 'node' within an XnatView.  By 'details'
+    we mean, it displays all of the relevant metadata pertaining to a given 
+    XNAT node, whether it's a folder (project, subject, experiment, scan)
+    or a file.
     """
 
     def __init__(self, MODULE = None):
-        """ Init function.
+        """ 
+        Init function.
         """
 
         #--------------------
@@ -37,16 +32,11 @@ class XnatNodeDetails(qt.QWidget):
         self.MODULE = MODULE
 
 
-        #self.settingsButton = XnatUtils.makeSettingsButton(self.MODULE.XnatDetailsSettings)
-
-
 
         self.textEdit = qt.QTextEdit(self)
-
         self.currFont = GLOB_LABEL_FONT
         self.textEdit.setFont(self.currFont)
         self.textEdit.setReadOnly(True)
-
 
 
         self._layout = qt.QGridLayout()
@@ -73,6 +63,15 @@ class XnatNodeDetails(qt.QWidget):
 
         self.setLayout(self._layout)
 
+
+
+        #--------------------
+        # Get the stored font from the settings file
+        #--------------------
+        storedFontSetting = self.MODULE.XnatSettingsFile.getSetting(self.MODULE.XnatLoginMenu.hostDropdown.currentText,
+                                                                    self.MODULE.XnatDetailsSettings.FONT_SIZE_TAG)
+        storedFont = int(storedFontSetting[0]) if len(storedFontSetting) > 0 else GLOB_FONT_SIZE
+        self.changeFontSize(storedFont)
         
 
 
@@ -121,7 +120,7 @@ class XnatNodeDetails(qt.QWidget):
         #--------------------     
         xnatHost = self.MODULE.XnatLoginMenu.hostDropdown.currentText
         metadataTag = self.MODULE.XnatDetailsSettings.ON_METADATA_CHECKED_TAGS['main'] + detailsDict['XNAT_LEVEL']
-        visibleTags = self.MODULE.XnatSettingsFile.getTagValues(xnatHost, metadataTag)
+        visibleTags = self.MODULE.XnatSettingsFile.getSetting(xnatHost, metadataTag)
 
 
                     

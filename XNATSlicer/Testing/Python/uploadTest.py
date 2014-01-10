@@ -2,7 +2,7 @@
 def upload(num):
 
     login = "sunilk"
-    password = "ambuSa5t"
+    password = "sunilk"
     localSrc = "C:/Users/Sunil Kumar/Desktop/test1.mrb"
     f=open(localSrc, 'rb')
     filebody = f.read()
