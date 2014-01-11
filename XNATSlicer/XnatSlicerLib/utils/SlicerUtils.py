@@ -6,7 +6,7 @@ import os
 
 
 
-class SlicerUtils(object):
+class XnatSlicerUtils(object):
     """
     """
 

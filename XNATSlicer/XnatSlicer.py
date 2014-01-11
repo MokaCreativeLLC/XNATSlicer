@@ -1,86 +1,66 @@
-import imp, os, inspect, sys, slicer
+# python
+import imp
+import os
+import inspect
+import sys
+import math
 
-#
-# Widget path needs to be globally recognized by Python.
-# Appending to global path.
-#
+# Make Module paths 
 MODULE_PATH = os.path.normpath(os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe()))[0])))
-#
-# Inlcude testing folders.
-#
-sys.path.append(os.path.join(MODULE_PATH, 'Testing'))
-#
-# Include lib folder.
-#
 LIB_PATH = os.path.join(MODULE_PATH, "XnatSlicerLib")
 sys.path.append(LIB_PATH)
-#
-# Include _external folder.
-#
-sys.path.append(os.path.join(LIB_PATH, '_external'))
-#
-# Include MokaUtils folder.
-#
-sys.path.append(os.path.join(LIB_PATH, '_external/MokaUtils'))
-#
-# Include ui folder.
-#
+sys.path.append(os.path.join(MODULE_PATH, 'Testing'))
+sys.path.append(os.path.join(LIB_PATH, 'ext/Xnat'))
+sys.path.append(os.path.join(LIB_PATH, 'ext/MokaUtils'))
 sys.path.append(os.path.join(LIB_PATH, 'ui'))
-#
-# Include ui-settings folder.
-#
-sys.path.append(os.path.join(LIB_PATH, 'ui/settings-widgets'))
-#
-# Include ui-custom-widgets folder.
-#
+sys.path.append(os.path.join(LIB_PATH, 'settings'))
 sys.path.append(os.path.join(LIB_PATH, 'ui/custom-qt-widgets'))
-#
-# Include utils folder.
-#
 sys.path.append(os.path.join(LIB_PATH, 'utils'))
-#
-# Include io folder.
-#
 sys.path.append(os.path.join(LIB_PATH, 'io'))
 
+# application
+import slicer
 
-import GLOB
-import math
+# external
+from Xnat import *
 from MokaUtils import *
-from SlicerUtils import *
-from XnatFileInfo import *
-from XnatFolderMaker import *
-from XnatLoadWorkflow import *
-from XnatUtils import *
-from XnatScenePackager import *
-from XnatSessionManager import *
-from XnatTimer import *
-from XnatSettingsFile import *
-from XnatTreeView import *
-from XnatSearchBar import *
-from XnatIo import *
-from XnatLoginMenu import *
-from XnatButtons import *
-from XnatViewer import *
-from XnatView import *
-from XnatPopup import *
 
-from XnatLoader import *
-from XnatLoader_Dicom import *
-from XnatLoader_Analyze import *
-from XnatLoader_File import *
-from XnatLoader_Mrb import *
+# module - io
+from DeleteWorkflow import *
+from SaveWorkflow import *
+from LoadWorkflow import *
+from Loader import *
+from Loader_Dicom import *
+from Loader_Analyze import *
+from Loader_File import *
+from Loader_Mrb import *
 
-#from XnatSlicerTest import *
-from XnatError import *
-from XnatSettings import *
-from XnatHostSettings import *
-from XnatTreeViewSettings import *
-from XnatMetadataSettings import *
-from XnatDetailsSettings import *
-from XnatCacheSettings import *
-from XnatNodeDetails import *
-from XnatMetadataManager import *
+# module - utils
+import XnatSlicerGlobals
+from XnatSlicerUtils import *
+from ScenePackager import *
+from SessionManager import *
+from SettingsFile import *
+from Timer import *
+from Error import *
+
+# module - ui
+from TreeView import *
+from SearchBar import *
+from LoginMenu import *
+from Buttons import *
+from Viewer import *
+from View import *
+from Popup import *
+from Settings import *
+from FolderMaker import *
+from HostSettings import *
+from TreeViewSettings import *
+from MetadataSettings import *
+from DetailsSettings import *
+from CacheSettings import *
+from NodeDetails import *
+from MetadataManager import *
 from AnimatedCollapsible import *
 from VariableItemListWidget import *
 
@@ -88,16 +68,28 @@ from VariableItemListWidget import *
 
 
 comment = """
+XNAT Software License Agreement
+
 Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted 
 provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Redistributions of source code must retain the above copyright notice, this list of conditions 
+and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors 
+may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+POSSIBILITY OF SUCH DAMAGE.
 """
 
 
@@ -112,8 +104,6 @@ class XnatSlicer:
   
   def __init__(self, parent):
       """ 
-      Init function.
-
       @param parent: The parent widget to attach to.
       @type parent: qt.QWidget
       """
@@ -189,7 +179,7 @@ class XnatSlicerWidget:
         # Construct all needed directories
         # if not there...
         #--------------------------------
-        XnatUtils.constructNecessaryModuleDirectories()
+        XnatSlicerUtils.constructNecessaryModuleDirectories()
 
         
         
@@ -211,94 +201,94 @@ class XnatSlicerWidget:
         #--------------------------------
         # Xnat settingsFile
         #--------------------------------
-        self.XnatSettingsFile = XnatSettingsFile(slicer.qMRMLWidget(), GLOB_LOCAL_URIS['settings'], self)
+        self.SettingsFile = SettingsFile(slicer.qMRMLWidget(), XnatSlicerGlobals.LOCAL_URIS['settings'], self)
 
 
         
         #--------------------------------
         # Login Menu
         #--------------------------------
-        self.XnatLoginMenu = XnatLoginMenu(parent = self.parent, MODULE = self)
-        self.XnatLoginMenu.loadDefaultHost()   
+        self.LoginMenu = LoginMenu(parent = self.parent, MODULE = self)
+        self.LoginMenu.loadDefaultHost()   
         def showHost(*arg):
-            self.XnatSettingsWindow.showWindow(self.XnatHostSettings.tabTitle)
-        self.XnatLoginMenu.setOnManageHostsButtonClicked(showHost)
+            self.SettingsWindow.showWindow(self.HostSettings.tabTitle)
+        self.LoginMenu.setOnManageHostsButtonClicked(showHost)
 
 
         
         #--------------------------------
         # Xnat xnatSettingsWindow
         #--------------------------------        
-        self.XnatSettingsWindow = XnatSettingsWindow(parent = None, MODULE = self)
+        self.SettingsWindow = SettingsWindow(parent = None, MODULE = self)
         
         #
-        # Add XnatHostSettings (communicates to XnatSettings)
+        # Add HostSettings (communicates to Settings)
         # to xnatSettingsWindow
         #
-        self.XnatHostSettings = XnatHostSettings('XNAT Hosts', self)
-        self.XnatSettingsWindow.addSetting(self.XnatHostSettings.title, widget = self.XnatHostSettings)
+        self.HostSettings = HostSettings('XNAT Hosts', self)
+        self.SettingsWindow.addSetting(self.HostSettings.title, widget = self.HostSettings)
         
         #
-        # Add XnatCacheSettings (communicates to XnatTreeView)
+        # Add CacheSettings (communicates to TreeView)
         # to xnatSettingsWindow
         #
-        self.XnatCacheSettings = XnatCacheSettings('Cache Settings', self)
-        self.XnatSettingsWindow.addSetting(self.XnatCacheSettings.title, widget = self.XnatCacheSettings)
+        self.CacheSettings = CacheSettings('Cache Settings', self)
+        self.SettingsWindow.addSetting(self.CacheSettings.title, widget = self.CacheSettings)
 
 
         #
-        # Add XnatMetadataSettings (communicates to XnatTreeView)
+        # Add MetadataSettings (communicates to TreeView)
         # to xnatSettingsWindow
         #
-        self.XnatMetadataSettings = XnatMetadataSettings('XNAT Metadata', self)
-        self.XnatSettingsWindow.addSetting(self.XnatMetadataSettings.title, widget = self.XnatMetadataSettings)
+        self.MetadataSettings = MetadataSettings('XNAT Metadata', self)
+        self.SettingsWindow.addSetting(self.MetadataSettings.title, widget = self.MetadataSettings)
         
         #
-        # Add XnatTreeViewSettings (communicates to XnatTreeView)
+        # Add TreeViewSettings (communicates to TreeView)
         # to xnatSettingsWindow
         #
-        self.XnatTreeViewSettings = XnatTreeViewSettings('Tree View Settings', self)
-        self.XnatSettingsWindow.addSetting(self.XnatTreeViewSettings.title, widget = self.XnatTreeViewSettings)
+        self.TreeViewSettings = TreeViewSettings('Tree View Settings', self)
+        self.SettingsWindow.addSetting(self.TreeViewSettings.title, widget = self.TreeViewSettings)
         
         #
-        # Add XnatDetailsSettings (communicates to XnatTreeView)
+        # Add DetailsSettings (communicates to TreeView)
         # to xnatSettingsWindow
         #
-        self.XnatDetailsSettings = XnatDetailsSettings('Details Settings', self)
-        self.XnatSettingsWindow.addSetting(self.XnatDetailsSettings.title, widget = self.XnatDetailsSettings)
+        self.DetailsSettings = DetailsSettings('Details Settings', self)
+        self.SettingsWindow.addSetting(self.DetailsSettings.title, widget = self.DetailsSettings)
 
 
 
         #--------------------------------
         # SearchBar
         #--------------------------------
-        self.XnatSearchBar = XnatSearchBar(MODULE = self)
+        self.SearchBar = SearchBar(MODULE = self)
 
         
       
         #--------------------------------
         # Viewer
         #--------------------------------
-        self.XnatView = XnatTreeView(MODULE = self)  
+        self.View = TreeView(MODULE = self)  
 
         
         
         #--------------------------------
         # Node Details
         #--------------------------------
-        self.XnatNodeDetails = XnatNodeDetails(MODULE = self) 
+        self.NodeDetails = NodeDetails(MODULE = self) 
         
         #
-        # Link a node click to populate XnatNodeDetails.
+        # Link a node click to populate NodeDetails.
         #
-        self.XnatView.addNodeChangedCallback(self.XnatNodeDetails.setXnatNodeText)
+        self.View.addNodeChangedCallback(self.NodeDetails.setXnatNodeText)
 
 
         
         #--------------------------------
         # Xnat Buttons
         #--------------------------------
-        self.XnatButtons = XnatButtons(self.parent, MODULE=self)  
+        self.Buttons = Buttons(self.parent, MODULE=self)  
         
         
 
@@ -306,7 +296,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Xnat Folder Maker
         #--------------------------------
-        self.XnatFolderMaker = XnatFolderMaker(self.parent, self)
+        self.FolderMaker = FolderMaker(None, self)
 
 
 
@@ -434,7 +424,7 @@ class XnatSlicerWidget:
         @type event: number
         """ 
         #print("'Close Scene' called. Resetting Xnat session data.")    
-        self.XnatView.sessionManager.clearCurrentSession()  
+        self.View.sessionManager.clearCurrentSession()  
 
 
 
@@ -450,9 +440,9 @@ class XnatSlicerWidget:
         @param event: The unsigned long int value of the vent.
         @type event: number
         """
-        if self.XnatView.lastButtonClicked == None:
+        if self.View.lastButtonClicked == None:
             #print("'Import Data' called. Resetting Xnat session data.")
-            self.XnatView.sessionManager.clearCurrentSession() 
+            self.View.sessionManager.clearCurrentSession() 
     
 
             
@@ -501,15 +491,15 @@ class XnatSlicerWidget:
         #--------------------------------
         # Set LOGIN Group Box.
         #--------------------------------    
-        self.collapsibles['login'].setWidget(self.XnatLoginMenu)
+        self.collapsibles['login'].setWidget(self.LoginMenu)
 
 
         
         #--------------------------------
         # Set VIEWER Group Box.
         #--------------------------------
-        self.XnatViewer = XnatViewer(self)
-        self.collapsibles['viewer'].setWidget(self.XnatViewer)
+        self.Viewer = Viewer(self)
+        self.collapsibles['viewer'].setWidget(self.Viewer)
 
 
 
@@ -519,7 +509,7 @@ class XnatSlicerWidget:
         #
         # Add detauls layout to group box.
         #
-        self.collapsibles['details'].setWidget(self.XnatNodeDetails)
+        self.collapsibles['details'].setWidget(self.NodeDetails)
 
 
         
@@ -531,7 +521,7 @@ class XnatSlicerWidget:
         #
         # Add tools layout to group box.
         #
-        self.collapsibles['tools'].setWidget(self.XnatButtons.toolsWidget) 
+        self.collapsibles['tools'].setWidget(self.Buttons.toolsWidget) 
 
  
 
@@ -593,19 +583,19 @@ class XnatSlicerWidget:
         #
         # Login Menu event.
         #
-        self.XnatLoginMenu.loginButton.connect('clicked()', self.onLoginButtonClicked)
+        self.LoginMenu.loginButton.connect('clicked()', self.onLoginButtonClicked)
         #
         # Button event.
         #
-        self.XnatButtons.buttons['io']['load'].connect('clicked()', self.onLoadClicked)
-        self.XnatButtons.buttons['io']['save'].connect('clicked()', self.onSaveClicked)
-        self.XnatButtons.buttons['io']['delete'].connect('clicked()', self.onDeleteClicked)
-        self.XnatButtons.buttons['io']['addFolder'].connect('clicked()', self.XnatFolderMaker.show)
-        self.XnatButtons.buttons['settings']['settings'].connect('clicked()', self.XnatSettingsWindow.showWindow)
+        self.Buttons.buttons['io']['load'].connect('clicked()', self.onLoadClicked)
+        self.Buttons.buttons['io']['save'].connect('clicked()', self.onSaveClicked)
+        self.Buttons.buttons['io']['delete'].connect('clicked()', self.onDeleteClicked)
+        self.Buttons.buttons['io']['addFolder'].connect('clicked()', self.FolderMaker.show)
+        self.Buttons.buttons['settings']['settings'].connect('clicked()', self.SettingsWindow.showWindow)
         #
         # Sort Button event.
         #
-        for key, button in self.XnatTreeViewSettings.buttons['sort'].iteritems():
+        for key, button in self.TreeViewSettings.buttons['sort'].iteritems():
             button.connect('clicked()', self.onFilterButtonClicked)
         #
         # Test button event.
@@ -613,12 +603,12 @@ class XnatSlicerWidget:
         # NOTE: Disabling this for now.
         # TODO: Implement a testing suite.
         #
-        #self.XnatButtons.buttons['io']['test'].connect('clicked(boolean*)', self.onTestClicked)
-        self.XnatButtons.buttons['io']['test'].setEnabled(False)
+        #self.Buttons.buttons['io']['test'].connect('clicked(boolean*)', self.onTestClicked)
+        self.Buttons.buttons['io']['test'].setEnabled(False)
         #
         # Search Bar event.
         #
-        self.XnatSearchBar.connect(self.XnatView.searchEntered)
+        self.SearchBar.connect(self.View.searchEntered)
 
 
 
@@ -635,7 +625,7 @@ class XnatSlicerWidget:
           raise Exception("'maxSize' argument must be greater than or equal to 0!")
 
 
-        folder = GLOB_CACHE_URI
+        folder = XnatSlicerGlobals.CACHE_URI
         folder_size = 0
 
 
@@ -664,7 +654,7 @@ class XnatSlicerWidget:
                 
     def beginXnat(self):
         """ 
-        Opens the XnatView class to allow for user interaction.
+        Opens the View class to allow for user interaction.
         Runs a test for the relevant libraries (i.e. SSL)
         before allowing the login process to begin.
         """
@@ -694,11 +684,11 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo = XnatIo(self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText), 
-                             self.XnatLoginMenu.usernameLine.text,
-                             self.XnatLoginMenu.passwordLine.text)
+        self.XnatIo = XnatIo(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText), 
+                                  self.LoginMenu.usernameLine.text,
+                                  self.LoginMenu.passwordLine.text)
         def jsonError(host, user, response):
-            return XnatError(host, user, response)
+            return Error(host, user, response)
         self.XnatIo.addEventCallback('jsonError', jsonError)        
 
 
@@ -706,7 +696,7 @@ class XnatSlicerWidget:
         #--------------------
         # Begin communicator
         #--------------------
-        self.XnatView.begin()
+        self.View.begin()
 
 
 
@@ -926,28 +916,28 @@ class XnatSlicerWidget:
         #--------------------
         # Store the current username in settings
         #--------------------
-        self.XnatSettingsFile.setCurrUsername(self.XnatLoginMenu.hostDropdown.currentText, self.XnatLoginMenu.usernameLine.text)
+        self.SettingsFile.setCurrUsername(self.LoginMenu.hostDropdown.currentText, self.LoginMenu.usernameLine.text)
 
         
         #--------------------
-        # Clear the current XnatView.
+        # Clear the current View.
         #--------------------
-        self.XnatView.clear()
+        self.View.clear()
 
 
         #--------------------
         # Derive the XNAT host URL by mapping the current item in the host
         # dropdown to its value pair in the settings.  
         #--------------------
-        if self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText):
-            self.currHostUrl = qt.QUrl(self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText))
+        if self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText):
+            self.currHostUrl = qt.QUrl(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText))
             #
             # Call the 'beginXnat' function from the MODULE.
             #
             self.loggedIn = True
             self.beginXnat()
         else:
-            print "%s The host '%s' doesn't appear to have a valid URL"%(XnatUtils.lf(), self.XnatLoginMenu.hostDropdown.currentText) 
+            print MokaUtils.lf("The host '%s' doesn't appear to have a valid URL"%(self.LoginMenu.hostDropdown.currentText))
             pass  
 
 
@@ -955,10 +945,10 @@ class XnatSlicerWidget:
 
     def onDeleteClicked(self, button=None):
         """ 
-        Starts Delete workflow (i.e. XnatDeleteWorkflow)
+        Starts Delete workflow (i.e. DeleteWorkflow)
         """  
 
-        xnatDeleteWorkflow = XnatDeleteWorkflow(self, self.XnatView.getCurrItemName())
+        xnatDeleteWorkflow = DeleteWorkflow(self, self.View.getCurrItemName())
         xnatDeleteWorkflow.beginWorkflow()
 
 
@@ -966,11 +956,11 @@ class XnatSlicerWidget:
             
     def onSaveClicked(self):        
         """ 
-        Starts Save workflow (i.e XnatSaveWorkflow)
+        Starts Save workflow (i.e SaveWorkflow)
         """     
         
         self.lastButtonClicked = "save" 
-        saver = XnatSaveWorkflow(self)
+        saver = SaveWorkflow(self)
         saver.beginWorkflow()
 
 
@@ -981,26 +971,26 @@ class XnatSlicerWidget:
         Starts Test workflow.
         """     
         self.lastButtonClicked = "test" 
-        self.XnatView.setEnabled(True)
+        self.View.setEnabled(True)
         #self.tester.runTest()
 
 
         
     def onLoadClicked(self):
         """ 
-        Starts Load workflow (i.e. XnatLoadWorkflow).
+        Starts Load workflow (i.e. LoadWorkflow).
         """
         
         self.lastButtonClicked = "load"
-        self.XnatLoadWorkflow = XnatLoadWorkflow(self)
+        self.LoadWorkflow = LoadWorkflow(self)
 
-        url = self.XnatView.getXnatUri()
+        url = self.View.getXnatUri()
         if url.startswith('/'):
             url = url[1:]
         if url.startswith('projects'):
-            url = self.XnatSettingsFile.getAddress(self.XnatLoginMenu.hostDropdown.currentText) + '/data/archive/' + url
+            url = self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText) + '/data/archive/' + url
 
-        self.XnatLoadWorkflow.beginWorkflow(url)
+        self.LoadWorkflow.beginWorkflow(url)
 
 
 
@@ -1008,22 +998,22 @@ class XnatSlicerWidget:
     def onFilterButtonClicked(self):
         """ 
         As stated.  Handles the toggling of filter
-        buttons relative to one another in the XnatView
+        buttons relative to one another in the View
         class.
         """
 
 
         try:
-            self.XnatButtons.buttons['filter']
+            self.Buttons.buttons['filter']
         except Exception, e:
             return
         #-----------------
         # Count down buttons
         #------------------
         checkedButtons = 0
-        buttonLength = len(self.XnatButtons.buttons['filter'])
-        for key in self.XnatButtons.buttons['filter']:
-           currButton = self.XnatButtons.buttons['filter'][key]
+        buttonLength = len(self.Buttons.buttons['filter'])
+        for key in self.Buttons.buttons['filter']:
+           currButton = self.Buttons.buttons['filter'][key]
            if currButton.isChecked():
                checkedButtons += 1
 
@@ -1034,11 +1024,11 @@ class XnatSlicerWidget:
         # filter and return.
         #------------------
         if checkedButtons == 0:
-            for key in self.XnatButtons.buttons['filter']:
-                self.XnatButtons.buttons['filter'][key].setDown(False)
-                self.XnatButtons.buttons['filter'][key].setChecked(False)
+            for key in self.Buttons.buttons['filter']:
+                self.Buttons.buttons['filter'][key].setDown(False)
+                self.Buttons.buttons['filter'][key].setChecked(False)
             self.currentlyToggledFilterButton = ''
-            self.XnatView.loadProjects(['all'])
+            self.View.loadProjects(['all'])
             return
  
 
@@ -1047,8 +1037,8 @@ class XnatSlicerWidget:
         # If a new button has been clicked
         # then set it as the self.currentlyToggledFilterButton. 
         #------------------
-        for key in self.XnatButtons.buttons['filter']:
-            currButton = self.XnatButtons.buttons['filter'][key]
+        for key in self.Buttons.buttons['filter']:
+            currButton = self.Buttons.buttons['filter'][key]
             if currButton.isChecked() and self.currentlyToggledFilterButton != currButton:
                 self.currentlyToggledFilterButton = currButton
                 break
@@ -1058,8 +1048,8 @@ class XnatSlicerWidget:
         #-----------------
         # Un-toggle previously toggled buttons.
         #-----------------
-        for key in self.XnatButtons.buttons['filter']:
-            currButton = self.XnatButtons.buttons['filter'][key]
+        for key in self.Buttons.buttons['filter']:
+            currButton = self.Buttons.buttons['filter'][key]
             if currButton.isChecked() and self.currentlyToggledFilterButton != currButton:
                 currButton.setDown(False)
 
@@ -1068,6 +1058,6 @@ class XnatSlicerWidget:
         #-----------------
         # Apply method
         #------------------
-        for key in self.XnatButtons.buttons['filter']:
-            if self.currentlyToggledFilterButton == self.XnatButtons.buttons['filter'][key]:
-                self.XnatView.loadProjects([self.currentlyToggledFilterButton.text.lower()])
+        for key in self.Buttons.buttons['filter']:
+            if self.currentlyToggledFilterButton == self.Buttons.buttons['filter'][key]:
+                self.View.loadProjects([self.currentlyToggledFilterButton.text.lower()])
