@@ -21,7 +21,7 @@ Installation
 
 [From GitHub](https://github.com/MokaCreativeLLC/XNATSlicer/wiki/Installing-XNATSlicer-from-GitHub).
 
-From Slicer's Extension Manager: Coming Soon!
+Please note that the repository has changed for XNATSlicer for Slicer 4.3+.  [XNATSlicer for Slicer 4.2](https://github.com/skumar221/XNATSlicer).
 
 
 Tutorials
