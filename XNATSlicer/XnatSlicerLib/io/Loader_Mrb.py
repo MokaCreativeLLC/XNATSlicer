@@ -260,7 +260,7 @@ class Loader_Mrb(Loader):
                 except Exception, e: 
                     MokaUtils.debug.lf("Couldn't make the following directory: %s\nRef. Error: %s"%(value, str(e)))# {} for some strange reason!").format(str(value))
             else:
-                MokaUtils.debug.lf( "REMOVING EXISTING FILES IN '%s'"%(value))
+                #MokaUtils.debug.lf( "REMOVING EXISTING FILES IN '%s'"%(value))
                 shutil.rmtree(value)
                 os.mkdir(value)
 

@@ -7,7 +7,7 @@ import sys
 from __main__ import vtk, qt, ctk, slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 
 # module
 from XnatSlicerGlobals import *
@@ -161,7 +161,7 @@ class Settings(qt.QScrollArea):
             #
             # Loop through all xnatLevels (projects, subjects, etc.)
             #
-            for xnatLevel in XnatGlobals.DEFAULT_XNAT_LEVELS:
+            for xnatLevel in Xnat.path.DEFAULT_LEVELS:
 
                 #
                 # Loop through the metadatacheckedtags

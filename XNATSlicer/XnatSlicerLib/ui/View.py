@@ -1,17 +1,12 @@
-#python
-import os
-import sys
-import shutil
-import csv
-
 #application
-from __main__ import vtk, ctk, qt, slicer
+from __main__ import qt
 
 #external
-from Xnat import XnatGlobals
+from Xnat import *
 
 #module
 from Timer import *
+from SlicerUtils import *
 from XnatSlicerUtils import *
 from SessionManager import *
 
@@ -59,14 +54,25 @@ class View(object):
             an error modal if it fails.
         """
 
+
         #----------------------
-        # If there's no project cache, query for 
-        # project contents...
+        # CHECK DICOM DATABASE, ERROR IF NONE
+        #----------------------
+        if not slicer.dicomDatabase:
+            
+            self.dicomDBMessage = qt.QMessageBox (2, "Setup error", "XNATSlicer cannot proceed without a DICOM database.  XNATSlicer will now open the DICOM module so you can set one up.")
+            self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', SlicerUtils.showDicomDetailsPopup)
+            self.dicomDBMessage.show()
+            self.MODULE.onLoginFailed()
+            return           
+
+        #----------------------
+        # CHECK PROJECTS, ERROR IF NONE
         #----------------------
         projectContents = None
         if self.MODULE.XnatIo.projectCache == None:
             self.clear()
-            projectContents = self.MODULE.XnatIo.getFolder('projects', XnatGlobals.DEFAULT_METADATA['projects'], 'accessible')
+            projectContents = self.MODULE.XnatIo.getFolder('projects', Xnat.metadata.DEFAULT_TAGS['projects'], 'accessible')
             #
             # If the class name of the Json is 'Error'
             # return out, with the error.

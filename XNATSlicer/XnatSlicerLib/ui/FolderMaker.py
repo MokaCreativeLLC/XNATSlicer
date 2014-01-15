@@ -10,7 +10,7 @@ from __main__ import qt
 from __main__ import slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 from MokaUtils import *
 
 # module
@@ -74,7 +74,7 @@ class FolderMaker(qt.QWidget):
         # creation.
         #--------------------
         self.xsiList = qt.QComboBox()
-        self.xsiList.addItems([key for key, value in XnatGlobals.DEFAULT_XSI_TYPES.iteritems()])
+        self.xsiList.addItems([key for key, value in Xnat.xsi.DEFAULT_TYPES.iteritems()])
 
 
 
@@ -138,8 +138,8 @@ class FolderMaker(qt.QWidget):
     def __createWidgets(self):
         """
         """
-        levelInd = XnatGlobals.DEFAULT_XNAT_LEVELS.index(XnatGlobals.HIGHEST_FOLDER_ADD_LEVEL)
-        self.xnatLevels = XnatGlobals.DEFAULT_XNAT_LEVELS[:levelInd+1]
+        levelInd = Xnat.path.DEFAULT_LEVELS.index(Xnat.path.HIGHEST_FOLDER_ADD_LEVEL)
+        self.xnatLevels = Xnat.path.DEFAULT_LEVELS[:levelInd+1]
         for level in self.xnatLevels:
 
             #
@@ -393,7 +393,7 @@ class FolderMaker(qt.QWidget):
                     xnatUri += uriAdd
                     # Special case for experiments
                     if level == 'experiments':
-                        xnatUri += '?xsiType=' + XnatGlobals.DEFAULT_XSI_TYPES[self.xsiList.currentText]
+                        xnatUri += '?xsiType=' + Xnat.xsi.DEFAULT_TYPES[self.xsiList.currentText]
                 else:
                     break
                     

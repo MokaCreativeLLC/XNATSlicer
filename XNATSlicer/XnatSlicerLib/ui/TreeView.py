@@ -2,10 +2,10 @@
 import os
 
 # application
-from __main__ import vtk, ctk, qt, slicer
+from __main__ import qt, slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 from MokaUtils import *
 
 # module
@@ -137,7 +137,7 @@ class TreeView(View, qt.QTreeWidget):
             XNAT metadata values.
         """
         self.columns = {}
-        for key, level in XnatGlobals.DEFAULT_METADATA.iteritems():
+        for key, level in Xnat.metadata.DEFAULT_TAGS.iteritems():
             for metadata in level:
                 if not metadata in self.columns:
                     self.columns[metadata] = {}
@@ -198,7 +198,7 @@ class TreeView(View, qt.QTreeWidget):
         # the XnatIo.DEFAULT_METADATA
         #---------------------- 
         self.columnKeyOrder = dict(self.columnKeyOrder.items() + 
-                                   XnatGlobals.DEFAULT_METADATA.items())
+                                   Xnat.metadata.DEFAULT_TAGS.items())
         
 
 
@@ -401,7 +401,7 @@ class TreeView(View, qt.QTreeWidget):
                 #
                 # Convert date tags to human readable
                 #
-                if key in XnatGlobals.DEFAULT_DATE_TAGS:
+                if key in Xnat.metadata.DEFAULT_DATE_TAGS:
                     value = XnatSlicerUtils.makeDateReadable(value)
                 widgetItem.setText(mergedInfoColumnNumber, widgetItem.text(mergedInfoColumnNumber) + self.columns[key]['displayname'] + ': ' + value + ' ')
                 widgetItem.setFont(mergedInfoColumnNumber, self.itemFonts['folders'])  
@@ -773,7 +773,7 @@ class TreeView(View, qt.QTreeWidget):
         # For all other URIs.
         #------------------------
         elif XnatDepth < 4: 
-            dirStr += XnatGlobals.DEFAULT_XNAT_LEVELS[XnatDepth] 
+            dirStr += Xnat.path.DEFAULT_LEVELS[XnatDepth] 
 
             
         return dirStr
@@ -1198,7 +1198,7 @@ class TreeView(View, qt.QTreeWidget):
         # Set nodeNames from metadata.
         #-------------------- 
         metadata = self.MODULE.XnatIo.getFolder(pathObj['childQueryUris'], 
-                                                XnatGlobals.getMetadataByLevel(currXnatLevel), queryArguments)
+                                                Xnat.metadata.getTagsByLevel(currXnatLevel), queryArguments)
 
 
 
@@ -1232,7 +1232,7 @@ class TreeView(View, qt.QTreeWidget):
         # Special case for children with Slicer URIs
         #--------------------
         if 'slicerQueryUris' in pathObj:
-            slicerMetadata = self.MODULE.XnatIo.getFolder(pathObj['slicerQueryUris'], XnatGlobals.getMetadataByLevel('files'))
+            slicerMetadata = self.MODULE.XnatIo.getFolder(pathObj['slicerQueryUris'], Xnat.metadata.getTagsByLevel('files'))
             #print "SLICER METADATA", slicerMetadata
             #
             # Proceed only if the relevant metadata to retrieve Slicer

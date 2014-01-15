@@ -7,7 +7,7 @@ import sys
 from __main__ import vtk, qt, ctk, slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 
 # module 
 from XnatSlicerGlobals import *
@@ -376,7 +376,7 @@ class XnatDefaultMetadataEditor(MetadataEditor):
         """ Add metadata items to the list widget of default
             (label) type.
         """
-        self.listWidget.addItemsByType([tag for tag in XnatGlobals.DEFAULT_METADATA[self.xnatLevel]])
+        self.listWidget.addItemsByType([tag for tag in Xnat.metadata.DEFAULT_TAGS[self.xnatLevel]])
 
 
 

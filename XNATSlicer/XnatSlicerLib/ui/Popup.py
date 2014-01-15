@@ -5,7 +5,7 @@ import math
 from __main__ import qt, slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 from MokaUtils import *
 
 # module
@@ -92,15 +92,9 @@ class XnatEmptyPopup(qt.QWidget):
             popup to be cenetered within the slicer app.
         """
         
-        if position:
-            mainWindow = slicer.util.mainWindow()
-            screenMainPos = mainWindow.pos
-            x = screenMainPos.x() + mainWindow.width/2 - self.width/2
-            y = screenMainPos.y() + mainWindow.height/2 - self.height/2
-            self.move(qt.QPoint(x,y))
-        
         self.raise_()
         qt.QWidget.show(self)
+        XnatSlicerUtils.repositionToMainSlicerWindow(self, 'center')
         
 
 
@@ -384,6 +378,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         """
         """
         #print self.downloadRows
+        uriKey = str(uriKey)
         if size > -1:
             self.downloadRows[uriKey]['size'] = self.recalcMem(size)
             self.downloadRows[uriKey]['progressBar'].setMaximum(100)
@@ -400,7 +395,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         if isinstance(pathDict, basestring):
             pathDict = self.downloadRows[pathDict]['pathDict']
         dlStr = ''
-        for level in XnatGlobals.DEFAULT_XNAT_LEVELS:
+        for level in Xnat.path.DEFAULT_LEVELS:
             if level in pathDict and str(pathDict[level]) != 'None':
                 dlStr += "<b>%s:</b> %s  "%(level, pathDict[level])
 

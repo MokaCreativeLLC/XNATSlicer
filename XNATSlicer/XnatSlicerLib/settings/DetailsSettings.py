@@ -1,12 +1,13 @@
-from XnatSlicerGlobals import *
-from __main__ import vtk, qt, ctk, slicer
-
+# python
 import os
 import glob
 import sys
 
+# external
+from Xnat import *
 
-from Xnat import XnatGlobals
+# module
+from XnatSlicerGlobals import *
 from Settings import *
 from MetadataManager import *
 
@@ -60,7 +61,7 @@ class DetailsSettings(Settings):
         #--------------------
         # Set the default selected metadata.
         #--------------------
-        self.setDefaultSelectedMetadata('main',  XnatGlobals.DEFAULT_METADATA)
+        self.setDefaultSelectedMetadata('main',  Xnat.metadata.DEFAULT_TAGS)
 
 
 

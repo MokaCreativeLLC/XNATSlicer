@@ -51,7 +51,8 @@ class Loader(object):
         """
         """ 
         self._src = self._src + "?format=zip"
-        self._dst = os.path.join(self._dstBase , 'projects' + self._src.replace('?formate=zip', '').split('projects')[1].split('/files')[0] + '/files.zip')
+        self._dst = os.path.join(self._dstBase , 'projects' + 
+                                 self._src.replace('?format=zip', '').split('projects')[1].split('/files')[0] + '/files.zip')
         #print "SRC:", self._src
         #print "DST:", self._dst
 

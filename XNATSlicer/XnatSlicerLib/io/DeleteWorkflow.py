@@ -1,27 +1,24 @@
-from __main__ import vtk, ctk, qt, slicer
-
+# python
 import os
 import sys
 import shutil
 import zipfile
 
-
-
-comment = """
-XnatDeletedWorkflow conducts the necessary steps to delete
-a folder or a file from a given XNAT host.  The ability to delete
-either depends on the user's priveleges determined both by the 
-projects and the XNAT host.
-
-
-TODO: Consider setting the current item to the deleted 
-sibling above or below it.  If no siblings, then go to parent.
-"""
+# application
+from __main__ import qt
 
 
     
 class DeleteWorkflow(object):
-    """ Descriptor above.
+    """ 
+    XnatDeletedWorkflow conducts the necessary steps to delete
+    a folder or a file from a given XNAT host.  The ability to delete
+    either depends on the user's priveleges determined both by the 
+    projects and the XNAT host.
+
+
+    TODO: Consider setting the current item to the deleted 
+    sibling above or below it.  If no siblings, then go to parent.
     """
     
     def __init__(self, MODULE, uriName):

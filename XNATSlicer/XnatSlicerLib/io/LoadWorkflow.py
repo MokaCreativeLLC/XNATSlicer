@@ -7,7 +7,7 @@ from __main__ import qt, slicer
 
 # external
 from MokaUtils import *
-from Xnat import XnatIo
+from Xnat import Xnat
 
 # module
 from Loader import *
@@ -126,7 +126,7 @@ class LoadWorkflow(object):
             #if size > 0:
             self.XnatDownloadPopup.setSize(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
-        self.MODULE.XnatIo.addEventCallback('downloadStarted', downloadStarted)
+        self.MODULE.XnatIo.onEvent('downloadStarted', downloadStarted)
 
         
 
@@ -136,7 +136,7 @@ class LoadWorkflow(object):
         def downloading(_xnatSrc, size = 0):
             self.XnatDownloadPopup.updateDownload(_xnatSrc.split('?format=zip')[0], size)
             slicer.app.processEvents()
-        self.MODULE.XnatIo.addEventCallback('downloading', downloading)
+        self.MODULE.XnatIo.onEvent('downloading', downloading)
 
         
 
@@ -146,7 +146,7 @@ class LoadWorkflow(object):
         def downloadFinished(_xnatSrc):
             self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
             slicer.app.processEvents()
-        self.MODULE.XnatIo.addEventCallback('downloadFinished', downloadFinished)
+        self.MODULE.XnatIo.onEvent('downloadFinished', downloadFinished)
 
 
 
@@ -154,16 +154,17 @@ class LoadWorkflow(object):
         # CANCELLED
         #--------------------------------
         def downloadCancelled(_xnatSrc, *args):
+            #print "DOWNLOAD QUEUE", len(self.MODULE.XnatIo.downloadQueue)
             if len(self.MODULE.XnatIo.downloadQueue) == 0:
                 self.XnatDownloadPopup.hide()
                 slicer.app.processEvents()
-        self.MODULE.XnatIo.addEventCallback('downloadCancelled', downloadCancelled)
+        self.MODULE.XnatIo.onEvent('downloadCancelled', downloadCancelled)
 
 
         #--------------------------------
         # FAILED (same as CANCELLED)
         #--------------------------------
-        self.MODULE.XnatIo.addEventCallback('downloadFailed', downloadCancelled)
+        self.MODULE.XnatIo.onEvent('downloadFailed', downloadCancelled)
 
         
         
@@ -202,7 +203,7 @@ class LoadWorkflow(object):
 
         if not self._src:
             self._src = src
-        self._src = XnatIo.uri.makeXnatUrl(self.MODULE.XnatIo.host, self._src)
+        self._src = Xnat.path.makeXnatUrl(self.MODULE.XnatIo.host, self._src)
 
             
         #------------------------
@@ -270,7 +271,7 @@ class LoadWorkflow(object):
         #------------------------ 
         self.preDownloadPopup.hide()
         self.XnatDownloadPopup.show()
-        self.MODULE.XnatIo.addEventCallback('downloadQueueFinished', runDownloadFinishedCallbacks)
+        self.MODULE.XnatIo.onEvent('downloadQueueFinished', runDownloadFinishedCallbacks)
         self.MODULE.XnatIo.startDownloadQueue()
       
 

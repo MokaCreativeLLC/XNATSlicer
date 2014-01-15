@@ -19,7 +19,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from __main__ import vtk, ctk, qt, slicer
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 from MokaUtils import *
 
 # module
@@ -265,13 +265,7 @@ class XnatSlicerUtils(object):
         @type location: string
         """
 
-        #---------------------------
-        # Make sure positionable is open.
-        #---------------------------
-        positionable.show()
-
-
-
+    
         #---------------------------
         # Get main window and its position.
         #---------------------------
@@ -311,7 +305,7 @@ class XnatSlicerUtils(object):
         @return: The XNAT path as a path dictionary.
         @rtype: dict
         """
-        uriDict = XnatGlobals.DEFAULT_PATH_DICT.copy()
+        uriDict = Xnat.path.DEFAULT_PATH_DICT.copy()
         uriList = xnatUri.split("/")
         for i in range(0, len(uriList)):
             for k in uriDict:

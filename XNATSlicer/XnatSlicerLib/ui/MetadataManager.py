@@ -4,10 +4,10 @@ import glob
 import sys
 
 # application
-from __main__ import vtk, qt, ctk, slicer
+from __main__ import qt
 
 # external
-from Xnat import XnatGlobals
+from Xnat import *
 
 # module
 from AnimatedCollapsible import *
@@ -23,7 +23,7 @@ class MetadataManager(qt.QFrame):
     MetadataManager is a class that combines several 
     XnatMetadtaEditors and AnimatedCollapsibles to 
     allow for editing of metadata for the XNAT Folder levels outlined
-    in 'XnatGlobals.DEFAULT_XNAT_LEVELS' (usually 'projects', 
+    in 'Xnat.path.DEFAULT_LEVELS' (usually 'projects', 
     'subjects', 'experiments','scans', etc.).
     
     Usually, there are two MetadataEditors for every
@@ -32,8 +32,8 @@ class MetadataManager(qt.QFrame):
     even further depending on the class that utilizes the
     MetadataEditor.
 
-    @param MODULE: The XNATSlicer module
-    @type MODULE: XnatSlicerModule
+    @param MODULE: The XNATSlicer widget.
+    @type MODULE: XnatSlicerWidget
     """
 
     def __init__(self, MODULE):
@@ -105,10 +105,10 @@ class MetadataManager(qt.QFrame):
         # collapsibles.
         #--------------------       
         for key, collapsible in self.collapsibles.iteritems():
-            collapsible.suspendAnimationDuration(True)
+            collapsible.suspendAnim(True)
             collapsible.show()
             collapsible.setChecked(True)
-            collapsible.suspendAnimationDuration(False)
+            collapsible.suspendAnim(False)
 
 
             
@@ -119,12 +119,12 @@ class MetadataManager(qt.QFrame):
 
         #--------------------
         # Loop through all folders as per 
-        # XnatGlobals.DEFAULT_XNAT_LEVELS.  We create an AnimatedCollapsible
+        # Xnat.path.DEFAULT_LEVELS.  We create an AnimatedCollapsible
         # for every folder, one XnatCustomMetadataEditor and one 
         # XnatDefaultMetadataEditor, along with the relevant buttons for
         # very folder in XNAT_LEVELS.
         #--------------------
-        for xnatLevel in XnatGlobals.DEFAULT_XNAT_LEVELS:
+        for xnatLevel in Xnat.path.DEFAULT_LEVELS:
 
             #
             # Set DEFAULT label per xnat level.
@@ -188,10 +188,13 @@ class MetadataManager(qt.QFrame):
             # Then set the widget of the AnimatedCollapsible to the
             # contentsWidget.
             #
-            self.collapsibles[xnatLevel] = AnimatedCollapsible(self, xnatLevel.title(), 250, 250)
+            self.collapsibles[xnatLevel] = AnimatedCollapsible(self, xnatLevel.title())
+            self.collapsibles[xnatLevel].setMaxExpandedHeight(250)
+            self.collapsibles[xnatLevel].setMinExpandedHeight(250)
+            
             contentsWidget = qt.QWidget()
             contentsWidget.setLayout(self.collapsibleLayouts[xnatLevel])
-            self.collapsibles[xnatLevel].setWidget(contentsWidget)
+            self.collapsibles[xnatLevel].setContents(contentsWidget)
             self.collapsibles[xnatLevel].setFixedWidth(550)
 
 
@@ -208,7 +211,7 @@ class MetadataManager(qt.QFrame):
         # layout when animating.
         #--------------------
         for key, collapsible in self.collapsibles.iteritems():
-            collapsible.setOnAnimate(self.updateLayout)
+            collapsible.onEvent('animate', self.updateLayout)
 
 
             

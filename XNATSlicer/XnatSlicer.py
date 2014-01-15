@@ -4,6 +4,7 @@ import os
 import inspect
 import sys
 import math
+import httplib # to test for SSL installation
 
 # Make Module paths 
 MODULE_PATH = os.path.normpath(os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe()))[0])))
@@ -150,6 +151,9 @@ class XnatSlicerWidget:
     registers it to the Slicer modules list.  It is where all of the 
     XnatSlicerLib classes and methods converge.
     """
+
+
+    COLLAPSIBLE_KEYS = ['login', 'viewer', 'details', 'tools']
     
     def __init__(self, parent = None):
         """ 
@@ -214,6 +218,9 @@ class XnatSlicerWidget:
         def showHost(*arg):
             self.SettingsWindow.showWindow(self.HostSettings.tabTitle)
         self.LoginMenu.setOnManageHostsButtonClicked(showHost)
+
+        # This exists basically for running the collapse anim
+        self.loggedIn = False
 
 
         
@@ -465,34 +472,39 @@ class XnatSlicerWidget:
         # Make Collapsible boxes: login, tools, viewer, details.
         #--------------------------------
         self.collapsibles = {}
-        self.collapsibles['login'] = AnimatedCollapsible(self.parent, 'Login', 60, 60)
-        self.collapsibles['tools'] = AnimatedCollapsible(self.parent, 'Tools', 60, 60)
+        self.collapsibleHeights = {}
+        self.collapsibleHeights['login'] = 60
+        self.collapsibleHeights['tools'] = 60
+        self.collapsibles['login'] = AnimatedCollapsible(self.parent, 'Login')
+        self.collapsibles['login'].setMaxExpandedHeight(self.collapsibleHeights['login'])
+
+        self.collapsibles['tools'] = AnimatedCollapsible(self.parent, 'Tools')
+        self.collapsibles['tools'].setMaxExpandedHeight(self.collapsibleHeights['tools'])
+
         self.collapsibles['viewer'] = AnimatedCollapsible(self.parent, 'Viewer')
         self.collapsibles['viewer'].setSizeGripVisible(True)
+        self.collapsibles['viewer'].setMinExpandedHeight(120)
+
         self.collapsibles['details'] = AnimatedCollapsible(self.parent, 'Details')
         
-        #
-        # Set collapsibles onAnimate callback to Update XNATSlicer's 
-        # layout when they are animating.
-        #
-        def onAnimatedCollapsibleAnimate():
-            self.mainLayout.update()
-        for key, collapsible in self.collapsibles.iteritems():
-            collapsible.setOnAnimate(onAnimatedCollapsibleAnimate)
-
 
             
         #--------------------------------
         # DEFINE: Main layout
-        #--------------------------------        
-        self.mainLayout = qt.QVBoxLayout()
+        #
+        # set in '__resetMainLayout'
+        #--------------------------------  
+        self.__mainLayout = None
+                
+        #self.mainCollapsibleButton.setLayout(self.__mainLayout)
+        
 
 
         
         #--------------------------------
         # Set LOGIN Group Box.
         #--------------------------------    
-        self.collapsibles['login'].setWidget(self.LoginMenu)
+        self.collapsibles['login'].setContents(self.LoginMenu)
 
 
         
@@ -500,7 +512,7 @@ class XnatSlicerWidget:
         # Set VIEWER Group Box.
         #--------------------------------
         self.Viewer = Viewer(self)
-        self.collapsibles['viewer'].setWidget(self.Viewer)
+        self.collapsibles['viewer'].setContents(self.Viewer)
 
 
 
@@ -510,7 +522,7 @@ class XnatSlicerWidget:
         #
         # Add detauls layout to group box.
         #
-        self.collapsibles['details'].setWidget(self.NodeDetails)
+        self.collapsibles['details'].setContents(self.NodeDetails)
 
 
         
@@ -522,7 +534,7 @@ class XnatSlicerWidget:
         #
         # Add tools layout to group box.
         #
-        self.collapsibles['tools'].setWidget(self.Buttons.toolsWidget) 
+        self.collapsibles['tools'].setContents(self.Buttons.toolsWidget) 
 
  
 
@@ -530,17 +542,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Add collapsibles to main layout.
         #--------------------------------
-        keys = ['login', 'viewer', 'details', 'tools']
-        for key in keys:
-            self.mainLayout.addWidget(self.collapsibles[key])
-
-
-        
-        #--------------------------------
-        # Add main layout to main collapsible button.
-        #-------------------------------- 
-        self.mainLayout.addStretch(30)
-        self.mainCollapsibleButton.setLayout(self.mainLayout)
+        self.__resetMainLayout()
         
 
         
@@ -550,15 +552,15 @@ class XnatSlicerWidget:
         # collapsible to 0 to avoid awkard load animations
         #--------------------------------
         for key, collapsible in self.collapsibles.iteritems():
-            collapsible.suspendAnimationDuration(True)
+            collapsible.suspendAnim(True)
             if key == 'login':
-                for child in collapsible.ContentsWidgets:
+                for child in collapsible.getContents():
                     child.hide()
                 collapsible.setChecked(True)
             else:
                 collapsible.setChecked(False)
                 collapsible.setEnabled(False)
-            collapsible.suspendAnimationDuration(False)
+            collapsible.suspendAnim(False)
             
 
             
@@ -685,12 +687,12 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo = XnatIo(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText), 
-                                  self.LoginMenu.usernameLine.text,
-                                  self.LoginMenu.passwordLine.text)
+        self.XnatIo = Xnat.io(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText), 
+                              self.LoginMenu.usernameLine.text,
+                              self.LoginMenu.passwordLine.text)
         def jsonError(host, user, response):
             return Error(host, user, response)
-        self.XnatIo.addEventCallback('jsonError', jsonError)        
+        self.XnatIo.onEvent('jsonError', jsonError)        
 
 
 
@@ -703,7 +705,49 @@ class XnatSlicerWidget:
 
 
 
-    def calculateCollapsibleTargetHeights(self, state):
+
+    def __resetMainLayout(self, createNew = True, addStretch = True):
+        """
+        """
+
+        #--------------------
+        # reset main layout
+        #-------------------- 
+        if createNew and addStretch:
+          self.__mainLayout = qt.QVBoxLayout() #if not self.__mainLayout else self.__mainLayout
+          #self.__mainLayout.setContentsMargins(0,0,0,0)
+          for key in self.COLLAPSIBLE_KEYS:
+            self.__mainLayout.addWidget(self.collapsibles[key])
+          if addStretch:
+            self.__mainLayout.addStretch()
+          self.mainCollapsibleButton.setLayout(self.__mainLayout)
+        
+
+        elif not createNew and addStretch:
+          if not self.__mainLayout.itemAt(4):
+            self.__mainLayout.addStretch()
+
+
+        elif not createNew and not addStretch:
+          if not addStretch:
+            stretcher = self.__mainLayout.itemAt(4)
+            self.__mainLayout.removeItem(stretcher)
+            self.__mainLayout.update()
+            del stretcher
+        
+
+        #--------------------
+        # Update mainLayout when animating
+        #--------------------
+        def onAnimatedCollapsibleAnimate():
+            self.__mainLayout.update()
+        for key, collapsible in self.collapsibles.iteritems():
+            collapsible.onEvent('animate', onAnimatedCollapsibleAnimate)
+            
+
+
+
+    def __calcTargetHeights(self, state):
         """ 
         Determines the target heights for the various
         collapsibles to animate to by quickly expanding
@@ -718,87 +762,95 @@ class XnatSlicerWidget:
         @type state: string
         """
 
-        #--------------------
-        # Expand the collapsibles 
-        # if the login to XNAT was successful.
-        #--------------------
         targetHeights = {}
-        if state == 'onLoginSuccessful':
-            
-            targetGeometries = {}
-
-            #
-            # Expand the collapsibles except 'login',
-            # supending the animation length.
-            #
-            for key, collapsible in self.collapsibles.iteritems():
-                collapsible.suspendAnimationDuration(True)
-                if key != 'login':
-                    collapsible.setChecked(True)
-                else:
-                    collapsible.setChecked(False)
-
-
-            #
-            # Give the 'viewer' collapsible a bit more size than
-            # the 'details' collapsible. Shimmy as necessary. 
-            #
-            viewerMargin = 80
-            viewerHeight = self.collapsibles['viewer'].height
-            vhHeights = {
-                'viewer': viewerHeight + viewerMargin,
-                'details': viewerHeight - viewerMargin - 40
-            }
-            for vh, height in vhHeights.iteritems():
-                self.collapsibles[vh].setMinHeight(height)
-                self.collapsibles[vh].setMaxHeight(height)
-                self.collapsibles[vh].setChecked(True)
+        marginTops = self.__mainLayout.contentsMargins().top() * (len(self.collapsibles) + 1)
+        parentHeight = self.mainCollapsibleButton.geometry.height() - marginTops
+        collapsedHeight = self.collapsibles['login'].collapsedHeight
             
 
-            #
-            # Record the geometries of the collapsibles.
-            #
-            for key, collapsible in self.collapsibles.iteritems():
-                targetGeometries[key] = collapsible.geometry
 
+        if state == 'loginSuccessful':
+          remainderHeight = parentHeight - self.collapsibleHeights['tools'] - collapsedHeight
+          for key, collapsible in self.collapsibles.iteritems():
+            if key in self.collapsibleHeights:
+              if key != 'login':
+                targetHeights[key] = self.collapsibleHeights[key]
+            else:
+              if key == 'viewer':
+                targetHeights[key] = (remainderHeight / 2) + 20
+              if key == 'details':
+                targetHeights[key] = (remainderHeight / 2)
+          
+                
+        if state == 'viewerMax' or state == 'detailsMax':
+          unfixedHeight = parentHeight - collapsedHeight * 2
+          targetHeights['viewer'] = unfixedHeight
+          targetHeights['details'] = unfixedHeight
+        
+          print "VIEWR HEIGHTS", parentHeight, targetHeights
+          self.__printCollapsibleHeights()
 
-            #
-            # Compress the collapsibles, but expand 'login'.
-            # Make sure animations are suspended.
-            #
-            for key, collapsible in self.collapsibles.iteritems():
-                collapsible.hide()
-                if key != 'login':
-                    collapsible.setChecked(False)
-                else:
-                    collapsible.setChecked(True)
-                collapsible.setEnabled(True)
-                collapsible.suspendAnimationDuration(False)
-                collapsible.show()
+        if state == 'detailsExpand':
+          #print "VIEWER",  self.collapsibles['viewer'].sizeHint.height() 
+          #print "VIEWER",  self.collapsibles['viewer'].geometry.height() 
+          unfixedHeight = parentHeight - self.collapsibles['login'].geometry.height() - self.collapsibles['tools'].geometry.height()
+          targetHeights['viewer'] = self.collapsibles['viewer'].sizeHint.height() 
+          targetHeights['details'] = unfixedHeight - self.collapsibles['viewer'].sizeHint.height()       
+          #print "UNFIXED", parentHeight, unfixedHeight,  unfixedHeight - self.collapsibles['viewer'].sizeHint.height() 
             
-
-            #
-            # Get the total height of the XnatSlicer
-            # widget.
-            #        
-            for key, geom in targetGeometries.iteritems():
-                targetHeights[key] = geom.height()
-
-
-            return targetHeights
-
+  
+        return targetHeights
 
             
 
-    def onLoginSuccessful(self):
+
+    def __setTargetHeights(self, heights, applyImmediately = False):
+        """ 
+        @param heights: The target heights. 
+        @type heights: dict 
+        """
+        for key, collapsible in self.collapsibles.iteritems():
+          if key in heights:
+            self.collapsibles[key].setMaxExpandedHeight(heights[key], applyImmediately)
+
+
+
+
+    def __configTargetHeights(self, state, applyImmediately = False):
+        """
+        """
+        heights = self.__calcTargetHeights(state)
+        self.__setTargetHeights(heights, applyImmediately)
+
+
+
+
+    def __printCollapsibleHeights(self, msg = "Collapsible heights:"):
+        """
+        """
+        for key, collapsible in self.collapsibles.iteritems():
+          print msg, key, "GEOM", collapsible.geometry.height(), "HINT", collapsible.sizeHint.height()
+
+
+
+    def onLoginSuccessful(self, callback = None):
         """ 
         Enables the relevant collapsible 
         group boxes for the user to interact with: 
         Viewer, Details and Tools
+
+        @param callback: The callback to run when the animation is finished.
+        @type callback: function
         """
-
-        heights = self.calculateCollapsibleTargetHeights('onLoginSuccessful')
-
+        
+        if self.loggedIn:
+          self.__resetMainLayout(False, True)
+          self.onLoginFailed(self.onLoginSuccessful)
+          return
+         
+ 
+        self.__configTargetHeights('loginSuccessful')
+        
         
         #--------------------
         # Creat animation chain callbacks.
@@ -807,45 +859,55 @@ class XnatSlicerWidget:
             self.collapsibles[ 'viewer' ].setChecked(True)
             self.collapsibles[ 'viewer' ].setEnabled(True)
 
-        
         def expandDetails():
-            #self.collapsibles[ 'viewer' ].setFixedHeight(heights['viewer'])
-            #return
-            #self.collapsibles[ 'details' ].setMaxHeight(heights['details'])
             self.collapsibles[ 'details' ].setChecked(True)
             self.collapsibles[ 'details' ].setEnabled(True)
        
-
-        
         def expandTools():
-            #self.collapsibles[ 'tools' ].setMaxHeight(heights['tools'])
             self.collapsibles[ 'tools' ].setChecked(True)
             self.collapsibles[ 'tools' ].setEnabled(True)
 
       
             
+        def recalcDetails():
+          #self.__configTargetHeights('viewerMax', True)
+          self.__configTargetHeights('detailsExpand')
+          
+        def recalcMax():
+           self.__configTargetHeights('viewerMax', True)
+
+
         #--------------------
         # Callback: Clear the animation Chain when
         # the animation chain is finished.
         #--------------------
         def clearChain(): 
-            for key, collapsible in self.collapsibles.iteritems():
-                collapsible.setOnExpand(None)
-                collapsible.setOnCollapse(None)
-                if key != 'tools' and key != 'login':
-                    collapsible.setMinimumHeight(60)
-                    #collapsible.setStretchHeight(heights[key])
-                    #if key == 'viewer':
-                    collapsible.setStyleSheet('height: %spx'%(heights[key]))
+          for key, collapsible in self.collapsibles.iteritems():
+            collapsible.clearEvents()
+            if key == 'viewer' or key == 'details':
+              if key == 'viewer':
+                collapsible.toggleButton.setEnabled(False)
+              if key == 'details':
+                collapsible.onEvent('expandStart', recalcDetails)
+                collapsible.onEvent('expanded', recalcMax)
+            print "POST", key, collapsible.geometry.height() 
+
+          recalcMax()
+
+
+
+
+          if callback: callback()
+          self.__resetMainLayout(False, False)
 
 
         #--------------------
         # Apply the callbacks to the collapsibles.
         #--------------------               
-        self.collapsibles['viewer'].setOnExpand(expandDetails)
-        self.collapsibles['details'].setOnExpand(expandTools)                
-        self.collapsibles['tools'].setOnExpand(clearChain)
-        self.collapsibles['login'].setOnCollapse(expandViewer)
+        self.collapsibles['viewer'].onEvent('expanded', expandDetails)
+        self.collapsibles['details'].onEvent('expanded', expandTools)                
+        self.collapsibles['tools'].onEvent('expanded', clearChain)
+        self.collapsibles['login'].onEvent('collapsed', expandViewer)
 
             
         
@@ -856,12 +918,17 @@ class XnatSlicerWidget:
         #--------------------              
         self.collapsibles['login'].setChecked(False)
 
+        self.loggedIn = True
+
 
         
         
-    def onLoginFailed(self):
+    def onLoginFailed(self, callback = None):
         """ 
         Disables and collapses the interactible widgets.
+
+        @param callback: The callback to run when the animation is finished.
+        @type callback: function
         """
 
         #--------------------
@@ -871,19 +938,19 @@ class XnatSlicerWidget:
         def collapseViewer():
             self.collapsibles[ 'viewer' ].setChecked(False)
             self.collapsibles[ 'viewer' ].setEnabled(False)
-        self.collapsibles['login'].setOnExpand(collapseViewer)
+        self.collapsibles['login'].onEvent('expanded', collapseViewer)
 
         
         def collapseDetails():
             self.collapsibles[ 'details' ].setChecked(False)
             self.collapsibles[ 'details' ].setEnabled(False)
-        self.collapsibles['viewer'].setOnCollapse(collapseDetails)
+        self.collapsibles['viewer'].onEvent('collapsed', collapseDetails)
 
         
         def collapseTools():
             self.collapsibles[ 'tools' ].setChecked(False)
             self.collapsibles[ 'tools' ].setEnabled(False)
-        self.collapsibles['details'].setOnCollapse(collapseTools)
+        self.collapsibles['details'].onEvent('collapsed', collapseTools)
 
         
 
@@ -892,9 +959,10 @@ class XnatSlicerWidget:
         #--------------------
         def clearChain(): 
             for key, collapsible in self.collapsibles.iteritems():
-                collapsible.setOnExpand(None)
-                collapsible.setOnCollapse(None)
-        self.collapsibles['tools'].setOnCollapse(clearChain)
+                collapsible.clearEvents()
+            if callback: callback()
+
+        self.collapsibles['tools'].onEvent('collapsed', clearChain)
 
 
         
@@ -905,6 +973,9 @@ class XnatSlicerWidget:
             self.collapsibles['login'].setChecked(True)
         else:
             self.collapsibles['viewer'].setChecked(False)
+
+
+        self.loggedIn = False
 
 
             
@@ -935,7 +1006,6 @@ class XnatSlicerWidget:
             #
             # Call the 'beginXnat' function from the MODULE.
             #
-            self.loggedIn = True
             self.beginXnat()
         else:
             print MokaUtils.lf("The host '%s' doesn't appear to have a valid URL"%(self.LoginMenu.hostDropdown.currentText))

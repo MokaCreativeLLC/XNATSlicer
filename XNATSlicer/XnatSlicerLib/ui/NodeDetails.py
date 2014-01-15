@@ -4,7 +4,7 @@ from __main__ import vtk, ctk, qt, slicer
 
 import os
 
-from Xnat import XnatGlobals
+from Xnat import *
 from Settings import *
 
 
@@ -148,7 +148,7 @@ class NodeDetails(qt.QWidget):
         for key, value in detailsDict.iteritems():
             if key in visibleTags:
 
-                if key in XnatGlobals.DEFAULT_DATE_TAGS:
+                if key in Xnat.metadata.DEFAULT_DATE_TAGS:
                     #print value
                     value = XnatSlicerUtils.makeDateReadable(value)
                     

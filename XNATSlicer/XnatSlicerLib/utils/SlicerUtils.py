@@ -137,3 +137,14 @@ class SlicerUtils(object):
 
                 
         return unmodifiedImageNodes, modifiedImageNodes, allImageNodes
+
+
+    @staticmethod
+    def showDicomDetailsPopup():
+        """
+        As stated.
+        """
+        from DICOM import DICOMWidget
+        p = DICOMWidget()
+        p.parent.hide()
+        p.detailsPopup.open()        

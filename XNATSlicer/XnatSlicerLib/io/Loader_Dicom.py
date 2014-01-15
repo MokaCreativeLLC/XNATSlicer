@@ -30,6 +30,7 @@ class Loader_Dicom(Loader):
         """
         super(Loader_Dicom, self).__init__(MODULE, _src, fileUris)
 
+        
         self.setZipSrcDst()
 
 
