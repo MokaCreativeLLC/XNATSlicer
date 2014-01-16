@@ -1,8 +1,14 @@
-from XnatSlicerUtils import *
-import imp, os, inspect, sys, slicer
+# python
+import os
 
-from Loader import *
+# application
+from __main__ import slicer
 import DICOMScalarVolumePlugin 
+
+# module
+from XnatSlicerUtils import *
+from Loader import *
+
 
 
 

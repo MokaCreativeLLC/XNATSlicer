@@ -1,12 +1,12 @@
-from __main__ import vtk, qt, ctk, slicer
+# application
+from __main__ import qt
 
-import os
-import glob
-import sys
+# external
+from MokaUtils import *
 
+# module
 from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
-from MokaUtils import *
 from Settings import *
 
 
@@ -469,7 +469,8 @@ class HostTable(qt.QTableWidget):
                 
                 return returner
         except Exception, e:
-            MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
+            pass
+            #MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
 
 
         

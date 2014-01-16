@@ -42,7 +42,6 @@ class Loader(object):
                                                                    self.MODULE.CacheSettings.USE_CACHED_IMAGES_TAG)
         #print "USE CACHED SETTING", useCachedSettingList
         useCachedSetting = True if (len(useCachedSettingList) > 0 and 'True' in useCachedSettingList[0]) else False
-
         self.useCached = self.checkCache(self.fileUris) and useCachedSetting        
         
 

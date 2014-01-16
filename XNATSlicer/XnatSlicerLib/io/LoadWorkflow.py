@@ -71,6 +71,11 @@ class LoadWorkflow(object):
         self.postDownloadPopup = XnatTextPopup('<b>Processing.  Data will load automatically.</b>')
 
 
+        self.__loaders = []
+
+
+
+
 
     def sortLoadablesByType(self, fileUris):
         """
@@ -155,6 +160,25 @@ class LoadWorkflow(object):
         #--------------------------------
         def downloadCancelled(_xnatSrc, *args):
             #print "DOWNLOAD QUEUE", len(self.MODULE.XnatIo.downloadQueue)
+            
+            #
+            # Update the download popup
+            #
+            _xnatSrc = _xnatSrc.split('?format=zip')[0]
+            self.XnatDownloadPopup.setText(_xnatSrc, 
+                                           "CANCELLED<br>'%s'"%(self.XnatDownloadPopup.makeDownloadPath(_xnatSrc)))
+
+            #
+            # Removed the cancelled download 'loader'
+            # from the stored 'loaders'
+            #
+            for loader in self.__loaders:
+                if _xnatSrc in loader.loadArgs['src']:
+                    self.__loaders.remove(loader)
+                    break
+            #
+            # Hide the popup if there's nothing left in the queue.
+            #
             if len(self.MODULE.XnatIo.downloadQueue) == 0:
                 self.XnatDownloadPopup.hide()
                 slicer.app.processEvents()
@@ -234,13 +258,13 @@ class LoadWorkflow(object):
         #------------------------
         # Set Download finished callbacks
         #------------------------        
-        downloadFinishedCallbacks = []
+        self.__loaders = []
         def runDownloadFinishedCallbacks():
             self.XnatDownloadPopup.hide()
             self.postDownloadPopup.show()
-            for callback in downloadFinishedCallbacks:
+            for loader in self.__loaders:
                 #print "DOWNLOAD FINISHED!"
-                callback()
+                loader.load()
                 slicer.app.processEvents()
                 self._src = None
             self.postDownloadPopup.hide()
@@ -262,7 +286,7 @@ class LoadWorkflow(object):
         for loader in self.loaderFactory(self._src):
             if not loader.useCached:
                 self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs['src'], loader.loadArgs['dst'])
-            downloadFinishedCallbacks.append(loader.load)             
+            self.__loaders.append(loader)             
 
 
             
