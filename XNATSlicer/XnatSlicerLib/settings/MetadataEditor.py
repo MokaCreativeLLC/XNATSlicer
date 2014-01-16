@@ -4,7 +4,7 @@ import glob
 import sys
 
 # application
-from __main__ import vtk, qt, ctk, slicer
+from __main__ import qt
 
 # external
 from Xnat import *
@@ -132,7 +132,36 @@ class MetadataEditor(qt.QFrame):
         return self.listWidget.count
 
 
-    
+
+    @property
+    def checkedLevelTag(self):
+        """
+        @return: The tag pertaining to the checked metadata level.
+        @rtype: string
+
+        """
+        return self.onMetadataCheckedTag + self.xnatLevel
+
+
+    @property
+    def checkedMetadataItems(self):
+        """
+        Returns all checked metadata items from
+        the list.
+
+        @return: A list of the checked metadata items (strings).
+        @rtype: string
+        """
+        checkedMetadataItems = []
+        for i in range(0, self.listWidget.count):
+            currItem = self.listWidget.item(i)
+            #print currItem.text(), currItem.flags(), currItem.checkState()
+            if currItem.flags() == 48 and currItem.checkState() == 2:
+                checkedMetadataItems.append(currItem.text())
+        return checkedMetadataItems
+
+
+
 
     def clear(self):
         """ Clears the listWidget.
@@ -213,10 +242,11 @@ class MetadataEditor(qt.QFrame):
                 
 
     def update(self):
-        """ Refreshes the contents of the listWidget
-            to match the stored contents within the
-            SettingsFile.  Also reconnects the event
-            callbacks when the items are clicked.
+        """ 
+        Refreshes the contents of the listWidget
+        to match the stored contents within the
+        SettingsFile.  Also reconnects the event
+        callbacks when the items are clicked.
         """
 
         #--------------------
@@ -252,12 +282,8 @@ class MetadataEditor(qt.QFrame):
                 # as part of the login menu.
                 #
                 xnatHost = self.MODULE.LoginMenu.hostDropdown.currentText
-
-                #
-                # Query the Settings file for any stored value, by host.
-                #
-                savedMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
-
+                savedMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, self.checkedLevelTag)
+                #print "SAVED ITEMS", savedMetadataItems
                 #
                 # Loop through the items and check accordingly.
                 #
@@ -296,7 +322,7 @@ class MetadataEditor(qt.QFrame):
             # Query the settings file for the saved 'checked'
             # metadata values.
             #
-            savedMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, self.onMetadataCheckedTag + self.xnatLevel)
+            savedMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, self.checkedLevelTag)
 
             #
             # If the item was CHECKED
@@ -305,16 +331,8 @@ class MetadataEditor(qt.QFrame):
             #
             if item.checkState() == 2:
 
-                #
-                # Get all checked metadata items from
-                # the list.
-                #
-                ##print item.text(), "Checked!"
-                checkedMetadataItems = []
-                for i in range(0, self.listWidget.count):
-                    currItem = self.listWidget.item(i)
-                    if currItem.flags() == 48 and currItem.checkState() == 2:
-                        checkedMetadataItems.append(currItem.text())
+                checkedMetadataItems = self.checkedMetadataItems
+                
                 
                 #
                 # Union the 'checkedMetadataItems' list with the 
@@ -325,7 +343,7 @@ class MetadataEditor(qt.QFrame):
                 #
                 # Save the unioned list back to the SettingsFile.
                 #
-                tagDict = {self.onMetadataCheckedTag + self.xnatLevel : mergedItems}
+                tagDict = {self.checkedLevelTag : mergedItems}
                 self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
 
 
@@ -342,7 +360,7 @@ class MetadataEditor(qt.QFrame):
                 # with the saved checked items in the SettingsFile.
                 #
                 differenceItems = list(set(savedMetadataItems) - set([item.text()]))                
-                tagDict = {self.onMetadataCheckedTag + self.xnatLevel : differenceItems}
+                tagDict = {self.checkedLevelTag : differenceItems}
                 self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)  
 
                 
@@ -352,7 +370,6 @@ class MetadataEditor(qt.QFrame):
         # changes.
         #--------------------
         self.MODULE.View.refreshColumns()
-
 
 
         
@@ -432,6 +449,7 @@ class XnatCustomMetadataEditor(MetadataEditor):
         # edit for tighter UX control.
         #
         self.lineEdit.installEventFilter(self)
+        self.lineEdit.connect('textChanged(const QString)', self.onLineEditFocused)
         
 
         
@@ -472,9 +490,13 @@ class XnatCustomMetadataEditor(MetadataEditor):
         
 
     def eventFilter(self, widget, event):
-        """ Tracks whether the lineEdit was focused
-            and runs the relevant callback.
+        """ 
+        Tracks whether the lineEdit was focused
+        and runs the relevant callback.
+
+        @deprecated
         """
+        print widget, event.type()
         if widget == self.lineEdit:
             if event.type() == qt.QEvent.FocusIn:
                 self.onLineEditFocused()
@@ -494,11 +516,21 @@ class XnatCustomMetadataEditor(MetadataEditor):
         
         
 
+
+
+
+
+
     def onDeleteButtonClicked(self):
-        """ Deletes a custom metadata item from the listWidget,
-            communicating with the SettingsFile accordingly.
+        """ 
+        Deletes a custom metadata item from the listWidget,
+        communicating with the SettingsFile accordingly.
         """
         
+
+        currItem = self.listWidget.currentItem()
+        currItemText = currItem.text().lower().strip()
+
         #--------------------
         # Retrieve the custom metadata elements
         # stored in the SettingsFile.
@@ -509,25 +541,21 @@ class XnatCustomMetadataEditor(MetadataEditor):
 
 
         #--------------------
-        # Remove the selected item 
-        # from the list widget. For all other
+        # STEP 1: Remove the selected item 
+        # from the custom tags. For all other
         # selected items, track in a list.
         #--------------------        
         updatedMetadataItems = []
         for item in customMetadataItems:
-            currItem = self.listWidget.currentItem()
-
-            if item.lower().strip() == currItem.text().lower().strip():
+            if item.lower().strip() == currItemText:
                 self.listWidget.removeItemWidget(self.listWidget.currentItem())
             else:
                 updatedMetadataItems.append(item)
 
-
-                
-        #--------------------
+        #
         # Write all selected items to the 
         # SettingsFile.
-        #--------------------        
+        #     
         tagDict = {XnatSlicerUtils.makeCustomMetadataTag(self.xnatLevel) : updatedMetadataItems}
         self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
 
@@ -554,10 +582,32 @@ class XnatCustomMetadataEditor(MetadataEditor):
         try:
             xnatHost = self.MODULE.LoginMenu.hostDropdown.currentText
             customMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, XnatSlicerUtils.makeCustomMetadataTag(self.xnatLevel))
+            
+
+            #checkedMetadataItems = self.checkedMetadataItems
+            #print self.onMetadataCheckedTag, customMetadataItems, checkedMetadataItems
+            
+
+            #
+            # Sync the custom tags with the settings file
+            #     
+            #print "CHECKED LEVEL TAG", self.checkedLevelTag
+            #checkedMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, self.checkedLevelTag)
+            #print "STORED", checkedMetadataItems
+            #checkedMetadataItems.remove(currItemText)
+            #print "STORED2", checkedMetadataItems
+            #tagDict = {self.checkedLevelTag : checkedMetadataItems}
+            #self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
+
+
+            #
+            # Apply changes to the listWidget
+            #
             self.listWidget.clear()
             self.listWidget.addItems(customMetadataItems)
             
         except Exception, e:
+            print str(e)
             pass
             
 
@@ -673,9 +723,10 @@ class XnatCustomMetadataEditor(MetadataEditor):
         
 
     def onLineEditFocused(self, *args):
-        """ Callback for when the user
-            focuses on the lineEdit.
-            Toggles the edit buttons accordingly.
+        """ 
+        Callback for when the user
+        focuses on the lineEdit.
+        Toggles the edit buttons accordingly.
         """
         if self.listWidget.currentItem():
             self.listWidget.currentItem().setSelected(False)

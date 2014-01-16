@@ -109,7 +109,7 @@ class AnimatedCollapsible(ctk.ctkExpandableWidget):
         #-------------------- 
         # Set the animation duration
         #--------------------
-        self.animDuration = 350
+        self.animDuration = 250
 
 
         

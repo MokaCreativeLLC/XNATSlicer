@@ -1,27 +1,24 @@
-from XnatSlicerGlobals import *
-from XnatSlicerUtils import *
-from __main__ import vtk, ctk, qt, slicer
-
+# python
 import os
 import sys
 import shutil
 
+# application
+from __main__ import qt
 
-
-comment = """
-SearchBar constructs the UI components for the search
-bar. It should be noted that the SearchBar class does
-not contain the methods for conducting a search on an XNAT 
-host, rather it allows the user to connect the 'returnPressed'
-signal of the searchLine to a search method of their choice.
-
-TODO:        
-"""
+# module
+from XnatSlicerGlobals import *
+from XnatSlicerUtils import *
 
 
 
 class SearchBar(qt.QFrame):
-    """ Descriptor above.
+    """ 
+    SearchBar constructs the UI components for the search
+    bar. It should be noted that the SearchBar class does
+    not contain the methods for conducting a search on an XNAT 
+    host, rather it allows the user to connect the 'returnPressed'
+    signal of the searchLine to a search method of their choice.
     """
     
     def __init__(self, MODULE):
@@ -32,7 +29,7 @@ class SearchBar(qt.QFrame):
         # Call parent __init__
         #--------------------------------       
         super(SearchBar, self).__init__(self)
-
+        self.widgetHeight = 22
 
 
         #--------------------------------
@@ -55,8 +52,8 @@ class SearchBar(qt.QFrame):
         # The search button
         #--------------------------------
         self.button = qt.QPushButton('')
-        self.button.setIcon(qt.QIcon(os.path.join(XnatSlicerGlobals.LOCAL_URIS['icons'], 'x.png')) )
-        size = qt.QSize(26,26)
+        self.button.setIcon(qt.QIcon(os.path.join(XnatSlicerGlobals.LOCAL_URIS['icons'], 'search.png')) )
+        size = qt.QSize(self.widgetHeight, self.widgetHeight)
         self.button.setFixedSize(size)
         self.button.connect('clicked()', self.onClearButtonClicked)
       
@@ -81,11 +78,12 @@ class SearchBar(qt.QFrame):
         #--------------------------------
         # AESTHETICS
         #--------------------------------  
+        
         #
         # Widget aesthetics
         #
         self.setStyleSheet('border: 1px solid rgb(160,160,160); border-radius: 3px;')
-        self.setFixedHeight(22)
+        self.setFixedHeight(self.widgetHeight)
         #
         # Search box aesthetics
         #
@@ -93,8 +91,8 @@ class SearchBar(qt.QFrame):
         #
         # Button aesthetics
         #
-        self.button.setStyleSheet("border: none")
-        self.button.setFixedHeight(20)
+        self.button.setStyleSheet("border: none;")
+        self.button.setFixedHeight(self.widgetHeight)
         #
         # Layout aesthetics
         #

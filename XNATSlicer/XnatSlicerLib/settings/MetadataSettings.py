@@ -1,9 +1,9 @@
-from __main__ import vtk, qt, ctk, slicer
-
+# python
 import os
 import glob
 import sys
 
+# module
 from Settings import *
 from MetadataManager import *
 

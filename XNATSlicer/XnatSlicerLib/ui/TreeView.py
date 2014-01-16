@@ -304,7 +304,7 @@ class TreeView(View, qt.QTreeWidget):
         # have already been populated.
         #------------------
         if xnatMetadata != None:
-            ##print "\n\n@@@@@@@@@@@@@@@@@@@@@@@@", widgetItem.text(0), xnatMetadata
+            
             for key in xnatMetadata:
 
                 
@@ -390,7 +390,12 @@ class TreeView(View, qt.QTreeWidget):
                 ##print "VALUE: ", value
             except Exception, e:
                 value = '(Empty)'
-                MokaUtils.debug.lf(str(e))
+                xnatLevel = self.columns['XNAT_LEVEL']['value']
+                key2 = str(e)
+                MokaUtils.debug.lf("\nProperty '%s' does not exist in provided XNAT metadata at the '%s' level.  "%(key2, xnatLevel) +  
+                                   "If this is a custom tag, you need to modify your XNAT server to provide it.  " +
+                                   "\nTo remove this tag, open the 'XNAT Metadata' tab of the settigs window," + 
+                                   "and remove '%s' property from the 'CUSTOM' section of the '%s' collapsible."%(key2, xnatLevel))
 
             #
             # Only allow metadata with a corresponding column.
@@ -1762,12 +1767,13 @@ class TreeView(View, qt.QTreeWidget):
 
 
         #
-        # 
+        # For no results found...
         #       
         if len(items) == 0:
             self.MODULE.Viewer.noSearchResultsFound.setText("No results for '%s' found."%(searchString))
             self.MODULE.Viewer.setNoResultsWidgetVisible(True)
-            
+        else:
+            self.MODULE.Viewer.setNoResultsWidgetVisible(False)
 
 
             

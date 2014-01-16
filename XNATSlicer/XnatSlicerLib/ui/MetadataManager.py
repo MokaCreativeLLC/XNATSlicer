@@ -285,7 +285,7 @@ class MetadataManager(qt.QFrame):
                 #--------------------
                 # Show the MetadataEditor settings window.
                 #--------------------
-                self.MODULE.SettingsWindow.setCurrentIndex(1) 
+                self.MODULE.SettingsWindow.showSettingWidget(self.MODULE.MetadataSettings.title) 
 
                 #--------------------
                 # Expand the collapsible that had the same
@@ -336,6 +336,15 @@ class MetadataManager(qt.QFrame):
                 self.defaultMetadataEditors[key].update()
                 self.customMetadataEditors[key].update()
 
+                #
+                # Sync the tags with the settings file
+                #  
+                xnatHost = self.MODULE.LoginMenu.hostDropdown.currentText
+                checkedItems = self.defaultMetadataEditors[key].checkedMetadataItems + self.customMetadataEditors[key].checkedMetadataItems
+                tagDict = {self.defaultMetadataEditors[key].checkedLevelTag : checkedItems}
+                self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
+                #print "\n\nCHECKED LEVEL TAG", checkedItems
+                #print "\nREF", self.defaultMetadataEditors[key].checkedLevelTag
                     
             except Exception, e:
                 MokaUtils.debug.lf(str(e))

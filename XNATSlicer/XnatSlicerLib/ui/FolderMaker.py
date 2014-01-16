@@ -439,7 +439,7 @@ class FolderMaker(qt.QWidget):
         #--------------------
         # Begin validation of text.
         #--------------------
-        if len(text.strip(" ")) > 0:
+        if len(text.strip(" ")) > 0 and self.MODULE.View.currentItem():
 
             #
             # Populate the lineEdits depending on nodeLevel

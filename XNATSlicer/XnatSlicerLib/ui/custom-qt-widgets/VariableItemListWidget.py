@@ -3,21 +3,16 @@ from __main__ import qt
 
 
 
-comment = """
-VariableItemListWidget is a customized QListWidget
-that allows the user to add items of varying ineractive 
-types (checkboxes, etc.).  
-
-TODO: Add more support for various item types specified
-here:
-http://harmattan-dev.nokia.com/docs/library/html/qt4/qt.html#ItemDataRole-enum
-"""
-
-
-
 
 class VariableItemListWidget (qt.QListWidget):
-    """ Descriptor above.
+    """
+    VariableItemListWidget is a customized QListWidget
+    that allows the user to add items of varying ineractive 
+    types (checkboxes, etc.).  
+    
+    TODO: Add more support for various item types specified
+    here:
+    http://harmattan-dev.nokia.com/docs/library/html/qt4/qt.html#ItemDataRole-enum
     """
     
     def __init__(self):

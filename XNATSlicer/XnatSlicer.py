@@ -475,6 +475,7 @@ class XnatSlicerWidget:
         self.collapsibleHeights = {}
         self.collapsibleHeights['login'] = 60
         self.collapsibleHeights['tools'] = 60
+        self.collapsibleHeights['details'] = 110
         self.collapsibles['login'] = AnimatedCollapsible(self.parent, 'Login')
         self.collapsibles['login'].setMaxExpandedHeight(self.collapsibleHeights['login'])
 
@@ -486,7 +487,7 @@ class XnatSlicerWidget:
         self.collapsibles['viewer'].setMinExpandedHeight(120)
 
         self.collapsibles['details'] = AnimatedCollapsible(self.parent, 'Details')
-        
+        self.collapsibles['details'].setMaxExpandedHeight(self.collapsibleHeights['details'])
 
             
         #--------------------------------
@@ -542,7 +543,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Add collapsibles to main layout.
         #--------------------------------
-        self.__resetMainLayout()
+        self.__resetMainLayout(True)
         
 
         
@@ -665,11 +666,11 @@ class XnatSlicerWidget:
         #--------------------
         # Can SSL be imported?
         #--------------------
-        print("XnatSlicer Module: Checking if SSL is installed...")
+        #print("XnatSlicer Module: Checking if SSL is installed...")
         try:      
             import ssl
             httplib.HTTPSConnection
-            print("XnatSlicer Module: SSL is installed!")
+            #print("XnatSlicer Module: SSL is installed!")
 
             
 
@@ -677,7 +678,8 @@ class XnatSlicerWidget:
         # If not, kick back OS error
         #--------------------
         except Exception, e:
-            strs = "XnatSlicer cannot operate on this system as SSL is not installed."
+            strs = "XnatSlicer cannot operate on this version of Slicer because SSL is not installed."
+            strs += "Please download the latest version of Slicer from http://www.slicer.org ."
             #print("XnatSlicer Module: %s"%(strs))
             qt.QMessageBox.warning(slicer.util.mainWindow(), "No SSL", "%s"%(strs))
             return
@@ -706,35 +708,20 @@ class XnatSlicerWidget:
 
 
 
-    def __resetMainLayout(self, createNew = True, addStretch = True):
+    def __resetMainLayout(self, createNew = True):
         """
         """
 
         #--------------------
         # reset main layout
         #-------------------- 
-        if createNew and addStretch:
-          self.__mainLayout = qt.QVBoxLayout() #if not self.__mainLayout else self.__mainLayout
-          #self.__mainLayout.setContentsMargins(0,0,0,0)
+        if createNew:
+          self.__mainLayout = qt.QVBoxLayout() 
           for key in self.COLLAPSIBLE_KEYS:
             self.__mainLayout.addWidget(self.collapsibles[key])
-          if addStretch:
-            self.__mainLayout.addStretch()
           self.mainCollapsibleButton.setLayout(self.__mainLayout)
         
 
-        elif not createNew and addStretch:
-          if not self.__mainLayout.itemAt(4):
-            self.__mainLayout.addStretch()
-
-
-        elif not createNew and not addStretch:
-          if not addStretch:
-            stretcher = self.__mainLayout.itemAt(4)
-            self.__mainLayout.removeItem(stretcher)
-            self.__mainLayout.update()
-            del stretcher
-        
 
         #--------------------
         # Update mainLayout when animating
@@ -766,37 +753,24 @@ class XnatSlicerWidget:
         marginTops = self.__mainLayout.contentsMargins().top() * (len(self.collapsibles) + 1)
         parentHeight = self.mainCollapsibleButton.geometry.height() - marginTops
         collapsedHeight = self.collapsibles['login'].collapsedHeight
-            
+        nonFixedHeights = parentHeight - self.collapsibleHeights['tools'] - collapsedHeight 
 
 
         if state == 'loginSuccessful':
-          remainderHeight = parentHeight - self.collapsibleHeights['tools'] - collapsedHeight
+          remainderHeight = parentHeight - self.collapsibleHeights['tools'] - collapsedHeight - self.collapsibleHeights['details']
           for key, collapsible in self.collapsibles.iteritems():
             if key in self.collapsibleHeights:
               if key != 'login':
                 targetHeights[key] = self.collapsibleHeights[key]
             else:
               if key == 'viewer':
-                targetHeights[key] = (remainderHeight / 2) + 20
-              if key == 'details':
-                targetHeights[key] = (remainderHeight / 2)
+                targetHeights[key] = (remainderHeight)
           
                 
         if state == 'viewerMax' or state == 'detailsMax':
-          unfixedHeight = parentHeight - collapsedHeight * 2
+          unfixedHeight = parentHeight - collapsedHeight * 3
           targetHeights['viewer'] = unfixedHeight
-          targetHeights['details'] = unfixedHeight
         
-          print "VIEWR HEIGHTS", parentHeight, targetHeights
-          self.__printCollapsibleHeights()
-
-        if state == 'detailsExpand':
-          #print "VIEWER",  self.collapsibles['viewer'].sizeHint.height() 
-          #print "VIEWER",  self.collapsibles['viewer'].geometry.height() 
-          unfixedHeight = parentHeight - self.collapsibles['login'].geometry.height() - self.collapsibles['tools'].geometry.height()
-          targetHeights['viewer'] = self.collapsibles['viewer'].sizeHint.height() 
-          targetHeights['details'] = unfixedHeight - self.collapsibles['viewer'].sizeHint.height()       
-          #print "UNFIXED", parentHeight, unfixedHeight,  unfixedHeight - self.collapsibles['viewer'].sizeHint.height() 
             
   
         return targetHeights
@@ -833,6 +807,7 @@ class XnatSlicerWidget:
 
 
 
+
     def onLoginSuccessful(self, callback = None):
         """ 
         Enables the relevant collapsible 
@@ -844,7 +819,7 @@ class XnatSlicerWidget:
         """
         
         if self.loggedIn:
-          self.__resetMainLayout(False, True)
+          #self.__resetMainLayout(False)
           self.onLoginFailed(self.onLoginSuccessful)
           return
          
@@ -869,14 +844,6 @@ class XnatSlicerWidget:
 
       
             
-        def recalcDetails():
-          #self.__configTargetHeights('viewerMax', True)
-          self.__configTargetHeights('detailsExpand')
-          
-        def recalcMax():
-           self.__configTargetHeights('viewerMax', True)
-
-
         #--------------------
         # Callback: Clear the animation Chain when
         # the animation chain is finished.
@@ -885,20 +852,15 @@ class XnatSlicerWidget:
           for key, collapsible in self.collapsibles.iteritems():
             collapsible.clearEvents()
             if key == 'viewer' or key == 'details':
-              if key == 'viewer':
-                collapsible.toggleButton.setEnabled(False)
-              if key == 'details':
-                collapsible.onEvent('expandStart', recalcDetails)
-                collapsible.onEvent('expanded', recalcMax)
-            print "POST", key, collapsible.geometry.height() 
-
-          recalcMax()
+              collapsible.toggleButton.setEnabled(False)
+              
+          self.__configTargetHeights('viewerMax', True)
 
 
 
 
           if callback: callback()
-          self.__resetMainLayout(False, False)
+          self.__resetMainLayout(False)
 
 
         #--------------------
