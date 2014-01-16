@@ -1,42 +1,10 @@
 import os
-import sys
-import shutil
-import time
-import math
 import urllib2
 import base64
-from urlparse import urljoin
-import string    
+import urlparse
 import httplib
-import codecs
-from os.path import abspath, isabs, isdir, isfile, join
 import json
 
-
-"""
-XNAT Software License Agreement
-
-Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted 
-provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of conditions 
-and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
-and the following disclaimer in the documentation and/or other materials provided with the distribution.
-Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-POSSIBILITY OF SUCH DAMAGE.
-"""
 
 
 class Xnat(object):
@@ -47,14 +15,29 @@ class Xnat(object):
     @contact: Sunil Kumar (sunilk@mokacreativellc.com), Dan Marcus (dmarcus@wustl.edu)
     @organization: Moka Creative, LLC in collaboration wtih The Neuroinformatics Research Group (NRG) 
         and The National Alliance for Medial Computing (NA-MIC)
-    @license: XNAT Software License Agreement (above)
+    @copyright: 2014 Washington University, All Rights Reserved
+    @license: XNAT Software License Agreement
 
+       Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
+       All rights reserved.
 
-    @see:
-    U{http://www.voidspace.org.uk/python/articles/authentication.shtml}
-    U{http://blog.oneiroi.co.uk/python/python-urllib2-basic-http-authentication/}
-    U{http://stackoverflow.com/questions/5131403/http-basic-authentication-doesnt-seem-to-work-with-urllib2-in-python}
-    U{http://stackoverflow.com/questions/635113/python-urllib2-basic-http-authentication-and-tr-im/4188709#4188709}
+       Redistribution and use in source and binary forms, with or without modification, are permitted 
+       provided that the following conditions are met:
+
+       Redistributions of source code must retain the above copyright notice, this list of conditions 
+       and the following disclaimer.
+       Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+       and the following disclaimer in the documentation and/or other materials provided with the distribution.
+       Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors 
+       may be used to endorse or promote products derived from this software without specific prior written permission.
+       THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
+       WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+       PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
+       ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+       TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+       HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+       NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+       POSSIBILITY OF SUCH DAMAGE.
     """
 
 
@@ -99,6 +82,7 @@ class Xnat(object):
             @param password: The password for the XNAT host.
             @type password: string        
             """
+            
             self.downloadQueue = []        
             self.__eventCallbacks = {}
             for eventType in Xnat.io.EVENT_TYPES:
@@ -151,8 +135,8 @@ class Xnat(object):
                 Default is all metadata.
             @type metadata: list.<string>
 
-            @param queryArgs: A string or list of query argument suffixes to apply.
-                Default is no suffix.
+            @param queryArgs: A string or list of query argument suffixes to apply (i.e. the '?queryArg=arg' suffixes). 
+                See XNAT documentation for more details.  Default is no suffix. 
             @type queryArgs: string | list.<string>
 
             @return: A list of dicts describing the contents of the folders, with metadata as keys.
@@ -326,6 +310,7 @@ class Xnat(object):
                     #print ( +  "FOUND RESOURCE ('%s') : %s"%(folder, r['Name']))                
 
                 return resourceNames
+
 
 
 
@@ -593,7 +578,7 @@ class Xnat(object):
 
         def clearDownloadQueue(self):
             """
-            As stated.
+            Clears the download queue.
             """
             #print "CLEAR DOWNLOAD QUEUE"
             self.downloadQueue = []
@@ -689,7 +674,7 @@ class Xnat(object):
 
         def __runEventCallbacks(self, event, *args):
             """
-            'Private' function that runs the callbacks based on the provided 'event' argument.
+            Private function that runs the callbacks based on the provided 'event' argument.
 
             @param event: The event descriptor for the callbacks stored in Xnat.callbacks.  Refer
               to self.EVENT_TYPES for the list.
@@ -711,7 +696,7 @@ class Xnat(object):
 
         def __httpsRequest(self, method, _uri, body='', headerAdditions={}):
             """ 
-            Makes httpsRequests to an XNAT host using RESTful methods.
+            Makes httpsRequests to an XNAT host.
 
             @param method: The request method to run ('GET', 'PUT', 'POST', 'DELETE').
             @type: string
@@ -767,6 +752,9 @@ class Xnat(object):
 
             @param _dst: The destination of the download file.
             @type _dst: string
+
+            @param dstFile: The destination file that has been opened already.
+            @type dstFile: file
 
             @param message: The message to indicated that the download failed.
             @type message: string
@@ -947,7 +935,7 @@ class Xnat(object):
 
         def __bufferRead(self, _src, dstFile, response, bufferSize=8192):
             """
-            Downloads files by a constant buffer size.
+            Downloads a file by a constant buffer size.
 
             @param _src: The _src url to run the GET request on.
             @type _src: string
@@ -1073,7 +1061,7 @@ class Xnat(object):
 
     class path(object):
         """
-        URI/URL methods for XnatIo specific to XNAT interaction.
+        URI/URL methods specific to XNAT interaction.
         """                
     
         QUERY_FILTERS = {
@@ -1193,10 +1181,10 @@ class Xnat(object):
 
             if not _url.startswith(host):
                 if _url.startswith('data/'):
-                    _url = urljoin(host, _url)
+                    _url = urlparse.urljoin(host, _url)
                 else:
-                    prefixUri = urljoin(host, 'data/archive/')
-                    _url = urljoin(prefixUri, _url) 
+                    prefixUri = urlparse.urljoin(host, 'data/archive/')
+                    _url = urlparse.urljoin(prefixUri, _url) 
 
 
             #--------------------
@@ -1215,6 +1203,7 @@ class Xnat(object):
 
     class xsi(object):
         """
+        Methods and varables for XNAT xsi experiment types.
         """
         DEFAULT_TYPES =  {
             'MR Session': 'xnat:mrSessionData',
@@ -1225,6 +1214,7 @@ class Xnat(object):
 
     class metadata(object):
         """
+        Methods and varables for managing and retrieving XNAT metadata.
         """
 
         DEFAULT_TAGS =  {

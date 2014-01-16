@@ -1,6 +1,5 @@
 # python
 import os
-import sys
 import shutil
 
 # application
@@ -90,10 +89,11 @@ class Loader(object):
     def extractDst(self):
         """
         """
+        
         #--------------------
         # UNZIP THE FILE SET
         #--------------------       
-        self.extractPath = self._dst.split(".")[0]
+        self.extractPath = os.path.join(os.path.dirname(self._dst), os.path.basename(self._dst).split(".")[0])
         
         #
         # Remove existing zipfile extract path if it exists

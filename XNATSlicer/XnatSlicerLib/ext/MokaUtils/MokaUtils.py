@@ -2,20 +2,10 @@ from __future__ import with_statement
 
 # python
 import os
-import unittest
-import glob
 import shutil
-import sys
 import zipfile
-import tempfile
-import platform
 import inspect
 import datetime
-import time 
-import inspect
-from contextlib import closing
-from zipfile import ZipFile, ZIP_DEFLATED
-
 
 
 
@@ -232,7 +222,7 @@ class MokaUtils(object):
             """
             zipURI = src + ".zip"
             assert os.path.isdir(src)
-            with closing(ZipFile(zipURI, "w", ZIP_DEFLATED)) as z:
+            with closing(zipfile.ZipFile(zipURI, "w", zipfile.ZIP_DEFLATED)) as z:
                 for root, dirs, files in os.walk(src):
                     for fileName in files: #NOTE: ignore empty directories
                         absfileName = os.path.join(root, fileName)
