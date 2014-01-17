@@ -91,7 +91,7 @@ class Loader(object):
         """
         
         #--------------------
-        # UNZIP THE FILE SET
+        # UNZIP The FILE SET
         #--------------------       
         self.extractPath = os.path.join(os.path.dirname(self._dst), os.path.basename(self._dst).split(".")[0])
         

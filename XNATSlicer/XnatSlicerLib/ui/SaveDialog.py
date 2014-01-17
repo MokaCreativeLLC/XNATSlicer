@@ -351,7 +351,7 @@ class XnatFileSaveDialog(SaveDialog):
         #--------------------
         # Get filename from the text input line.
         #--------------------
-        self.MODULE.View.sessionManager.sessionArgs['fileName'] = MokaUtils.string.replaceForbiddenChars(self.fileLine.text.split(".")[0], "_")
+        self.MODULE.View.sessionManager.sessionArgs['fileName'] = MokaUtils.string.replaceForbidden(self.fileLine.text.split(".")[0], "_")
         if len(self.MODULE.View.sessionManager.sessionArgs['fileName']) == 0:
             import datetime
             self.MODULE.View.sessionManager.sessionArgs['fileName'] = datetime.datetime.now().strftime("%Y_%m_%d_%H-%M-%S")

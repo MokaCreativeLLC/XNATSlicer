@@ -1,10 +1,3 @@
-# python
-import datetime, time
-import os
-import sys
-import re
-import urllib2
-
 # application
 from __main__ import qt
 from __main__ import slicer

@@ -1,28 +1,40 @@
-import sys
+# python
 import os
+import sys
 import shutil
-from datetime import datetime
+import datetime
+import getopt
+
 
 
 def createBackup(rootDir, backupPath):
+    """
+    """
     for root, dirs, files in os.walk(rootDir):
        for f in files:
+           #
+           # Construct src,dst
+           #
            filename = (f).replace('\\', "/")
            rVal = root.replace(rootDir, "")
            dst = (os.path.join("./", backupPath + "/" + rVal + "/" + filename)).replace("\\", "/").replace("//", "/")           
            src = os.path.join(root, filename)                                                                                                            
-           
+           #
            # make paths that don't exist
+           #
            if (not os.path.exists(os.path.dirname(dst))):
                 os.makedirs(os.path.dirname(dst))
            
+           #
            # copy files to backup
+           #
            shutil.copyfile(src, dst)
     
    
            
 def checkAndInject(src, findStr, replaceStr):
-   
+   """
+   """
    # read the file line by line, store it.
    if os.path.exists(src):
        lines = [line for line in open(src)]
@@ -61,7 +73,7 @@ def main():
 
 
  
-    backupPath = os.path.join("../", backupDir) + "_" + datetime.now().strftime("%Y-%m-%d %H:%M:%S").replace(':','_').replace(" ", "__").strip()
+    backupPath = os.path.join("../", backupDir) + "_" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").replace(':','_').replace(" ", "__").strip()
 
 
 
@@ -88,5 +100,15 @@ def main():
 
 
 
+
+
+
+
+
+
+
 if __name__ == "__main__":
     main()
+        
+
+
