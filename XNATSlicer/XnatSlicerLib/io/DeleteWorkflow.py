@@ -1,53 +1,60 @@
 # python
 import os
-import sys
-import shutil
-import zipfile
 
 # application
 from __main__ import qt
 
 
+
     
 class DeleteWorkflow(object):
     """ 
-    XnatDeletedWorkflow conducts the necessary steps to delete
+    Conducts the necessary steps to delete
     a folder or a file from a given XNAT host.  The ability to delete
     either depends on the user's priveleges determined both by the 
     projects and the XNAT host.
 
 
-    TODO: Consider setting the current item to the deleted 
+    @todo: Consider setting the current item to the deleted 
     sibling above or below it.  If no siblings, then go to parent.
     """
     
-    def __init__(self, MODULE, uriName):
-        """ Init function.
+    def __init__(self, MODULE):
         """
-
-        #--------------------
-        # The MODULE
-        #--------------------
+        @param MODULE: The XNATSlicer module
+        @type MODULE: XnatSlicerWidget
+        """
         self.MODULE = MODULE
-
+        self.deleteDialog = self.__makeDialog()
 
         
-        #--------------------
-        # The Dialog box.  If the user 'OK's the delete
-        # it calls on 'DeleteWorkflow.beginWorkflow'
-        #--------------------
-        self.deleteDialog = qt.QMessageBox()
-        self.deleteDialog.setIcon(qt.QMessageBox.Warning)
-        self.deleteDialog.setText("Are you sure you want to delete the '%s' from Xnat?"%(uriName))   
-        self.deleteDialog.connect('buttonClicked(QAbstractButton*)', self.beginWorkflow)
-        self.deleteDialog.addButton(qt.QMessageBox.Ok)
-        self.deleteDialog.addButton(qt.QMessageBox.Cancel)  
+
+
+    def __makeDialog(self):
+        """
+        The Dialog box.  If the user 'OK's the delete
+        it calls on 'DeleteWorkflow.beginWorkflow'
+
+        @return: The delete dialog.
+        @rtype: qt.QMessageBox
+        """
+        deleteDialog = qt.QMessageBox()
+        deleteDialog.setIcon(qt.QMessageBox.Warning)
+        deleteDialog.setText("Are you sure you want to delete '%s' from Xnat?"%(self.MODULE.View.getCurrItemName()))   
+        deleteDialog.connect('buttonClicked(QAbstractButton*)', self.beginWorkflow)
+        deleteDialog.addButton(qt.QMessageBox.Ok)
+        deleteDialog.addButton(qt.QMessageBox.Cancel) 
+        return deleteDialog
 
 
         
         
     def beginWorkflow(self, button = None):
-        """ Main function for the class.
+        """ 
+        Main workflow function for the class.
+
+        @param button: The button pressed from the delete dialog.
+        @type button: qt.QAbstractButton.
         """
 
         #--------------------

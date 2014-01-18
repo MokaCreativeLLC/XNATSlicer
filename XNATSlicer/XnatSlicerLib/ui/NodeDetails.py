@@ -1,11 +1,13 @@
+# application
+from __main__ import qt
+
+# external
+from Xnat import *
+
+# module
+from Settings import *
 from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
-from __main__ import vtk, ctk, qt, slicer
-
-import os
-
-from Xnat import *
-from Settings import *
 
 
 
@@ -109,7 +111,8 @@ class NodeDetails(qt.QWidget):
         # arguments (see 'runNodeClickedCallbacks' in 
         # XnatSlicerUtils).
         #--------------------      
-        detailsDict = detailsDict[0]
+        if isinstance(detailsDict, list):
+            detailsDict = detailsDict[0]
         detailsText = ''
 
         ##print "\n\n\t\tDETAILS DICT", detailsDict, '\n\n\n'

@@ -93,7 +93,7 @@ class Loader(object):
         #--------------------
         # UNZIP The FILE SET
         #--------------------       
-        self.extractPath = os.path.join(os.path.dirname(self._dst), os.path.basename(self._dst).split(".")[0])
+        self.extractPath = os.path.join(os.path.dirname(self._dst), 'files')
         
         #
         # Remove existing zipfile extract path if it exists

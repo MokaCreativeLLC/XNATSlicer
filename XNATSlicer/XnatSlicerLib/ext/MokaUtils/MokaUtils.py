@@ -3,6 +3,7 @@ from __future__ import with_statement
 import os
 import sys
 import shutil
+import gzip
 import zipfile
 import inspect
 import datetime
@@ -382,7 +383,7 @@ class MokaUtils(object):
         @staticmethod    
         def decompress(src, dst = None):
             """ 
-            Emplots various methods to decompress a given file
+            Employs various methods to decompress a given file
             based on the file extension.  
             
             @param src: The source path of the deompressible file.
@@ -400,27 +401,24 @@ class MokaUtils(object):
 
 
             if not os.path.isfile(src):
-                raise "MokaUtils.file.decompress: The src argument '%s' must be a file!"%(src)
+                raise Exception("MokaUtils.file.decompress: The src argument '%s' must be a file!"%(src))
                 return
-            if not os.path.isdir(dst):
-                raise "MokaUtils.file.decompress: The dst argument '%s' must be a directory!"%(src)
-                return           
-                
-
+                     
 
             if src.endswith(".zip"):
-                import zipfile
                 z = zipfile.ZipFile(src)      
-                
                 z.extractall(dst)
+
+
             elif src.endswith(".gz"):
-                import gzip 
                 a = gzip.GzipFile(src, 'rb')
                 content = a.read()
                 a.close()                                          
                 f = open(src.split(".gz")[0], 'wb')
                 f.write(content) 
                 f.close()
+
+
 
 
 
@@ -533,6 +531,7 @@ class MokaUtils(object):
 
 
 
+
     class debug(object):
         """
         A subclass of MokaUtils pertaining to debugging.
@@ -571,6 +570,7 @@ class MokaUtils(object):
 
 
 
+
     class convert(object):
         """
         A subclass of MokaUtils pertaining to converting certain numerical types.
@@ -602,6 +602,98 @@ class MokaUtils(object):
 
 
 
+
+    class Events(object):
+        """
+        
+        """
+
+        def __init__(self, __eventTypes):
+            """
+            @param __eventTypes: The event types.
+            @type __eventTypes: str
+            """
+            assert isinstance(__eventTypes, list), "Must have a string list for event types!"
+            self.__eventTypes = __eventTypes
+            self.eventCallbacks__ = {}
+            for eventType in self.__eventTypes:
+                self.eventCallbacks__[str(eventType)] = []
+
+
+
+        @property
+        def EVENT_TYPES(self):
+            """
+            @return: The stored event types.
+            @rtype: str
+            """
+            return self.__eventTypes
+
+
+
+        def onEvent(self, eventKey, callback):
+            """
+            Adds a callback for a given event.  
+            Callbacks are strored internally as a dictionary of arrays in Xnat.callbacks.
+
+            @param eventKey: The eventKey descriptor for the callbacks stored in Xnat.callbacks.  Refer
+                to self.__eventTypes for the list.
+            @type eventKey: string
+
+            @param callback: The callback function to enlist.
+            @type callback: function
+
+            @raise: Error if 'eventKey' argument is not a valid event type.
+            """
+
+            if not eventKey in self.__eventTypes:
+                raise Exception("Xnat.io (onEvent): invalid event type '%s'"%(eventKey))
+            self.eventCallbacks__[eventKey].append(callback)
+
+
+        def runEventCallbacks(self, event, *args):
+            """
+            Private function that runs the callbacks based on the provided 'event' argument.
+
+            @param event: The event descriptor for the callbacks stored in Xnat.callbacks.  Refer
+                to self.__eventTypes for the list.
+            @type event: string
+
+            @param *args: The arguments that are necessary to run the event callbacks.
+
+            @raise: Error if 'event' argument is not a valid event type.
+            """
+
+            if not event in self.__eventTypes:
+                raise Exception("XnatIo (onEvent): invalid event type '%s'"%(event))
+            for callback in self.eventCallbacks__[event]:
+                #print "EVENT CALLBACK", event
+                callback(*args)
+
+
+        def clearEvents(self, eventKey = None):
+            """
+            Clears the event callbacks associated with the 'eventKey' argument.  
+            If 'eventKey' is not specified, clears all of the event callbacks.
+
+            @param eventKey: The event key to clear.
+            @type eventKey: string
+            """
+            if not eventKey:
+                for key in self.eventCallbacks__:
+                    self.eventCallbacks__[key] = []
+                return
+
+            if not eventKey in self.__eventTypes:
+                raise Exception("%s (clearEvents): invalid event type '%s'"%(self.__class__.__name__, eventKey))
+
+            else:
+                self.eventCallbacks__[eventKey] = []
+
+
+
+
+
     class ops(object):
         """
         
@@ -611,8 +703,6 @@ class MokaUtils(object):
             'InjectInclude',
             'ListFiles'
         ]  
-
-
 
         @staticmethod
         def opFactory(optDict):
@@ -860,7 +950,7 @@ class MokaUtils(object):
                 replacer = self.optDict['replacer']
             
                 def callback(src):
-                    if src.endswith(self.optDict['extension']) not MokaUtils.SCRIPT_DIR in src:
+                    if src.endswith(self.optDict['extension']) and not MokaUtils.SCRIPT_DIR in src:
                         self.__replaceInFile(src, finder, replacer)
     
                 MokaUtils.path.fileWalk(self.optDict['directory'], callback)

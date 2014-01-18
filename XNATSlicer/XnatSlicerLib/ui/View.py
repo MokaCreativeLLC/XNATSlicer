@@ -1,10 +1,10 @@
-#application
+# application
 from __main__ import qt
 
-#external
+# external
 from Xnat import *
 
-#module
+# module
 from Timer import *
 from SlicerUtils import *
 from XnatSlicerUtils import *
@@ -22,9 +22,16 @@ class View(object):
     @todo:  Consider sending more functions from TreeView
     here. 
     """
+
+    EVENT_TYPES = [
+        'nodeChanged',
+    ] 
+
+
     def __init__(self, MODULE = None):
         """ 
-
+        @param MODULE: The XNATSlicer module
+        @type MODULE: XnatSlicerWidget
         """
         
         self.MODULE = MODULE
@@ -34,89 +41,87 @@ class View(object):
 
         
         #--------------------
-        # For for populating details window.
+        # Events
         #--------------------
-        self.nodeChangedCallbacks = []
+        self.Events = MokaUtils.Events(self.EVENT_TYPES)
 
         
         
         
     def loadProjects(self):
-        """ To be inherited by child class.
+        """ 
+        To be inherited by child class.
         """
         pass
 
 
     
     
-    def begin(self, skipAnim = None):
-        """ Begins the communication process with.  Shows
-            an error modal if it fails.
+    def begin(self):
+        """ 
+        Begins the the View communication process, 
+        first by retrieving the projects from the XNAT server 
+        based on the user's credentials.
+        
+        Displays error message boxes accordingly (server communication issues,
+        or credential issues.)
         """
 
 
         #----------------------
-        # CHECK DICOM DATABASE, ERROR IF NONE
-        #----------------------
-        if not slicer.dicomDatabase:
-            
-            self.dicomDBMessage = qt.QMessageBox (2, "Setup error", "XNATSlicer cannot proceed without a DICOM database.  XNATSlicer will now open the DICOM module so you can set one up.")
-            self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', SlicerUtils.showDicomDetailsPopup)
-            self.dicomDBMessage.show()
-            self.MODULE.onLoginFailed()
-            return           
-
-        #----------------------
-        # CHECK PROJECTS, ERROR IF NONE
+        # Check projects
         #----------------------
         projectContents = None
         if self.MODULE.XnatIo.projectCache == None:
             self.clear()
-            projectContents = self.MODULE.XnatIo.getFolder('projects', Xnat.metadata.DEFAULT_TAGS['projects'], 'accessible')
+            projectContents = None
+
+            try:
+                projectContents = self.MODULE.XnatIo.getFolder('projects', Xnat.metadata.DEFAULT_TAGS['projects'], 'accessible')
+
             #
-            # If the class name of the Json is 'Error'
-            # return out, with the error.
+            # Error: SERVER ISSUES
+            #
+            except Exception, e:
+                self.showError("Server error", "Server error for 'HOST_NAME' (HOST_URL):\n%s" %(str(e)))
+                return
+                
+            #
+            # Error: LOGIN
             #
             if projectContents == None:
-                hostName = self.MODULE.LoginMenu.hostDropdown.currentText
-                hostUrl = self.MODULE.SettingsFile.getAddress(hostName)
-                qt.QMessageBox.warning( None, "Login error", "Invalid username and/or password for the XNAT host '%s' (%s)" %(hostName, hostUrl))
-                self.MODULE.onLoginFailed()
+                self.showError("Login error", "Invalid username and/or password for the XNAT host 'HOST_NAME' (HOST_URL).")
                 return
 
 
             
         #----------------------
-        # Create View items via 'loadProjects' assuming
-        # that there's projectCotnents
+        # Load projects ino View.
         #----------------------
-        projectsLoaded = self.loadProjects(filters = None, projectContents = projectContents)
-        if projectsLoaded:
-            if not skipAnim:
-                self.MODULE.onLoginSuccessful()
-            self.MODULE.Buttons.setEnabled(buttonKey='addFolder', enabled=True) 
+        self.loadProjects(filters = None, projectContents = projectContents)
+        slicer.app.processEvents()
+        self.MODULE.onLoginSuccessful()
+        self.MODULE.Buttons.setEnabled(buttonKey='addFolder', enabled=True) 
 
 
 
-        
 
-    def addNodeChangedCallback(self, callback):
-        """ 
-        @param callback: The callback for when a view node changes.
-        @type callback: function
+    def showError(self, title, msg):
         """
-        self.nodeChangedCallbacks.append(callback)
+        Displays an error message box.
 
+        @param title: The message box title.
+        @type title: str
 
-        
-    
-
-    def runNodeChangedCallbacks(self, *args):
+        @param msg: The error message.
+        @type msg: str
         """
-        """
-        for callback in self.nodeChangedCallbacks:
-            callback(args)
+        hostName = self.MODULE.LoginMenu.hostDropdown.currentText
+        hostUrl = self.MODULE.SettingsFile.getAddress(hostName)
+        qt.QMessageBox.warning( None, title, msg.replace('HOST_NAME', hostName).replace('HOST_URL', hostUrl))
+        self.MODULE.onLoginFailed()
 
 
-            
+
+
 

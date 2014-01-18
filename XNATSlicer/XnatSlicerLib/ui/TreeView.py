@@ -911,7 +911,7 @@ class TreeView(View, qt.QTreeWidget):
         #------------------------
         # Callback
         #------------------------
-        self.runNodeChangedCallbacks(detailsDict)
+        self.Events.runEventCallbacks('nodeChanged', detailsDict)
 
         
 
@@ -1352,7 +1352,7 @@ class TreeView(View, qt.QTreeWidget):
 
         rowVals = self.getRowValues()
         if rowVals:
-            self.runNodeChangedCallbacks(rowVals)
+            self.Events.runEventCallbacks('nodeChanged', rowVals)
 
         
 
@@ -1381,7 +1381,7 @@ class TreeView(View, qt.QTreeWidget):
             item = root.child(i)
             ##print '\n\n\n', item.text()
             self.populateColumns(item)
-            self.runNodeChangedCallbacks(self.getRowValues())
+            self.Events.runEventCallbacks('nodeChanged', self.getRowValues())
 
             
     

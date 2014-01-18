@@ -84,9 +84,6 @@ class Xnat(object):
             """
             
             self.downloadQueue = []        
-            self.__eventCallbacks = {}
-            for eventType in Xnat.io.EVENT_TYPES:
-                self.__eventCallbacks[str(eventType)] = []
 
 
             #-------------------
@@ -533,9 +530,42 @@ class Xnat(object):
 
             @raise: Error if 'eventKey' argument is not a valid event type.
             """
+
+            #-------------------- 
+            # Construct callback dict if it doesn't exist.
+            #--------------------
+            if not hasattr(self, 'eventCallbacks__'):
+                self.eventCallbacks__ = {}
+                for eventType in self.EVENT_TYPES:
+                    self.eventCallbacks__[str(eventType)] = []
+
+
             if not eventKey in self.EVENT_TYPES:
                 raise Exception("Xnat.io (onEvent): invalid event type '%s'"%(eventKey))
-            self.__eventCallbacks[eventKey].append(callback)
+            self.eventCallbacks__[eventKey].append(callback)
+
+
+
+
+
+        def runEventCallbacks(self, event, *args):
+            """
+            Private function that runs the callbacks based on the provided 'event' argument.
+
+            @param event: The event descriptor for the callbacks stored in Xnat.callbacks.  Refer
+              to self.EVENT_TYPES for the list.
+            @type event: string
+
+            @param *args: The arguments that are necessary to run the event callbacks.
+
+            @raise: Error if 'event' argument is not a valid event type.
+            """
+
+            if not event in self.EVENT_TYPES:
+                raise Exception("XnatIo (onEvent): invalid event type '%s'"%(event))
+            for callback in self.eventCallbacks__[event]:
+                #print "EVENT CALLBACK", event
+                callback(*args)
 
 
 
@@ -549,15 +579,15 @@ class Xnat(object):
             @type eventKey: string
             """
             if not eventKey:
-                for key in self.__eventCallbacks:
-                    self.__eventCallbacks[key] = []
+                for key in self.eventCallbacks__:
+                    self.eventCallbacks__[key] = []
                 return
 
             if not eventKey in self.EVENT_TYPES:
-                raise Exception("Xnat.io (clearEvents): invalid event type '%s'"%(eventKey))
+                raise Exception("%s (clearEvents): invalid event type '%s'"%(self.__class__.__name__, eventKey))
 
             else:
-                self.__eventCallbacks[eventKey] = []
+                self.eventCallbacks__[eventKey] = []
 
 
 
@@ -592,11 +622,11 @@ class Xnat(object):
             Begins the the download queue.
             """
 
-            self.__runEventCallbacks('downloadQueueStarted') 
+            self.runEventCallbacks('downloadQueueStarted') 
             while len(self.downloadQueue):
                 if self.downloadQueue[0]['dst'] != None:
                     self.getFile(self.downloadQueue[0]['src'], self.downloadQueue[0]['dst'])
-            self.__runEventCallbacks('downloadQueueFinished') 
+            self.runEventCallbacks('downloadQueueFinished') 
             self.clearDownloadQueue()
 
 
@@ -656,7 +686,7 @@ class Xnat(object):
             #-------------------- 
             # Callbacks
             #-------------------- 
-            self.__runEventCallbacks('downloadCancelled', _src) 
+            self.runEventCallbacks('downloadCancelled', _src) 
 
 
             #-------------------- 
@@ -666,30 +696,6 @@ class Xnat(object):
             if len(self.downloadQueue) == 0:
                 self.clearDownloadQueue()
 
-
-               
-
-
-
-
-        def __runEventCallbacks(self, event, *args):
-            """
-            Private function that runs the callbacks based on the provided 'event' argument.
-
-            @param event: The event descriptor for the callbacks stored in Xnat.callbacks.  Refer
-              to self.EVENT_TYPES for the list.
-            @type event: string
-
-            @param *args: The arguments that are necessary to run the event callbacks.
-
-            @raise: Error if 'event' argument is not a valid event type.
-            """
-
-            if not event in self.EVENT_TYPES:
-                raise Exception("XnatIo (onEvent): invalid event type '%s'"%(event))
-            for callback in self.__eventCallbacks[event]:
-                #print "EVENT CALLBACK", event
-                callback(*args)
 
 
 
@@ -763,7 +769,7 @@ class Xnat(object):
             dstFile.close()
             os.remove(dstFile.name)
             print "\nFailed to download '%s'.  Error: %s"%(_src, message)
-            self.__runEventCallbacks('downloadFailed', _src, _dst, message)
+            self.runEventCallbacks('downloadFailed', _src, _dst, message)
 
 
 
@@ -792,8 +798,8 @@ class Xnat(object):
             #-------------------- 
             # Pre-download callbacks
             #-------------------- 
-            self.__runEventCallbacks('downloadStarted', _src, -1)
-            self.__runEventCallbacks('downloading', _src, 0)
+            self.runEventCallbacks('downloadStarted', _src, -1)
+            self.runEventCallbacks('downloading', _src, 0)
 
 
 
@@ -811,7 +817,7 @@ class Xnat(object):
             # Post-download callbacks
             #--------------------     
             self.removeFromDownloadQueue(_src)
-            self.__runEventCallbacks('downloadFinished', _src)
+            self.runEventCallbacks('downloadFinished', _src)
 
 
 
@@ -959,7 +965,7 @@ class Xnat(object):
             # Pre-download callbacks
             #--------------------
             size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else -1
-            self.__runEventCallbacks('downloadStarted', _src, size)
+            self.runEventCallbacks('downloadStarted', _src, size)
 
 
 
@@ -975,7 +981,7 @@ class Xnat(object):
                     print "Cancelling download of '%s'"%(_src)
                     dstFile.close()
                     os.remove(dstFile.name)
-                    self.__runEventCallbacks('downloadCancelled', _src)
+                    self.runEventCallbacks('downloadCancelled', _src)
                     break
 
 
@@ -986,7 +992,7 @@ class Xnat(object):
                 if not buffer: 
                     # Pop from the queue
                     self.removeFromDownloadQueue(_src)
-                    self.__runEventCallbacks('downloadFinished', _src)
+                    self.runEventCallbacks('downloadFinished', _src)
                     break
 
 
@@ -999,7 +1005,7 @@ class Xnat(object):
                 # And update progress indicators
                 #
                 self.downloadTracker['downloadedSize']['bytes'] += len(buffer)
-                self.__runEventCallbacks('downloading', _src, self.downloadTracker['downloadedSize']['bytes'])
+                self.runEventCallbacks('downloading', _src, self.downloadTracker['downloadedSize']['bytes'])
 
 
             return self.downloadTracker['downloadedSize']['bytes']
@@ -1034,7 +1040,7 @@ class Xnat(object):
             try:
                 return json.loads(response)['ResultSet']['Result']
             except Exception, e:
-                self.__runEventCallbacks('jsonError', self.host, self.username, response)
+                self.runEventCallbacks('jsonError', self.host, self.username, response)
 
 
 

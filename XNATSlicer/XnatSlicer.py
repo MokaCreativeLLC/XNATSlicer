@@ -289,7 +289,7 @@ class XnatSlicerWidget:
         #
         # Link a node click to populate NodeDetails.
         #
-        self.View.addNodeChangedCallback(self.NodeDetails.setXnatNodeText)
+        self.View.Events.onEvent('nodeChanged', self.NodeDetails.setXnatNodeText)
 
 
         
@@ -685,6 +685,19 @@ class XnatSlicerWidget:
             return
                 
 
+
+        #----------------------
+        # Check dicom database.  Error if none.
+        #----------------------
+        if not slicer.dicomDatabase:
+          self.dicomDBMessage = qt.QMessageBox (2, "Setup error", "XNATSlicer cannot " + 
+          "proceed without a DICOM database.  XNATSlicer will now open the DICOM module so you can set one up.")
+          self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', SlicerUtils.showDicomDetailsPopup)
+          self.dicomDBMessage.show()
+          self.onLoginFailed()
+          return  
+
+
         
         #--------------------
         # Init XnatIo.
@@ -981,7 +994,7 @@ class XnatSlicerWidget:
         Starts Delete workflow (i.e. DeleteWorkflow)
         """  
 
-        xnatDeleteWorkflow = DeleteWorkflow(self, self.View.getCurrItemName())
+        xnatDeleteWorkflow = DeleteWorkflow(self)
         xnatDeleteWorkflow.beginWorkflow()
 
 

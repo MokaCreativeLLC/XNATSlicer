@@ -25,7 +25,7 @@ class FolderMaker(qt.QWidget):
         @type parent: qt.QWidget
 
         @param MODULE: The XNATSlicer module
-        @type MODULE: XnatSlicerModule
+        @type MODULE: XnatSlicerWidget
         """
 
         self.MODULE = MODULE
@@ -237,8 +237,8 @@ class FolderMaker(qt.QWidget):
         @param widget: The widget calling the event.
         @type widget: qt.QWidget
 
-        @param MODULE: The XNATSlicer module
-        @type MODULE: XnatSlicerModule        
+        @param event: The QT event.
+        @type event: number     
         """
         for level, lineEdit in self.lineEdits.iteritems():
             if widget == lineEdit:
