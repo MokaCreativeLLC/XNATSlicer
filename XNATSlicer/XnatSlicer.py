@@ -840,18 +840,22 @@ class XnatSlicerWidget:
         self.__configTargetHeights('loginSuccessful')
         
         
+
         #--------------------
-        # Creat animation chain callbacks.
+        # Create animation chain callbacks.
         #-------------------- 
         def expandViewer():
+            slicer.app.processEvents()
             self.collapsibles[ 'viewer' ].setChecked(True)
             self.collapsibles[ 'viewer' ].setEnabled(True)
 
         def expandDetails():
+            slicer.app.processEvents()
             self.collapsibles[ 'details' ].setChecked(True)
             self.collapsibles[ 'details' ].setEnabled(True)
        
         def expandTools():
+            slicer.app.processEvents()
             self.collapsibles[ 'tools' ].setChecked(True)
             self.collapsibles[ 'tools' ].setEnabled(True)
 
@@ -883,7 +887,10 @@ class XnatSlicerWidget:
         self.collapsibles['details'].onEvent('expanded', expandTools)                
         self.collapsibles['tools'].onEvent('expanded', clearChain)
         self.collapsibles['login'].onEvent('collapsed', expandViewer)
-
+        #self.collapsibles['viewer'].onEvent('expanded', clearChain)
+        #self.collapsibles['details'].onEvent('expanded', expandViewer)                
+        #self.collapsibles['tools'].onEvent('expanded', expandDetails)
+        #self.collapsibles['login'].onEvent('collapsed', expandTools)
             
         
         #--------------------
