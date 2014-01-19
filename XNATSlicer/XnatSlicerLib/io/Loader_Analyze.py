@@ -9,9 +9,9 @@ from Loader import *
 
 
 
-class Loader_Analyze(Loader):
+class Loader_Analyze(Loader_Images):
     """ 
-    Class description above.  Inherits from Loader.
+    Class description above.  Inherits from Loader_Images.
     Loader_Analyze contains the specific load methods for analyze 
     filetypes (.hdr and .img pairings) to be downloaded from an XNAT host into Slicer.  
     """
@@ -20,14 +20,7 @@ class Loader_Analyze(Loader):
 
     def __init__(self, MODULE, _src, fileUris):
         super(Loader_Analyze, self).__init__(MODULE, _src, fileUris)
-        self.setZipSrcDst()
 
-
-        #--------------------
-        # Check cache, and also see if 'useCached' is enabled 
-        # in the settings.
-        #--------------------  
-        self.runCacheCheckWorkflow()
     
         
         if self.useCached:
@@ -83,7 +76,7 @@ class Loader_Analyze(Loader):
             
             
         else:
-            if not Loader.load(self): return 
+            if not os.path.exists(self._dst): return 
             self.extractDst()
             
         for fileName in self.extractedFiles:

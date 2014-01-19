@@ -6,7 +6,7 @@ import DICOMScalarVolumePlugin
 
 
 
-class Loader_Dicom(Loader):
+class Loader_Dicom(Loader_Images):
     """ 
     Loader_Dicom conducts the necessary steps
     to load DICOM files into Slicer.
@@ -30,15 +30,7 @@ class Loader_Dicom(Loader):
         """
         super(Loader_Dicom, self).__init__(MODULE, _src, fileUris)
 
-        
-        self.setZipSrcDst()
-
-
-        #--------------------
-        # Check cache, and also see if 'useCached' is enabled 
-        # in the settings.
-        #--------------------  
-        self.runCacheCheckWorkflow()
+    
 
         if self.useCached: 
             self._dst = None
@@ -151,7 +143,7 @@ class Loader_Dicom(Loader):
             return self.loadDicomsFromDatabase(self.extractedFiles)
 
 
-        if not Loader.load(self):
+        if not os.path.exists(self._dst):
             return 
         
 

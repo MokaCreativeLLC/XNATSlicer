@@ -35,7 +35,7 @@ class Loader_Mrb(Loader):
 
 
         
-        if not Loader.load(self): return     
+        if not os.path.exists(self._dst): return     
 
         
         #-------------------------

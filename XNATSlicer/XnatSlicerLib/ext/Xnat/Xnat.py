@@ -1090,6 +1090,31 @@ class Xnat(object):
         HIGHEST_FOLDER_ADD_LEVEL  = 'experiments'
 
 
+
+        @staticmethod
+        def modifySrcDstForZipDownload(src, dstBase):   
+            """
+            Modifies the variables src and dstBase to create a new src and a dst
+            for downloading a zipped set of files form XNAT.  
+
+            @param src: The source URI to modify.
+            @type src: str
+
+            @param dstBase: The base destination URI to create the appropriate dst from.
+            @type dstBase: str
+
+            @returns: The modified src, dst as tuples
+            @rtypes: str, str
+            """ 
+
+            src = src + "?format=zip"
+            dst = os.path.join(dstBase , 'projects' + 
+                               src.replace('?format=zip', '').split('projects')[1].split('/files')[0] + '/files.zip')
+            return src, dst
+
+
+
+
         @staticmethod
         def getUriAt(_uri, level):
             """ 
