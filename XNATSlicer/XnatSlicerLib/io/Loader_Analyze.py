@@ -16,30 +16,14 @@ class Loader_Analyze(Loader_Images):
     filetypes (.hdr and .img pairings) to be downloaded from an XNAT host into Slicer.  
     """
 
-    
-
-    def __init__(self, MODULE, _src, fileUris):
-        super(Loader_Analyze, self).__init__(MODULE, _src, fileUris)
-
-    
-        
-        if self.useCached:
-            # Update the download popup
-            self._dst = None
-            popupKey = self._src.replace('?format=zip', '')
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setText(popupKey, 
-                                                  "USING CACHED<br>'%s'"%(self.MODULE.LoadWorkflow.XnatDownloadPopup.makeDownloadPath(popupKey)))
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setProgressBarValue(popupKey, 100)
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setEnabled(popupKey, False)
-
-            
-            self.extractedFiles = self.cachedFiles
-                                                                    
-    
-
         
     def checkCache(self, *args):
         """
+        Checks the XNATSlicer cache for the existence of the to-be downloaded
+        files.
+
+        @params args: The dummy arguments needed for checking the cache.
+        @types: None
         """
         splitter = '/projects/'
      
@@ -66,9 +50,10 @@ class Loader_Analyze(Loader_Images):
             
         
     def load(self):
-        """ Downloads an analyze file pair (.hdr and .img) from XNAT, 
-            then attempts to load it via the Slicer API's 'loadNodeFromFile' 
-            method, which returns True or False if the load was successful.
+        """ 
+        Downloads an analyze file pair (.hdr and .img) from XNAT, 
+        then attempts to load it via the Slicer API's 'loadNodeFromFile' 
+        method, which returns True or False if the load was successful.
         """
 
         if self.useCached:

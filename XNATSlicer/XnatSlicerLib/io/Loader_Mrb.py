@@ -1,12 +1,15 @@
-from XnatSlicerGlobals import *
+# external
 from MokaUtils import *
+
+# module
+from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
 from Loader import *
 from MrmlParser import *
 
 
 
-class Loader_Mrb(Loader):
+class Loader_Mrb(Loader_File):
     """
     Loader_Mrb is a subclass of the Loader class.
     It contains specific functions for downloadloading scenes from an XNAT server, 
@@ -18,23 +21,17 @@ class Loader_Mrb(Loader):
     """
 
 
-    def __init__(self, MODULE, _src):
-        super(Loader_Mrb, self).__init__(MODULE, _src)
-        self.setFileSrcDst()
-        
-
-
         
     def load(self):
-        """ Main load function for downloading Slicer scenes
-            and loading them into Slicer.  
-
-            Refers to a number of functions below (updateAbsoluteMrmlUrisToRelative, 
-            deconstructMrb, etc.) to load the mrml.
+        """ 
+        Main load function for downloading Slicer scenes
+        and loading them into Slicer.  
+        
+        Refers to a number of functions below (updateAbsoluteMrmlUrisToRelative, 
+        deconstructMrb, etc.) to load the mrml.
         """
 
 
-        
         if not os.path.exists(self._dst): return     
 
         

@@ -45,18 +45,9 @@ class Loader(object):
         self._src = _src
         self._dst = ''
         self.fileUris = fileUris
+        self.useCached = None
         self._dstBase = XnatSlicerGlobals.LOCAL_URIS['downloads']
         
-
-
-        
-    def setFileSrcDst(self):
-        """
-        Derive the protected variable _dst from self._src.
-        """
-        self._dst = os.path.join(self._dstBase , 'projects' + self._src.split('projects')[1])
-    
-
 
         
     @property
@@ -132,6 +123,40 @@ class Loader(object):
 
 
 
+class Loader_File(Loader):
+    """
+    A subclass of the Loader class for downlading individual files.
+    """
+
+    def __init__(self, MODULE, _src, fileUris = None):
+        """
+        Init function.
+
+        @param MODULE: The XNATSlicer module.
+        @type MODULE: XnatSlicerWidget
+
+        @param _src: The source URI to begin the load from.
+        @type _src: str
+
+        @param fileUris: The fileUrs to download from (in case the download is of
+           an entire 'files' folder).
+        @type fileUris: list(str)
+        """
+        super(Loader_File, self).__init__(MODULE, _src, fileUris)
+        self._dst = os.path.join(self._dstBase , 'projects' + self._src.split('projects')[1])
+        
+
+
+    def load(self):
+        """ 
+        Generic file load.
+        """
+        if not os.path.exists(self._dst): return 
+        SlicerUtils.loadNodeFromFile(self._dst)
+
+
+
+
 
 class Loader_Images(Loader):
     """
@@ -153,8 +178,72 @@ class Loader_Images(Loader):
         @type fileUris: list(str)
         """
         super(Loader_Images, self).__init__(MODULE, _src, fileUris)
+
+        #--------------------
+        # Derive a src and dst
+        #--------------------
         self._src, self._dst = Xnat.path.modifySrcDstForZipDownload(self._src, self._dstBase)
+
+
+        #--------------------
+        # Perform cache check
+        #--------------------
         self.useCached = self.checkCache(self.fileUris) and self.isUseCacheChecked()
+        if self.useCached: 
+            self.performUseCacheUpdates()
+
+            
+        #--------------------
+        # Sync file URIs if necessary
+        #--------------------
+        for fileUri in self.fileUris:
+            if XnatSlicerUtils.isDICOM(fileUri):
+                self.syncFileUris()
+                return
+
+
+
+    def syncFileUris(self):
+        """
+        Updates the internal variables to have equivalent directory URIs.  
+        Usually for DICOM downloads.
+        
+        @note: The reason this exists is because when querying for file contents
+            of a given folder, the XNAT metadata returns a URI that is relative
+            to the experiment ID of the files to be downloaded, not the project.
+        """
+    
+        fileDirs = []
+        for fileUri in self.fileUris:
+            if XnatSlicerUtils.isDICOM(fileUri):
+                fileDir = os.path.dirname(fileUri)
+                if not fileDir in fileDirs:
+                    fileDirs.append(fileDir)
+
+                    
+        self._oldSrc = None
+        if len(fileDirs) == 1 and self._dst != None:
+            self._oldSrc = self._src
+            self._oldDst = self._dst
+            self._src = self._src.split('/data/')[0] + fileDirs[0] # + '?format=zip'
+            self._dst = self._dstBase + fileDirs[0] + '.zip'
+
+            #--------------------
+            # Remove any folders that 
+            # exist after the 'files' level in self._src
+            # We don't need them.
+            #--------------------  
+            splitter = 'files'
+            self._src = self._src.split(splitter)[0] + splitter + '?format=zip'
+            
+            
+
+        #--------------------
+        # Update the download popup
+        #--------------------            
+        if self.MODULE.LoadWorkflow.XnatDownloadPopup and self._oldSrc:
+            self.MODULE.LoadWorkflow.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), 
+                                                                    self._src.replace('?format=zip', ''))
 
 
 
@@ -176,6 +265,21 @@ class Loader_Images(Loader):
 
         return useCachedSetting 
 
+
+
+    def performUseCacheUpdates(self):
+        """
+        """
+        self._dst = None
+        folderUri = self._src.replace('?format=zip', '')
+        
+        # Update the download popup
+        self.MODULE.LoadWorkflow.XnatDownloadPopup.setText(folderUri, 
+                                                           "USING CACHED<br>'%s'"%(self.MODULE.LoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
+        self.MODULE.LoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
+        self.MODULE.LoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
+        self.extractedFiles = self.cachedFiles
+        return
 
 
 

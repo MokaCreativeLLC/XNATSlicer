@@ -1306,7 +1306,7 @@ class TreeView(View, qt.QTreeWidget):
         index = 0
         for name in names:
             ##print name, XnatSlicerUtils.isDICOM(name)
-            if XnatSlicerUtils.isDICOM(name):
+            if XnatSlicerUtils.isDICOM(name) or XnatSlicerUtils.isAnalyze(name):
                 returnName = name
                 break
             index += 1

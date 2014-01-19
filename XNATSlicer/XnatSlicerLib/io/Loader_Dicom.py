@@ -1,8 +1,14 @@
-from XnatSlicerUtils import *
-import imp, os, inspect, sys, slicer
+# python
+import os
 
-from Loader import *
+# application
+import slicer
 import DICOMScalarVolumePlugin 
+
+# module
+from Loader import *
+from XnatSlicerUtils import *
+
 
 
 
@@ -11,84 +17,18 @@ class Loader_Dicom(Loader_Images):
     Loader_Dicom conducts the necessary steps
     to load DICOM files into Slicer.
 
-    Loader_Dicom is the loader class for all DICOM input received
-    from XNAT.  The high-level workflow of the download is as follows:
-    
-    1) Download a zip file of one scan or multiple scans in DICOM format.
-    2) Unpack the zip file and cache accordingly.
-    3) Apply these files to the slicer DICOM database.
-    4) Leverage the slicer 'DICOMWidget' to parse and and load the images.
-    
     NOTE: DICOMLoader makes use of Slicer's DICOM database and 
-    Steve Pieper's DICOMPlugin for parsing.
+    for parsing.
     """
-
     
-    
-    def __init__(self, MODULE, _src, fileUris):
-        """
-        """
-        super(Loader_Dicom, self).__init__(MODULE, _src, fileUris)
-
-    
-
-        if self.useCached: 
-            self._dst = None
-            folderUri = self._src.replace('?format=zip', '')
-
-            # Update the download popup
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setText(folderUri, 
-                                                  "USING CACHED<br>'%s'"%(self.MODULE.LoadWorkflow.XnatDownloadPopup.makeDownloadPath(folderUri)))
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setProgressBarValue(folderUri, 100)
-            self.MODULE.LoadWorkflow.XnatDownloadPopup.setEnabled(folderUri, False)
-            self.extractedFiles = self.cachedFiles
-            return
-
-
-        
-        #--------------------
-        # CHANGE SRC to match the file URIs 
-        #
-        # (XNAT quirk: they're slighly different)
-        #--------------------  
-
-        fileDirs = []
-        for fileUri in self.fileUris:
-            if XnatSlicerUtils.isDICOM(fileUri):
-                fileDir = os.path.dirname(fileUri)
-                if not fileDir in fileDirs:
-                    fileDirs.append(fileDir)
-
-                    
-        self._oldSrc = None
-        if len(fileDirs) == 1 and self._dst != None:
-            self._oldSrc = self._src
-            self._oldDst = self._dst
-            self._src = self._src.split('/data/')[0] + fileDirs[0] # + '?format=zip'
-            self._dst = self._dstBase + fileDirs[0] + '.zip'
-
-            #--------------------
-            # Remove any folders that 
-            # exist after the 'files' level in self._src
-            # We don't need them.
-            #--------------------  
-            splitter = 'files'
-            self._src = self._src.split(splitter)[0] + splitter + '?format=zip'
-            
-            
-
-            
-        if self.MODULE.LoadWorkflow.XnatDownloadPopup:
-            if self._oldSrc:
-                self.MODULE.LoadWorkflow.XnatDownloadPopup.changeRowKey(self._oldSrc.replace('?format=zip', ''), 
-                                                                            self._src.replace('?format=zip', ''))
-
-
-            
 
     def checkCache(self, fileUris):
-        """ Checks the fileUris against the dicom database.  If there's
-            a 100% match, immediately defaults to using the cache.
+        """ 
+        Checks the fileUris against the dicom database.  If there's
+        a 100% match, immediately defaults to using the cache.
+
+        @param fileUris: The fileUris to check the cache against.
+        @type fileUris: list(str)
         """
 
 
@@ -135,8 +75,9 @@ class Loader_Dicom(Loader_Images):
 
                 
     def load(self): 
-        """ Main load function for downloading DICOM files
-            from an XNAT server and loading them into Slicer. 
+        """ 
+        Main load function for downloading DICOM files
+        from an XNAT server and loading them into Slicer. 
         """
 
         if self.useCached:
@@ -202,6 +143,9 @@ class Loader_Dicom(Loader_Images):
         into Slicer without prompting the user to input anything.  
         The 'loadable' with the hightest priority has the highest 
         file count.
+
+        @param dicomFiles: The local dicomFiles to load.
+        @type dicomFiles: list(str)
         """
 
         #--------------------
@@ -277,11 +221,10 @@ class Loader_Dicom(Loader_Images):
 
             
     def beginDICOMSession(self):
-        """ DEECATED: Once a DICOM folder has been downloaded, 
-            track the origins of the files for Save/upload
-            routines.
-
-            NOTE:
+        """ 
+        @deprecated: Once a DICOM folder has been downloaded, 
+        track the origins of the files for Save/upload
+        routines.
         """
         ##print(MokaUtils.debug.lf(), "DICOMS successfully loaded.")
         sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self.xnatSrc)
