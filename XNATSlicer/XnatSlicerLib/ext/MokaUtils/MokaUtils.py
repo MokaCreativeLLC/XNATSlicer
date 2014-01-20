@@ -201,13 +201,13 @@ class MokaUtils(object):
             newURIs = []
 
             if not os.path.isdir(src):
-                raise "MokaUtils.path.moveDir: Argument '%s' is not a directory!"%(src)
+                raise Exception("MokaUtils.path.moveDir: Argument '%s' is not a directory!"%(src))
                 return 
             if not os.path.isdir(dst):
-                raise "MokaUtils.path.moveDir: Argument '%s' is not a directory!"%(src)
+                raise Exception("MokaUtils.path.moveDir: Argument '%s' is not a directory!"%(src))
                 return 
             if not os.path.exists(src):
-                raise "MokaUtils.path.moveDir: Argument '%s' doesn't exist!"%(src)
+                raise Exception("MokaUtils.path.moveDir: Argument '%s' doesn't exist!"%(src))
                 return                 
 
 

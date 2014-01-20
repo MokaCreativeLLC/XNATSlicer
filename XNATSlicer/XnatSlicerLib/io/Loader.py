@@ -12,7 +12,6 @@ from MokaUtils import *
 # module
 from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
-from FileInfo import *
 from SessionManager import *
 
 
