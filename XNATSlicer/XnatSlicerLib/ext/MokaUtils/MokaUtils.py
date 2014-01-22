@@ -1045,7 +1045,7 @@ class MokaUtils(object):
             #
             tabber = '\n\t\t\t\t\t' 
             MokaUtils.cmd.ARG_TYPES['o']['desc'] += tabber
-            MokaUtils.cmd.ARG_TYPES['o']['desc'] += tabber.join(MokaUtils.ops.OPERATIONS) + '.'
+            MokaUtils.cmd.ARG_TYPES['o']['desc'] += tabber.join(MokaUtils.ops.OPERATIONS)
 
 
             #
