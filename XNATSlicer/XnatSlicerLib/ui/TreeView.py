@@ -358,7 +358,9 @@ class TreeView(View, qt.QTreeWidget):
         # Acquire the metadata from the MODULE.SettingsFile
         #
         xnatHost = self.MODULE.LoginMenu.hostDropdown.currentText
-        infoMetadata = self.MODULE.SettingsFile.getSetting(xnatHost, self.MODULE.TreeViewSettings.ON_METADATA_CHECKED_TAGS['info'] + widgetItem.text(xnatLevelColumnNumber))
+        infoMetadata = self.MODULE.SettingsFile.getSetting(xnatHost, 
+                                                           self.MODULE.TreeViewSettings.ON_METADATA_CHECKED_TAGS['info'] 
+                                                           + widgetItem.text(xnatLevelColumnNumber))
 
 
         ##print "MERGED INFO TEXT:", widgetItem.text(mergedInfoColumnNumber)
@@ -392,7 +394,7 @@ class TreeView(View, qt.QTreeWidget):
                 value = '(Empty)'
                 xnatLevel = self.columns['XNAT_LEVEL']['value']
                 key2 = str(e)
-                MokaUtils.debug.lf("\nProperty '%s' does not exist in provided XNAT metadata at the '%s' level.  "%(key2, xnatLevel) +  
+                MokaUtils.debug.lf("\n\nProperty '%s' does not exist in provided XNAT metadata at the '%s' level.  "%(key2, xnatLevel) +  
                                    "If this is a custom tag, you need to modify your XNAT server to provide it.  " +
                                    "\nTo remove this tag, open the 'XNAT Metadata' tab of the settigs window," + 
                                    "and remove '%s' property from the 'CUSTOM' section of the '%s' collapsible."%(key2, xnatLevel))
@@ -1770,7 +1772,7 @@ class TreeView(View, qt.QTreeWidget):
         # For no results found...
         #       
         if len(items) == 0:
-            self.MODULE.Viewer.noSearchResultsFound.setText("No results for '%s' found."%(searchString))
+            self.MODULE.Viewer.noSearchResultsFound.setText("No results for '%s'."%(searchString))
             self.MODULE.Viewer.setNoResultsWidgetVisible(True)
         else:
             self.MODULE.Viewer.setNoResultsWidgetVisible(False)

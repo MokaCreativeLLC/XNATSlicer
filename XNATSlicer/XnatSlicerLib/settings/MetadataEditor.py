@@ -648,27 +648,34 @@ class XnatCustomMetadataEditor(MetadataEditor):
         
         #--------------------
         # Merge the lineEdit text with the saved
-        # metadata.
+        # metadata IF it's not there in both the default and custom tags.
         #-------------------- 
         xnatHost = self.MODULE.LoginMenu.hostDropdown.currentText
+        defaultMetadataItems = Xnat.metadata.DEFAULT_TAGS[self.xnatLevel]
         customMetadataItems = self.MODULE.SettingsFile.getSetting(xnatHost, XnatSlicerUtils.makeCustomMetadataTag(self.xnatLevel))
 
-        tagDict = {XnatSlicerUtils.makeCustomMetadataTag(self.xnatLevel) : [lineText] + customMetadataItems}
-        self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
+        inDefault = lineText in defaultMetadataItems
+        inCustom = lineText in customMetadataItems
 
+        if not inDefault and not inCustom:
+            tagDict = {XnatSlicerUtils.makeCustomMetadataTag(self.xnatLevel) : [lineText] + customMetadataItems}
+            self.MODULE.SettingsFile.setSetting(xnatHost, tagDict)
 
+            #
+            # Clear the lineEdit.
+            #
+            self.lineEdit.clear()
         
-        #--------------------
-        # Clear the lineEdit.
-        #-------------------- 
-        self.lineEdit.clear()
-
-
-        
-        #--------------------
-        # Update all the settingsWidgets.
-        #-------------------- 
-        self.MODULE.SettingsWindow.updateSettingWidgets()
+            #
+            # Update all the settingsWidgets.
+            #
+            self.MODULE.SettingsWindow.updateSettingWidgets()
+        else:
+            tagType = 'Custom' if inCustom else 'Default'
+            msg = "'%s' already exists in %s tags."%(lineText, tagType)
+            self.takenBox = qt.QMessageBox(1, "Add Metadata", msg)
+            self.takenBox.show()
+            self.lineEdit.selectAll()
 
 
         

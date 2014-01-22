@@ -57,7 +57,7 @@ class View(object):
 
     
     
-    def begin(self):
+    def begin(self, skipAnim = False):
         """ 
         Begins the the View communication process, 
         first by retrieving the projects from the XNAT server 
@@ -65,6 +65,9 @@ class View(object):
         
         Displays error message boxes accordingly (server communication issues,
         or credential issues.)
+
+        @param skipAnim: Whether to skip the animation.
+        @type skipAnim: bool
         """
 
 
@@ -100,7 +103,8 @@ class View(object):
         #----------------------
         self.loadProjects(filters = None, projectContents = projectContents)
         slicer.app.processEvents()
-        self.MODULE.onLoginSuccessful()
+        if not skipAnim:
+            self.MODULE.onLoginSuccessful()
         self.MODULE.Buttons.setEnabled(buttonKey='addFolder', enabled=True) 
 
 

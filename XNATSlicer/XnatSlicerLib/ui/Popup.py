@@ -452,11 +452,28 @@ class XnatDownloadPopup(XnatEmptyPopup):
 
         
 
-    def setComplete(self, uriKey):
+    def setCancelled(self, uriKey):
         """
+        Updates the relevant download row to the cancelled state.
+        
+        @param uriKey: The key referring to the download row.
+        @type uriKey: str
         """
         self.downloadRows[uriKey]['widget'].setEnabled(False)
-        self.downloadRows[uriKey]['textEdit'].setText("Completed<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
+        self.downloadRows[uriKey]['textEdit'].setText("CANCELLED<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
+        
+
+
+
+    def setFinished(self, uriKey):
+        """
+        Updates the relevant download row to the complete state.
+        
+        @param uriKey: The key referring to the download row.
+        @type uriKey: str
+        """
+        self.downloadRows[uriKey]['widget'].setEnabled(False)
+        self.downloadRows[uriKey]['textEdit'].setText("FINISHED<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
         self.setProgressBarValue(uriKey, 100)
         
 

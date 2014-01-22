@@ -1,7 +1,3 @@
-# python
-import os
-import sys
-
 # application
 from __main__ import qt, slicer
 
@@ -34,7 +30,9 @@ class LoadWorkflow(object):
 
     
     def __init__(self, MODULE):
-        """ Parent init.
+        """ 
+        @param MODULE: The XNATSlicer module.
+        @type MODULE: XnatSlicerWidget
         """
         self.MODULE = MODULE       
         self.loadFile = None
@@ -44,7 +42,7 @@ class LoadWorkflow(object):
 
         self.skipEmptySceneCheck = False
         self._src = None
-
+        self.loaders = {}
 
         
         #--------------------------------
@@ -65,14 +63,14 @@ class LoadWorkflow(object):
         self.XnatDownloadPopup.setCancelCallback(self.MODULE.XnatIo.cancelDownload)
         
         self.clearScenePopup = XnatClearScenePopup()
-        self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.clearSceneButtonClicked) 
+        self.clearScenePopup.connect('buttonClicked(QAbstractButton*)', self.__clearSceneButtonClicked) 
 
         self.preDownloadPopup = XnatTextPopup('<b>Checking files...</b>')
         self.postDownloadPopup = XnatTextPopup('<b>Processing.  Data will load automatically.</b>')
 
 
 
-    def sortLoadablesByType(self, fileUris):
+    def __sortLoadablesByType(self, fileUris):
         """
         Sorts a list of file uris by XNATSlicer loadable types.  Generally used 
         when multi-folder downloading is in effect.
@@ -106,9 +104,10 @@ class LoadWorkflow(object):
 
 
 
-    def resetIOCallbacks(self):
-        """ Clears and sets the IO callbacks for the MODULE.XnatIO.
-            Callbacks labeleled accordingly.
+    def __resetIOCallbacks(self):
+        """ 
+        Clears and sets the IO callbacks for the MODULE.XnatIO.
+        Callbacks labeleled accordingly.
         """
 
         #--------------------------------
@@ -144,7 +143,10 @@ class LoadWorkflow(object):
         # FINISHED
         #--------------------------------
         def downloadFinished(_xnatSrc):
-            self.XnatDownloadPopup.setComplete(_xnatSrc.split('?format=zip')[0])
+            #
+            # Update the popup
+            #
+            self.XnatDownloadPopup.setFinished(_xnatSrc.split('?format=zip')[0])
             slicer.app.processEvents()
         self.MODULE.XnatIo.onEvent('downloadFinished', downloadFinished)
 
@@ -154,7 +156,20 @@ class LoadWorkflow(object):
         # CANCELLED
         #--------------------------------
         def downloadCancelled(_xnatSrc, *args):
-            #print "DOWNLOAD QUEUE", len(self.MODULE.XnatIo.downloadQueue)
+            
+            #
+            # Update the popup
+            #
+            self.XnatDownloadPopup.setCancelled(_xnatSrc.split('?format=zip')[0])
+
+            #
+            # Set loader to None if it pertains to the 
+            # cancelled download
+            #
+            for key, loader in self.loaders.iteritems():
+                if loader and _xnatSrc in loader.loadArgs['src']:
+                    self.loaders[key] = None
+
             if len(self.MODULE.XnatIo.downloadQueue) == 0:
                 self.XnatDownloadPopup.hide()
                 slicer.app.processEvents()
@@ -169,17 +184,24 @@ class LoadWorkflow(object):
         
         
     
-    def terminateLoad(self, warnStr):
-        """ Notifies the user that they will terminate the load.
-            Reenables the viewer UI.
+    def terminateLoad(self, *warnStrs):
+        """ 
+        Notifies the user that they will terminate the load.
+        Reenables the viewer UI.
+
+        @params: The warning strings (title, and message).
         """
-        qt.QMessageBox.warning( None, warnStr[0], warnStr[1])
+        qt.QMessageBox.warning( None, warnStrs[0], warnStrs[1])
 
 
 
 
-    def clearSceneButtonClicked(self, button):
+    def __clearSceneButtonClicked(self, button):
         """
+        Callback for when the clear scene button is clicked.
+
+        @param button: The button in the dialog that was clicked.
+        @type button. qt.QAbstractButton
         """
         if 'yes' in button.text.lower():
             self.MODULE.View.sessionManager.clearCurrentSession()
@@ -192,12 +214,16 @@ class LoadWorkflow(object):
             
 
     def beginWorkflow(self, src = None):
-        """ This function is the first to be called
-            when the user clicks on the "load" button (right arrow).
-            The class that calls 'beginWorkflow' has no idea of the
-            workflow subclass that will be used to load
-            the given XNAT node.  Those classes (which inherit from
-            LoadWorkflow) will be called on in this function.
+        """ 
+        This function is the first to be called
+        when the user clicks on the "load" button (right arrow).
+        The class that calls 'beginWorkflow' has no idea of the
+        workflow subclass that will be used to load
+        the given XNAT node.  Those classes (which inherit from
+        LoadWorkflow) will be called on in this function.
+
+        @param src: The optional src file 
+        @type src: str
         """
 
 
@@ -227,24 +253,25 @@ class LoadWorkflow(object):
         #------------------------    
         # Clear download queue
         #------------------------
-        self.resetIOCallbacks()
+        self.__resetIOCallbacks()
 
         
 
         #------------------------
         # Set Download finished callbacks
         #------------------------        
-        downloadFinishedCallbacks = []
-        def runDownloadFinishedCallbacks():
+        def onDownloadFinished():
             self.XnatDownloadPopup.hide()
             self.postDownloadPopup.show()
-            for callback in downloadFinishedCallbacks:
+            for key, loader in self.loaders.iteritems():
                 #print "DOWNLOAD FINISHED!"
-                callback()
-                slicer.app.processEvents()
-                self._src = None
+                if loader:
+                    loader.load()
+                    slicer.app.processEvents()
+                    self._src = None
             self.postDownloadPopup.hide()
             self.MODULE.XnatIo.clearDownloadQueue()
+            self.loaders = {}
 
             
         
@@ -262,7 +289,8 @@ class LoadWorkflow(object):
         for loader in self.loaderFactory(self._src):
             if not loader.useCached:
                 self.MODULE.XnatIo.addToDownloadQueue(loader.loadArgs['src'], loader.loadArgs['dst'])
-            downloadFinishedCallbacks.append(loader.load)             
+            self.loaders[loader.loadArgs['src']] = loader
+                         
 
 
             
@@ -271,7 +299,7 @@ class LoadWorkflow(object):
         #------------------------ 
         self.preDownloadPopup.hide()
         self.XnatDownloadPopup.show()
-        self.MODULE.XnatIo.onEvent('downloadQueueFinished', runDownloadFinishedCallbacks)
+        self.MODULE.XnatIo.onEvent('downloadQueueFinished', onDownloadFinished)
         self.MODULE.XnatIo.startDownloadQueue()
       
 
@@ -290,11 +318,11 @@ class LoadWorkflow(object):
         Returns the appropriate set of loaders after analyzing the
         '_src' argument.
         
-        Arguments:
-        _src The URI to create loaders from.
+        @param _src: The URI to create loaders from.
+        @type _src: str
         
-        Returns:
-        A loader list.
+        @return: The loader list.
+        @rtype: list(Loader)
             
         """
 
@@ -344,7 +372,7 @@ class LoadWorkflow(object):
             contentUris = self.MODULE.XnatIo.getFolder(scanSrc, metadata= ['URI'])['URI']
             #print "CONTENT URIS", contentUris
             # get file uris and sort them by type
-            loadables = self.sortLoadablesByType(contentUris)
+            loadables = self.__sortLoadablesByType(contentUris)
             #print "LOADABLES", loadables
             # cycle through the loadables and
             # create the loader for each loadable list.
