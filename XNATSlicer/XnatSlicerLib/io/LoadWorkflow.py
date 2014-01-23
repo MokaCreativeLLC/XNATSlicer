@@ -9,7 +9,6 @@ from Xnat import Xnat
 from Loader import *
 from Loader_Analyze import *
 from Loader_Dicom import *
-from Loader_File import *
 from Loader_Mrb import *
 from Popup import *
 from SlicerUtils import *

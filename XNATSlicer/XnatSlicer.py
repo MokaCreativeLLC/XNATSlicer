@@ -34,7 +34,6 @@ from LoadWorkflow import *
 from Loader import *
 from Loader_Dicom import *
 from Loader_Analyze import *
-from Loader_File import *
 from Loader_Mrb import *
 
 # module - utils
