@@ -5,9 +5,16 @@ import inspect
 import sys
 import math
 import httplib # to test for SSL installation
+from collections import OrderedDict
 
-# Make Module paths 
-MODULE_PATH = os.path.normpath(os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe()))[0])))
+# Acquire Module path.
+MODULE_PATH = os.path.normpath(
+  os.path.realpath(
+    os.path.abspath(
+      os.path.split(
+        inspect.getfile( inspect.currentframe()))[0])))
+
+# Add Lib Paths
 LIB_PATH = os.path.join(MODULE_PATH, "XnatSlicerLib")
 sys.path.append(LIB_PATH)
 sys.path.append(os.path.join(MODULE_PATH, 'Testing'))
@@ -28,42 +35,35 @@ from Xnat import *
 from MokaUtils import *
 
 # module - io
-from DeleteWorkflow import *
-from SaveWorkflow import *
-from LoadWorkflow import *
-from Loader import *
-from Loader_Dicom import *
-from Loader_Analyze import *
-from Loader_Mrb import *
+from Workflow_Delete import *
+from Workflow_Save import *
+from Workflow_Load import *
 
 # module - utils
 import XnatSlicerGlobals
 from XnatSlicerUtils import *
-from ScenePackager import *
-from SessionManager import *
 from SettingsFile import *
 from Timer import *
 from Error import *
 
 # module - ui
-from TreeView import *
+from Viewer import *
+from View_Tree import *
 from SearchBar import *
 from LoginMenu import *
 from Buttons import *
-from Viewer import *
-from View import *
-from Popup import *
-from Settings import *
-from FolderMaker import *
-from HostSettings import *
-from TreeViewSettings import *
-from MetadataSettings import *
-from DetailsSettings import *
-from CacheSettings import *
 from NodeDetails import *
-from MetadataManager import *
 from AnimatedCollapsible import *
-from VariableItemListWidget import *
+
+# module - settings
+from FolderMaker import *
+from Settings_Hosts import *
+from Settings_Cache import *
+from Settings_Metadata import *
+from Settings_Details import *
+from Settings_View_Tree import *
+
+
 
 
 
@@ -71,26 +71,32 @@ from VariableItemListWidget import *
 comment = """
 XNAT Software License Agreement
 
-Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
+Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / 
+Washington University
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted 
-provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions 
-and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
-and the following disclaimer in the documentation and/or other materials provided with the distribution.
-Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY The COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, The IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL The COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF The USE OF THIS SOFTWARE, EVEN IF ADVISED OF The 
-POSSIBILITY OF SUCH DAMAGE.
+Redistributions of source code must retain the above copyright notice, this list 
+of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this 
+list of conditions and the following disclaimer in the documentation and/or other 
+materials provided with the distribution.  Neither the names of Washington 
+University, Harvard University and HHMI nor the names of its contributors may be 
+used to endorse or promote products derived from this software without specific 
+prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY The COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, The IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+IN NO EVENT SHALL The COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+OR OTHERWISE) ARISING IN ANY WAY OUT OF The USE OF THIS SOFTWARE, EVEN IF ADVISED 
+OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
@@ -116,16 +122,19 @@ class XnatSlicer:
       parent.title = "XNATSlicer"
       parent.categories = ["XNATSlicer"]
       parent.dependencies = []
-      parent.contributors = ["Sunil Kumar (Moka Creative, LLC), Dan Marcus (WashU-St. Louis), Steve Pieper (Isomics)"] 
-      parent.helpText = """ The XNATSlicer 1.0"""
-      parent.acknowledgementText = """Sunil Kumar for the Neuroinformatics Research Group - sunilk@mokacreativellc.com""" 
+      parent.contributors = ["Sunil Kumar (Moka Creative, LLC), " + \
+        "Dan Marcus (WashU-St. Louis), Steve Pieper (Isomics)"] 
+      parent.helpText = """XNATSlicer 2.1"""
+      parent.acknowledgementText = "Sunil Kumar for the Neuroinformatics " + \
+        "Research Group at WashU-St.Louis (sunilk@mokacreativellc.com)"
       self.parent = parent
 
 
       
       #--------------------------------
-      # Add this test to the SelfTest module's list for discovery when the module
-      # is created.  Since this module may be discovered before SelfTests itself,
+      # Add this test to the SelfTest module's list for 
+      # discovery when the module is created.
+      # Since this module may be discovered before SelfTests itself,
       # create the list if it doesn't already exist.
       #--------------------------------
       try:
@@ -192,79 +201,22 @@ class XnatSlicerWidget:
         #--------------------------------
         self.layout = self.parent.layout()
 
-        
-        
+    
+        self.__collapseDataProbe()
+
+
+        self.__initSettings()
+
+
+        self.__initLoginMenu()
+
+
         #--------------------------------
-        # Collapse the 'Data Probe' button.
+        # Sync settinsg with file
         #--------------------------------
-        dataProbeButton = slicer.util.findChildren(text='Data Probe')[0]
-        dataProbeButton.setChecked(False)
-
-
+        for key, Settings in self.__Settings.iteritems():
+          Settings.syncWithSettingsFile()
         
-        #--------------------------------
-        # Xnat settingsFile
-        #--------------------------------
-        self.SettingsFile = SettingsFile(slicer.qMRMLWidget(), XnatSlicerGlobals.LOCAL_URIS['settings'], self)
-
-
-        
-        #--------------------------------
-        # Login Menu
-        #--------------------------------
-        self.LoginMenu = LoginMenu(parent = self.parent, MODULE = self)
-        self.LoginMenu.loadDefaultHost()   
-        def showHost(*arg):
-            self.SettingsWindow.showWindow(self.HostSettings.tabTitle)
-        self.LoginMenu.setOnManageHostsButtonClicked(showHost)
-
-        # This exists basically for running the collapse anim
-        self.loggedIn = False
-
-
-        
-        #--------------------------------
-        # Xnat xnatSettingsWindow
-        #--------------------------------        
-        self.SettingsWindow = SettingsWindow(parent = None, MODULE = self)
-        
-        #
-        # Add HostSettings (communicates to Settings)
-        # to xnatSettingsWindow
-        #
-        self.HostSettings = HostSettings('XNAT Hosts', self)
-        self.SettingsWindow.addSetting(self.HostSettings.title, widget = self.HostSettings)
-        
-        #
-        # Add CacheSettings (communicates to TreeView)
-        # to xnatSettingsWindow
-        #
-        self.CacheSettings = CacheSettings('Cache Settings', self)
-        self.SettingsWindow.addSetting(self.CacheSettings.title, widget = self.CacheSettings)
-
-
-        #
-        # Add MetadataSettings (communicates to TreeView)
-        # to xnatSettingsWindow
-        #
-        self.MetadataSettings = MetadataSettings('XNAT Metadata', self)
-        self.SettingsWindow.addSetting(self.MetadataSettings.title, widget = self.MetadataSettings)
-        
-        #
-        # Add TreeViewSettings (communicates to TreeView)
-        # to xnatSettingsWindow
-        #
-        self.TreeViewSettings = TreeViewSettings('Tree View Settings', self)
-        self.SettingsWindow.addSetting(self.TreeViewSettings.title, widget = self.TreeViewSettings)
-        
-        #
-        # Add DetailsSettings (communicates to TreeView)
-        # to xnatSettingsWindow
-        #
-        self.DetailsSettings = DetailsSettings('Details Settings', self)
-        self.SettingsWindow.addSetting(self.DetailsSettings.title, widget = self.DetailsSettings)
-
-
 
         #--------------------------------
         # SearchBar
@@ -276,7 +228,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Viewer
         #--------------------------------
-        self.View = TreeView(MODULE = self)  
+        self.View = View_Tree(MODULE = self)  
 
         
         
@@ -335,6 +287,7 @@ class XnatSlicerWidget:
         #--------------------------------
         self.cleanCacheDir(200)
 
+        
       
 
       
@@ -586,19 +539,26 @@ class XnatSlicerWidget:
         #
         # Login Menu event.
         #
-        self.LoginMenu.loginButton.connect('clicked()', self.onLoginButtonClicked)
+        self.LoginMenu.loginButton.connect('clicked()', 
+                            self.onLoginButtonClicked)
         #
         # Button event.
         #
-        self.Buttons.buttons['io']['load'].connect('clicked()', self.onLoadClicked)
-        self.Buttons.buttons['io']['save'].connect('clicked()', self.onSaveClicked)
-        self.Buttons.buttons['io']['delete'].connect('clicked()', self.onDeleteClicked)
-        self.Buttons.buttons['io']['addFolder'].connect('clicked()', self.FolderMaker.show)
-        self.Buttons.buttons['settings']['settings'].connect('clicked()', self.SettingsWindow.showWindow)
+        self.Buttons.buttons['io']['load'].connect('clicked()', 
+            self.onLoadClicked)
+        self.Buttons.buttons['io']['save'].connect('clicked()', 
+            self.onSaveClicked)
+        self.Buttons.buttons['io']['delete'].connect('clicked()', 
+            self.onDeleteClicked)
+        self.Buttons.buttons['io']['addFolder'].connect('clicked()', 
+            self.FolderMaker.show)
+        self.Buttons.buttons['settings']['settings'].connect('clicked()', 
+            self.SettingsWindow.showWindow)
         #
         # Sort Button event.
         #
-        for key, button in self.TreeViewSettings.buttons['sort'].iteritems():
+        for key, button \
+            in self.__Settings['TREEVIEW'].buttons['sort'].iteritems():
             button.connect('clicked()', self.onFilterButtonClicked)
         #
         # Test button event.
@@ -997,22 +957,22 @@ class XnatSlicerWidget:
 
     def onDeleteClicked(self, button=None):
         """ 
-        Starts Delete workflow (i.e. DeleteWorkflow)
+        Starts Delete workflow (i.e. Workflow_Delete)
         """  
 
-        xnatDeleteWorkflow = DeleteWorkflow(self)
-        xnatDeleteWorkflow.beginWorkflow()
+        xnatWorkflow_Delete = Workflow_Delete(self)
+        xnatWorkflow_Delete.beginWorkflow()
 
 
 
             
     def onSaveClicked(self):        
         """ 
-        Starts Save workflow (i.e SaveWorkflow)
+        Starts Save workflow (i.e Workflow_Save)
         """     
         
         self.lastButtonClicked = "save" 
-        saver = SaveWorkflow(self)
+        saver = Workflow_Save(self)
         saver.beginWorkflow()
 
 
@@ -1030,11 +990,11 @@ class XnatSlicerWidget:
         
     def onLoadClicked(self):
         """ 
-        Starts Load workflow (i.e. LoadWorkflow).
+        Starts Load workflow (i.e. Workflow_Load).
         """
         
         self.lastButtonClicked = "load"
-        self.LoadWorkflow = LoadWorkflow(self)
+        self.Workflow_Load = Workflow_Load(self)
 
         url = self.View.getXnatUri()
         if url.startswith('/'):
@@ -1042,7 +1002,7 @@ class XnatSlicerWidget:
         if url.startswith('projects'):
             url = self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText) + '/data/archive/' + url
 
-        self.LoadWorkflow.beginWorkflow(url)
+        self.Workflow_Load.beginWorkflow(url)
 
 
 
@@ -1113,3 +1073,145 @@ class XnatSlicerWidget:
         for key in self.Buttons.buttons['filter']:
             if self.currentlyToggledFilterButton == self.Buttons.buttons['filter'][key]:
                 self.View.loadProjects([self.currentlyToggledFilterButton.text.lower()])
+
+
+
+
+
+    def __collapseDataProbe(self):
+        """
+        """
+        #--------------------------------
+        # Collapse the 'Data Probe' button.
+        #--------------------------------
+        dataProbeButton = slicer.util.findChildren(text='Data Probe')[0]
+        dataProbeButton.setChecked(False)
+
+
+
+
+    @property
+    def Settings(self):
+        """
+        """
+        return self.__Settings
+
+
+
+
+    def __initSettings(self):
+        """
+        """
+        #-------------------
+        # SettingsFile
+        #-------------------
+        self.SettingsFile = SettingsFile(slicer.qMRMLWidget(), 
+            XnatSlicerGlobals.LOCAL_URIS['settings'], self)
+
+        
+        #-------------------
+        # SettingWindow
+        #-------------------       
+        self.SettingsWindow = SettingsWindow(parent = None, MODULE = self)
+        
+
+        #-------------------
+        # Create settings
+        #-------------------
+        self.__Settings = XnatSlicerWidget.__createSettings(self.SettingsFile)
+
+
+        #-------------------
+        # Add settings widget to the window
+        #-------------------
+        for key, Setting in self.Settings.iteritems():
+          self.SettingsWindow.addSetting(Setting.title, widget = Setting)
+
+
+        self.__setSettingsCallbacks()
+
+
+
+
+
+    def __setSettingsCallbacks(self):
+        """
+        """
+        #
+        # HOSTS
+        #
+        events = ['HOSTADDED', 'HOSTDELETED']
+        def callback():
+          if self.LoginMenu:
+            self.LoginMenu.loadDefaultHost
+        for event in events:
+          self.__Settings['HOSTS'].Events.onEvent(event, callback)
+          
+
+
+        #
+        # TREE VIEW
+        #
+        def fontChanged(size):
+          self.View.changeFontSize(int(size))
+        self.__Settings['TREEVIEW'].Events.onEvent('FONTSIZECHANGED', fontChanged)
+
+        def filterToggled():
+            if self.__Settings['TREEVIEW'].buttons['sort']['accessed'].isDown():
+                self.View.filter_accessed()
+            else:
+                self.View.filter_all()
+        self.__Settings['TREEVIEW'].Events.onEvent('FILTERTOGGLED', filterToggled)
+
+
+
+        #
+        # Details
+        #
+        def fontChanged(size):
+          self.NodeDetails.changeFontSize(int(size))
+        self.__Settings['DETAILS'].Events.onEvent('FONTSIZECHANGED', fontChanged)
+
+
+
+  
+
+    @staticmethod
+    def __createSettings(_SettingsFile):
+        """
+        @param MODULE: The XnatSlicerWidget 
+        @type MODULE: XnatSlicerWidget
+
+        @return: An ordered dictionary of the Settings.
+        @rtype: collections.OrderedDict(string, Settings)
+        """
+        settingsDict = OrderedDict([
+          ('HOSTS', Settings_Hosts(_SettingsFile)),
+          ('CACHE' , Settings_Cache(_SettingsFile)),
+          ('METADATA', Settings_Metadata(_SettingsFile)),
+          ('TREEVIEW', Settings_View_Tree(_SettingsFile)),
+          ('DETAILS' , Settings_Details(_SettingsFile)),
+         ])
+        return settingsDict
+
+
+
+        
+        
+    def __initLoginMenu(self):
+        """
+        As stated.
+        """
+        self.LoginMenu = LoginMenu(parent = self.parent, MODULE = self)
+        self.LoginMenu.loadDefaultHost()   
+
+        def showHost(*arg):
+          try:
+            self.SettingsWindow.showWindow(self.__Settings['HOSTS'].tabTitle)
+          except Exception, e:
+            print "Error opening Host Settings: %s"%(str(e))
+
+        self.LoginMenu.setOnManageHostsButtonClicked(showHost)
+
+        # This exists basically for running the collapse anim
+        self.loggedIn = False
