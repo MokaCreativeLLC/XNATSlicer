@@ -61,7 +61,7 @@ from Settings_Hosts import *
 from Settings_Cache import *
 from Settings_Metadata import *
 from Settings_Details import *
-from Settings_View_Tree import *
+from Settings_View import *
 
 
 
@@ -233,14 +233,14 @@ class XnatSlicerWidget:
         #--------------------------------
         # Viewer
         #--------------------------------
-        self.View = View_Tree(MODULE = self)  
+        self.View = View_Tree(self, self.Settings['VIEW'])  
 
         
         
         #--------------------------------
         # Node Details
         #--------------------------------
-        self.NodeDetails = NodeDetails(MODULE = self)
+        self.NodeDetails = NodeDetails(self, self.Settings['DETAILS'])
         self.__setNodeDetailsCallbacks()
         
 
@@ -659,7 +659,8 @@ class XnatSlicerWidget:
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo = Xnat.io(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText), 
+        self.XnatIo = Xnat.io(self.SettingsFile.\
+                        getAddress(self.LoginMenu.hostDropdown.currentText), 
                               self.LoginMenu.usernameLine.text,
                               self.LoginMenu.passwordLine.text)
         def jsonError(host, user, response):
@@ -927,7 +928,8 @@ class XnatSlicerWidget:
         #--------------------
         # Store the current username in settings
         #--------------------
-        self.SettingsFile.setCurrUsername(self.LoginMenu.hostDropdown.currentText, self.LoginMenu.usernameLine.text)
+        self.SettingsFile.setCurrUsername(self.LoginMenu.hostDropdown.\
+                                currentText, self.LoginMenu.usernameLine.text)
 
         
         #--------------------
@@ -940,14 +942,19 @@ class XnatSlicerWidget:
         # Derive the XNAT host URL by mapping the current item in the host
         # dropdown to its value pair in the settings.  
         #--------------------
-        if self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText):
-            self.currHostUrl = qt.QUrl(self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText))
+        if self.SettingsFile.\
+           getAddress(self.LoginMenu.hostDropdown.currentText):
+
+            self.currHostUrl = \
+                  qt.QUrl(self.SettingsFile.\
+                          getAddress(self.LoginMenu.hostDropdown.currentText))
             #
             # Call the 'beginXnat' function from the MODULE.
             #
             self.beginXnat()
         else:
-            print MokaUtils.lf("The host '%s' doesn't appear to have a valid URL"%(self.LoginMenu.hostDropdown.currentText))
+            print MokaUtils.lf("The host '%s' doesn't appear to" + 
+                  " have a valid URL"%(self.LoginMenu.hostDropdown.currentText))
             pass  
 
 
@@ -998,7 +1005,8 @@ class XnatSlicerWidget:
         if url.startswith('/'):
             url = url[1:]
         if url.startswith('projects'):
-            url = self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText) + '/data/archive/' + url
+            url = self.SettingsFile.getAddress(self.LoginMenu.\
+                            hostDropdown.currentText) + '/data/archive/' + url
 
         self.Workflow_Load.beginWorkflow(url)
 
@@ -1049,7 +1057,8 @@ class XnatSlicerWidget:
         #------------------
         for key in self.Buttons.buttons['filter']:
             currButton = self.Buttons.buttons['filter'][key]
-            if currButton.isChecked() and self.currentlyToggledFilterButton != currButton:
+            if currButton.isChecked() and \
+               self.currentlyToggledFilterButton != currButton:
                 self.currentlyToggledFilterButton = currButton
                 break
 
@@ -1060,7 +1069,8 @@ class XnatSlicerWidget:
         #-----------------
         for key in self.Buttons.buttons['filter']:
             currButton = self.Buttons.buttons['filter'][key]
-            if currButton.isChecked() and self.currentlyToggledFilterButton != currButton:
+            if currButton.isChecked() and \
+               self.currentlyToggledFilterButton != currButton:
                 currButton.setDown(False)
 
                 
@@ -1126,12 +1136,47 @@ class XnatSlicerWidget:
 
 
 
+    def __syncSettingsToFile(self):
+      """
+      """
+      for key, Setting in self.Settings.iteritems():
+        Setting.syncToFile()
+
+
+    
+    def __showCustomWindow(self, button, xnatLevel):
+        """
+        Opens the 'Metadata' tab of the settings window
+        and expands the relevant collapsible for editing
+        of custom metadata types.
+        """
+        
+        self.SettingsWindow.setTab(self.Settings['METADATA'].title) 
+        collapsibles =  self.Settings['METADATA'].\
+                        MetadataEditorSets['XNAT Metadata'].\
+                        collapsibles
+        for level, collapsible in collapsibles.iteritems():
+          if level == xnatLevel:
+            collapsible.setChecked(True)
+          else:
+            collapsible.setChecked(False)
+          
+
+
 
     def __setSettingsCallbacks(self):
         """
         """
 
         for key, Setting in self.Settings.iteritems():
+          Setting.Events.onEvent('SETTINGSFILEMODIFIED', \
+                                 self.__syncSettingsToFile)
+
+
+          if hasattr(Setting, 'MetadataEditorSets'):
+            for setKey, _set in Setting.MetadataEditorSets.iteritems():
+              _set.Events.onEvent('editCustomClicked', self.__showCustomWindow)
+          
 
           if key == 'HOSTS':
 
@@ -1143,12 +1188,14 @@ class XnatSlicerWidget:
               self.__Settings['HOSTS'].Events.onEvent(event, callback)
           
 
+            
 
+              
 
-          if key == 'TREEVIEW':
+          if key == 'VIEW':
                                   
             def filterToggled():
-              if self.__Settings['TREEVIEW'].\
+              if self.__Settings['VIEW'].\
                  buttons['sort']['accessed'].isDown():
                 self.View.filter_accessed()
               else:
@@ -1158,12 +1205,12 @@ class XnatSlicerWidget:
             # Sort Button event.
             #
             for key, button \
-                in self.__Settings['TREEVIEW'].buttons['sort'].iteritems():
+                in self.__Settings['VIEW'].buttons['sort'].iteritems():
               button.connect('clicked()', self.onFilterButtonClicked)
 
-            self.__Settings['TREEVIEW'].Events.onEvent('FONTSIZECHANGED', 
-                                                  self.View.changeFontSize)
-            self.__Settings['TREEVIEW'].Events.onEvent('FILTERTOGGLED',
+            #self.__Settings['VIEW'].Events.onEvent('FONTSIZECHANGED', 
+            #                                      self.View.changeFontSize)
+            self.__Settings['VIEW'].Events.onEvent('FILTERTOGGLED',
                                                        filterToggled)
 
 
@@ -1175,6 +1222,9 @@ class XnatSlicerWidget:
                 self.NodeDetails.changeFontSize
             self.__Settings['DETAILS'].Events.onEvent('FONTSIZECHANGED',  
                                                       callback)
+
+            self.__Settings['DETAILS'].linkToSetting('Details Metadata', \
+                                  self.Settings['METADATA'], 'XNAT Metadata')
 
 
 
@@ -1192,8 +1242,8 @@ class XnatSlicerWidget:
         settingsDict = OrderedDict([
           ('HOSTS', Settings_Hosts(_SettingsFile)),
           ('CACHE' , Settings_Cache(_SettingsFile)),
-          #('METADATA', Settings_Metadata(_SettingsFile)),
-          #('TREEVIEW', Settings_View_Tree(_SettingsFile, 'View')),
+          ('METADATA', Settings_Metadata(_SettingsFile)),
+          ('VIEW', Settings_View(_SettingsFile, 'View')),
           ('DETAILS' , Settings_Details(_SettingsFile)),
          ])
         return settingsDict
@@ -1230,10 +1280,8 @@ class XnatSlicerWidget:
       """
       As stated.
       """
-      self.LoginMenu.Events.onEvent('MANAGEHOSTSCLICKED', 
-                                    self.__showHostWindow)
-      self.LoginMenu.Events.onEvent('HOSTSELECTED', 
-                                    self.__onHostSelected)
+      self.LoginMenu.Events.onEvent('MANAGEHOSTSCLICKED', self.__showHostWindow)
+      self.LoginMenu.Events.onEvent('HOSTSELECTED', self.__onHostSelected)
 
 
 
