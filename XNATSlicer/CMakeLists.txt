@@ -20,7 +20,7 @@ XnatSlicerLib/settings/Settings_Cache.py
 XnatSlicerLib/settings/Settings_Details.py
 XnatSlicerLib/settings/Settings_Hosts.py
 XnatSlicerLib/settings/Settings_Metadata.py
-XnatSlicerLib/settings/Settings_View_Tree.py
+XnatSlicerLib/settings/Settings_View.py
 XnatSlicerLib/settings/SettingsFile.py
 XnatSlicerLib/ui/Buttons.py
 XnatSlicerLib/ui/FolderMaker.py

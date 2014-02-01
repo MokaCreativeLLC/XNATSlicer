@@ -240,7 +240,7 @@ class XnatSlicerWidget:
         #--------------------------------
         # Node Details
         #--------------------------------
-        self.NodeDetails = NodeDetails(self, self.Settings['DETAILS'])
+        self.NodeDetails = NodeDetails(self.Settings['DETAILS'])
         self.__setNodeDetailsCallbacks()
         
 
@@ -1134,15 +1134,7 @@ class XnatSlicerWidget:
         self.__setSettingsCallbacks()
 
 
-
-
-    def __syncSettingsToFile(self):
-      """
-      """
-      for key, Setting in self.Settings.iteritems():
-        Setting.syncToFile()
-
-
+ 
     
     def __showCustomWindow(self, button, xnatLevel):
         """
@@ -1164,6 +1156,31 @@ class XnatSlicerWidget:
 
 
 
+    def __syncSettingsToFile(self, *args):
+      """
+      As stated.
+      """
+      isFontChange = args[0] and 'FONT_SIZE_CHANGED' in args[0]
+
+      #MokaUtils.debug.lf(args[0])
+      for key, Setting in self.Settings.iteritems():
+        Setting.syncToFile()
+        slicer.app.processEvents()
+      #try:
+      if hasattr(self, 'NodeDetails'):
+        self.NodeDetails.updateFromSettings()
+      if hasattr(self, 'View'):
+        self.View.updateFromSettings()
+      if hasattr(self, 'LoginMenu') and not isFontChange:
+        #MokaUtils.debug.lf()
+        self.LoginMenu.updateFromSettings()
+      #except Exception, e:
+      #  print (MokaUtils.debug.lf(str(e)))
+      #  pass
+
+
+
+
     def __setSettingsCallbacks(self):
         """
         """
@@ -1172,31 +1189,18 @@ class XnatSlicerWidget:
           Setting.Events.onEvent('SETTINGSFILEMODIFIED', \
                                  self.__syncSettingsToFile)
 
-
           if hasattr(Setting, 'MetadataEditorSets'):
             for setKey, _set in Setting.MetadataEditorSets.iteritems():
               _set.Events.onEvent('editCustomClicked', self.__showCustomWindow)
           
 
-          if key == 'HOSTS':
-
-            def callback():
-              if self.LoginMenu:
-                self.LoginMenu.loadDefaultHost
-
-            for event in ['HOSTADDED', 'HOSTDELETED']:
-              self.__Settings['HOSTS'].Events.onEvent(event, callback)
-          
-
-            
-
-              
-
           if key == 'VIEW':
                                   
             def filterToggled():
+              #MokaUtils.debug.lf("FILTER TOGGLED", self.__Settings['VIEW'].\
+              #   buttons['sort']['accessed'].isChecked())
               if self.__Settings['VIEW'].\
-                 buttons['sort']['accessed'].isDown():
+                 buttons['sort']['accessed'].isChecked():
                 self.View.filter_accessed()
               else:
                 self.View.filter_all()
@@ -1208,22 +1212,18 @@ class XnatSlicerWidget:
                 in self.__Settings['VIEW'].buttons['sort'].iteritems():
               button.connect('clicked()', self.onFilterButtonClicked)
 
-            #self.__Settings['VIEW'].Events.onEvent('FONTSIZECHANGED', 
-            #                                      self.View.changeFontSize)
             self.__Settings['VIEW'].Events.onEvent('FILTERTOGGLED',
                                                        filterToggled)
 
+            self.__Settings['VIEW'].linkToSetting(Settings_View.LABEL_METADATA,
+                                  self.Settings['METADATA'], 'XNAT Metadata')
 
 
 
           if key == 'DETAILS':
-            def callback():
-              if self.NodeDetails:
-                self.NodeDetails.changeFontSize
-            self.__Settings['DETAILS'].Events.onEvent('FONTSIZECHANGED',  
-                                                      callback)
 
-            self.__Settings['DETAILS'].linkToSetting('Details Metadata', \
+            self.__Settings['DETAILS'].linkToSetting(\
+                      Settings_Details.LABEL_METADATA, 
                                   self.Settings['METADATA'], 'XNAT Metadata')
 
 
@@ -1260,13 +1260,15 @@ class XnatSlicerWidget:
                                self.NodeDetails.setXnatNodeText)
 
 
+
   
     def __initLoginMenu(self):
       """
       As stated.
       """
 
-      self.LoginMenu = LoginMenu(parent = self.parent, MODULE = self)
+      self.LoginMenu = LoginMenu(parent = self.parent, MODULE = self, 
+                                Setting = self.Settings['HOSTS'])
       self.__setLoginMenuCalbacks()
       
       # This exists basically for running the collapse anim
@@ -1302,7 +1304,7 @@ class XnatSlicerWidget:
       """
       As stated.
       """
-      print "\n\nHOST SELECTED CALLBACK"
       for key, Setting in self.__Settings.iteritems():
         Setting.currXnatHost = host
+        #MokaUtils.debug.lf(Setting.__class__.__name__)
         Setting.syncToFile()
