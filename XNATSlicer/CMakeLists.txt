@@ -23,6 +23,10 @@ XnatSlicerLib/settings/Settings_Metadata.py
 XnatSlicerLib/settings/Settings_View.py
 XnatSlicerLib/settings/SettingsFile.py
 XnatSlicerLib/ui/Buttons.py
+XnatSlicerLib/ui/custom-qt-widgets/AnimatedCollapsible.py
+XnatSlicerLib/ui/custom-qt-widgets/FingerTabWidget.py
+XnatSlicerLib/ui/custom-qt-widgets/HoverButton.py
+XnatSlicerLib/ui/custom-qt-widgets/VariableItemListWidget.py
 XnatSlicerLib/ui/FolderMaker.py
 XnatSlicerLib/ui/LoginMenu.py
 XnatSlicerLib/ui/MetadataEditor.py
@@ -37,10 +41,6 @@ XnatSlicerLib/ui/SettingsWindow.py
 XnatSlicerLib/ui/View.py
 XnatSlicerLib/ui/View_Tree.py
 XnatSlicerLib/ui/Viewer.py
-XnatSlicerLib/ui/custom-qt-widgets/AnimatedCollapsible.py
-XnatSlicerLib/ui/custom-qt-widgets/FingerTabWidget.py
-XnatSlicerLib/ui/custom-qt-widgets/HoverButton.py
-XnatSlicerLib/ui/custom-qt-widgets/VariableItemListWidget.py
 XnatSlicerLib/utils/Error.py
 XnatSlicerLib/utils/FileInfo.py
 XnatSlicerLib/utils/ScenePackager.py
@@ -48,7 +48,8 @@ XnatSlicerLib/utils/SessionManager.py
 XnatSlicerLib/utils/SlicerUtils.py
 XnatSlicerLib/utils/Timer.py
 XnatSlicerLib/utils/XnatSlicerGlobals.py
-XnatSlicerLib/utils/XnatSlicerUtils.py  )
+XnatSlicerLib/utils/XnatSlicerUtils.py  
+)
 
 set(MODULE_PYTHON_RESOURCES
   Resources/Icons/addproj.png
