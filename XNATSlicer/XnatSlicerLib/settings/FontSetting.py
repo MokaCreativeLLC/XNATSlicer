@@ -115,7 +115,7 @@ class FontSetting(object):
         #print " FONT SIZE CHANGED!"
         self.__syncFileTo()
         #MokaUtils.debug.lf()
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       'FONT_SIZE_CHANGED')
         
 

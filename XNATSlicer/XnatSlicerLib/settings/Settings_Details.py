@@ -29,6 +29,7 @@ class Settings_Details(FontSetting,
 
     def setup(self):
         """
+        Method inherited from parent function.
         """
         #--------------------
         # Add the fontSizeDropdown

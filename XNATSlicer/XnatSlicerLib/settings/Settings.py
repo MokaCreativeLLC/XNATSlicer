@@ -18,7 +18,7 @@ class Settings(qt.QScrollArea):
     SECTION_SPACING = 5
     EVENT_TYPES = [
         'UPDATEUI',
-        'SETTINGSFILEMODIFIED'
+        'SETTINGS_FILE_MODIFIED'
     ]
 
 

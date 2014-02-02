@@ -1,0 +1,12 @@
+username:		admin
+XnatIo:		None
+saveLevel:		http://localhost:8080/xnat/data/archive/projects/1/subjects/subj1/experiments/subj1_MR1
+fileName:		test2.mrb
+saveUri:		http://localhost:8080/xnat/data/archive/projects/1/subjects/subj1/experiments/subj1_MR1/resources/Slicer/files
+host:		local
+otherDirs:		None
+sessionType:		scene download
+sessionStart:		2014-02-01 21:39:58.662846
+metadata:		None
+
+

@@ -118,11 +118,11 @@ class MetadataEditorSetting(object):
             self.SettingsFile.setSetting(self.currXnatHost, tagDict)
             editor.lineEdit.clear()
             MokaUtils.debug.lf()
-            self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+            self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                           self.__class__.__name__)
 
         else:
-            tagType = 'Custom' if inCustom else 'Default'
+            tagType = 'Custom' if lineText in customItems else 'Default'
             msg = "'%s' already exists in %s tags."%(lineText, tagType)
             editor.takenBox = qt.QMessageBox(1, "Add Metadata", msg)
             editor.takenBox.show()
@@ -162,8 +162,8 @@ class MetadataEditorSetting(object):
         self.SettingsFile.setSetting(self.currXnatHost, tagDict)
 
         #print "NEED TO PROPAGATE CUSTOM METADATA REMOVE!"
-        MokaUtils.debug.lf()
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        #MokaUtils.debug.lf()
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       self.__class__.__name__)
         #self.MODULE.SettingsWindow.updateSettingWidgets()
 
@@ -293,8 +293,8 @@ class MetadataEditorSetting(object):
         self.SettingsFile.setSetting(self.currXnatHost, tagDict)
 
 
-        MokaUtils.debug.lf("CHECKED ITEMS", checkedItems)
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        #MokaUtils.debug.lf("CHECKED ITEMS", checkedItems)
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       self.__class__.__name__)
         
 

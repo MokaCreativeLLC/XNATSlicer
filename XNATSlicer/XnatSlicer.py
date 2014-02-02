@@ -1160,7 +1160,7 @@ class XnatSlicerWidget:
       """
       As stated.
       """
-      isFontChange = args[0] and 'FONT_SIZE_CHANGED' in args[0]
+      isFontChange = args and 'FONT_SIZE_CHANGED' in args
 
       #MokaUtils.debug.lf(args[0])
       for key, Setting in self.Settings.iteritems():
@@ -1185,8 +1185,11 @@ class XnatSlicerWidget:
         """
         """
 
+        self.SettingsFile.Events.onEvent('SETTINGS_FILE_RESTORED',
+                                         self.__syncSettingsToFile)
+
         for key, Setting in self.Settings.iteritems():
-          Setting.Events.onEvent('SETTINGSFILEMODIFIED', \
+          Setting.Events.onEvent('SETTINGS_FILE_MODIFIED', \
                                  self.__syncSettingsToFile)
 
           if hasattr(Setting, 'MetadataEditorSets'):

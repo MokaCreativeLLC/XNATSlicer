@@ -191,7 +191,7 @@ class Settings_Hosts(Settings):
         self.SettingsFile.deleteHost(self.prevName)
         self.prevName = None
         self.writeHost()
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       self.__class__.__name__)
 
 
@@ -229,7 +229,7 @@ class Settings_Hosts(Settings):
         #--------------------
         self.currModal.close()
         self.currModal = None
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       self.__class__.__name__)
 
 
@@ -303,7 +303,7 @@ class Settings_Hosts(Settings):
         self.currModal.close()
         self.currModal = None
 
-        self.Events.runEventCallbacks('SETTINGSFILEMODIFIED', 
+        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       self.__class__.__name__)
 
 
