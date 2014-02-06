@@ -3,7 +3,6 @@ from Settings import *
 from MetadataEditorSetting import *
 
 
-
         
 class Settings_Metadata(MetadataEditorSetting, Settings):
     """
@@ -23,6 +22,7 @@ class Settings_Metadata(MetadataEditorSetting, Settings):
   
     def setup(self):
         """
+        Adds the metadata editor sets.
         """
         self.createMetadataEditorSets('XNAT Metadata', 
                                       itemType = 'label', 

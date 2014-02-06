@@ -6,7 +6,6 @@ from Xnat import *
 from MokaUtils import *
 
 # module
-from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
 
 
@@ -20,8 +19,11 @@ class NodeDetails(qt.QWidget):
     XNAT node, whether it's a folder (project, subject, experiment, scan)
     or a file.
     """
+    
+    DEFAULT_FONT_SIZE = 11
+    DEFAULT_FONT = qt.QFont('Arial', DEFAULT_FONT_SIZE, 10, False)  
 
-    def __init__(self, Setting = None):
+    def __init__(self, Setting = None, numColumns = 2):
         """ 
         @param Setting: The Setting to associate with the widget 
             (i.e. Setting_Details)
@@ -31,30 +33,26 @@ class NodeDetails(qt.QWidget):
         super(NodeDetails, self).__init__()
 
         self.Setting = Setting
+        self.Setting.Events.onEvent('SHOWEMPTY', self.__showEmptyMetadata)
         self.storedDetailsDict = None
-        self.currFont = XnatSlicerGlobals.LABEL_FONT
+        self.currFont = NodeDetails.DEFAULT_FONT
 
-        self._layout = qt.QGridLayout()
+        self._layout = qt.QFormLayout()
         self._layout.setContentsMargins(0,0,0,0)
 
-        self.numColumns = 2
+        self.numColumns = numColumns
+            
+        self.__textViewer = qt.QTextEdit(self)
+        self.__textViewer.setReadOnly(True)
+        self.__textViewer.setObjectName('nodeDetails')
+        self.__textViewer.setStyleSheet('#nodeDetails{border: none;}')
+        self.__textViewer.verticalScrollBar().setFixedWidth(15)
 
-        # new method
-        self.__textViewer = qt.QTableWidget(self)
-	self.__textViewer.verticalHeader().hide()
-	self.__textViewer.horizontalHeader().hide()
-	self.__textViewer.horizontalHeader().setResizeMode(1)
-        self.__textViewer.setShowGrid(False)
-        self.__textViewer.setColumnCount(self.numColumns)
-        self.__textViewer.setStyleSheet('border: none; padding:' + 
-                                ' 0px; margin-left: 0px; margin-right: 0px')
-        self.__textViewer.verticalScrollBar().setStyleSheet('width: 15px;')
-
-
-        self._layout.addWidget(self.__textViewer, 0, 0)
+        self._layout.addWidget(self.__textViewer)
         self.setLayout(self._layout)
         self.updateFontFromSettings()
         
+        self.__showEmptyMetadata = True
 
 
 
@@ -68,7 +66,30 @@ class NodeDetails(qt.QWidget):
         self.currFont.setPointSize(size)
         self.__textViewer.setFont(self.currFont)
 
+
+        #--------------------
+        # Adaptive style
+        #--------------------          
+        if (size <= 10):
+            self.numColumns = 3
+        else:
+            self.numColumns = 2
+
+        #MokaUtils.debug.lf(self.currFont.pointSize())
+
+
+
         
+    def __showEmptyMetadata(self, checked):
+        """
+        Stores the internal variable to show empty metadata values.
+
+        @param checked: Whether to show the empty metadata.
+        @type checked: bool
+        """
+        self.__showEmptyMetadata = checked
+        self.setXnatNodeText(None)
+
 
 
     def setText(self, string):
@@ -92,7 +113,7 @@ class NodeDetails(qt.QWidget):
                                                        LABEL_FONT_SIZE)
         storedFont = int(storedFontSetting[0]) if \
                      len(storedFontSetting) > 0 else \
-                     XnatSlicerGlobals.FONT_SIZE
+                     NodeDetails.DEFAULT_FONT_SIZE
         self.changeFontSize(storedFont)
 
 
@@ -125,110 +146,17 @@ class NodeDetails(qt.QWidget):
 
         if not detailsDict:
             return
+
+      
         #--------------------
-        # The argument is a tuple because
-        # the callback is called with multiple
-        # arguments (see 'runNodeClickedCallbacks' in 
-        # XnatSlicerUtils).
-        #--------------------      
-        if isinstance(detailsDict, list):
-            detailsDict = detailsDict[0]
-            
-        detailsText = ''  
-        storedMetadata = self.Setting.getStoredMetadata( \
-                                      self.Setting.LABEL_METADATA, 
-                                      detailsDict['XNAT_LEVEL'],
-                                      True)
-        #MokaUtils.debug.lf("DETAILS DICT", detailsDict, '\n\n\n') 
-        #MokaUtils.debug.lf("STORED METADATA", storedMetadata)
-        self.__constructItemTable(detailsDict, storedMetadata)
-        self.__setItems()
+        # Adjusts the scrollbar -- minor Qt bug.
+        #--------------------        
+        self.__textViewer.verticalScrollBar().setStyleSheet(\
+                       'left: ' + 
+                        str(self.__textViewer.width - 15) + 'px; ' + 
+                        'width: 15px')
 
 
-
-
-    def __setItems(self):
-        """
-        Sets the stored itemTable QTableWidget items to the textViewer.
-        """
-        self.__textViewer.clear()
-        self.__textViewer.setRowCount(len(self.itemTable))
-        for i in range(0, len(self.itemTable)):
-            self.currFont.setWeight(75 if i%2 == 0 else 50)
-            for j in range (0, len(self.itemTable[i])):
-                currItem = self.itemTable[i][j]
-                self.__textViewer.setItem(i, j, currItem)
-                currItem.setFlags(32)
-                currItem.setTextAlignment(0x0001)
-                currItem.setFont(self.currFont)
-        self.__textViewer.resizeRowsToContents()
-
-
-
-
-    def __printItemTable(self):
-        """
-        As stated.
-        """
-        MokaUtils.debug.lf("ITEM TABLE", itemTable, len(itemTable))
-        for i in range(0, len(self.itemTable)):
-            print self.itemTable[i][0].text() + ': \'', \
-                self.itemTable[i][1].text() +'\' | ', \
-                self.itemTable[i][2].text() + ': \'', \
-                self.itemTable[i][3].text() + '\'' 
-        print '\n\n'
-
-
-
-    def __constructItemTable(self, detailsDict, storedMetadata):
-        """
-        Constructs an item table for populating into the __textViewer.
-
-        @param detailsDict: The details dictionary associated with the node.
-        @type detailsDict: dict(str, dict(str, str))
-
-        @param storedMetadata: The metadata associated with the node.
-        @type storedMetadata: dict(str, str)
-        """
-        currRow = 0
-        self.itemTable = []
-        for key, value in detailsDict.iteritems():
-            if key in storedMetadata:
-                if key in Xnat.metadata.DEFAULT_DATE_TAGS:
-                    value = XnatSlicerUtils.makeDateReadable(value)
-                tableItemK = qt.QTableWidgetItem('\n' + key.strip() + ':')
-                tableItemV = qt.QTableWidgetItem(value.strip())
-                try:
-                    self.itemTable[currRow] += [tableItemK]
-                    self.itemTable[currRow+1] += [tableItemV]
-                except Exception, e:
-                    self.itemTable.append([])
-                    self.itemTable.append([])
-                    self.itemTable[currRow] += [tableItemK]
-                    self.itemTable[currRow+1] += [tableItemV]
-
-                if len(self.itemTable[currRow]) == (self.numColumns):        
-                    currRow += 2
-
-
-        
-    def setXnatNodeText_old(self, detailsDict):
-        """ 
-        Sets the text of the widget based on a key-value pair
-        styling method.
-
-        @param detailsDict: The dictionary containing details information 
-           (including the metadata) specific to the View node.
-        @type detailsDict:  dict(str, str)
-        """
-
-        if detailsDict == None:
-            detailsDict = self.storedDetailsDict
-        else:
-            self.storedDetailsDict = detailsDict
-
-        if not detailsDict:
-            return
         #--------------------
         # The argument is a tuple because
         # the callback is called with multiple
@@ -278,6 +206,10 @@ class NodeDetails(qt.QWidget):
                 if key in Xnat.metadata.DEFAULT_DATE_TAGS:
                     #print value
                     value = XnatSlicerUtils.makeDateReadable(value)
+
+                value = value.strip()
+                if len(value) == 0 and self.__showEmptyMetadata == False:
+                    continue
                 detailsStr = "<b>%s</b>:  %s"%(key, value)                
                 detailsText += "\n\t<td style=\"width:50%\"" + \
                                ">%s</td>\n"%(detailsStr)
@@ -299,3 +231,43 @@ class NodeDetails(qt.QWidget):
         #-------------------- 
         self.__textViewer.setText(detailsText)
 
+
+
+
+
+    def setXnatNodeText_old(self, detailsDict):
+        """ 
+        @deprecated
+        Sets the text of the widget based on a key-value pair
+        styling method.
+
+        @param detailsDict: The dictionary containing details information 
+           (including the metadata) specific to the View node.
+        @type detailsDict:  dict(str, str)
+        """
+
+        if detailsDict == None:
+            detailsDict = self.storedDetailsDict
+        else:
+            self.storedDetailsDict = detailsDict
+
+        if not detailsDict:
+            return
+        #--------------------
+        # The argument is a tuple because
+        # the callback is called with multiple
+        # arguments (see 'runNodeClickedCallbacks' in 
+        # XnatSlicerUtils).
+        #--------------------      
+        if isinstance(detailsDict, list):
+            detailsDict = detailsDict[0]
+            
+        detailsText = ''  
+        storedMetadata = self.Setting.getStoredMetadata( \
+                                      self.Setting.LABEL_METADATA, 
+                                      detailsDict['XNAT_LEVEL'],
+                                      True)
+        #MokaUtils.debug.lf("DETAILS DICT", detailsDict, '\n\n\n') 
+        #MokaUtils.debug.lf("STORED METADATA", storedMetadata)
+        self.__constructItemTable(detailsDict, storedMetadata)
+        self.__setItems()

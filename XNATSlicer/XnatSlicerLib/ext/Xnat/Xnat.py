@@ -704,16 +704,19 @@ class Xnat(object):
             """ 
             Makes httpsRequests to an XNAT host.
 
-            @param method: The request method to run ('GET', 'PUT', 'POST', 'DELETE').
+            @param method: The request method to run ('GET', 'PUT', 'POST', 
+                'DELETE').
             @type: string
 
             @param _uri: The XNAT uri to run the request on.
             @type: string      
 
-            @param body: The body contents of the request.  Defaults to an empty string.
+            @param body: The body contents of the request.  Defaults to an 
+                empty string.
             @type: string
 
-            @param headerAdditions: The additional header dictionary to add to the request.
+            @param headerAdditions: The additional header dictionary to add 
+                to the request.
             @type: dict
             """
 
@@ -723,7 +726,7 @@ class Xnat(object):
             url = Xnat.path.makeXnatUrl(self.host, _uri)
             request = urllib2.Request(url)
             host = request.get_host()
-
+            #print ("XNAT URL: ", _uri, url) 
             
             #-------------------- 
             # For local uris
@@ -742,7 +745,8 @@ class Xnat(object):
             #-------------------- 
             # Conduct REST call
             #-------------------- 
-            connection.request(method.upper(), request.get_selector(), body=body, headers=header)
+            connection.request(method.upper(), request.get_selector(), 
+                               body=body, headers=header)
             return connection.getresponse()
 
 

@@ -15,6 +15,7 @@ XnatSlicerLib/io/Workflow_Load.py
 XnatSlicerLib/io/Workflow_Save.py
 XnatSlicerLib/settings/FontSetting.py
 XnatSlicerLib/settings/MetadataEditorSetting.py
+XnatSlicerLib/settings/CheckBoxSetting.py
 XnatSlicerLib/settings/Settings.py
 XnatSlicerLib/settings/Settings_Cache.py
 XnatSlicerLib/settings/Settings_Details.py
