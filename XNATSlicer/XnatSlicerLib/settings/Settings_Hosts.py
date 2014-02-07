@@ -5,7 +5,6 @@ from __main__ import qt
 from MokaUtils import *
 
 # module
-from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
 from Settings import *
 
@@ -22,7 +21,10 @@ class Settings_Hosts(Settings):
     are to be displaed in the 'SettingsWindow' class.
     """
 
-    
+    FONT_NAME =  "Arial"
+    FONT_SIZE =  10
+    LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False) 
+    LABEL_FONT_ITALIC = qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
 
     def setup(self):
         """
@@ -660,7 +662,7 @@ class HostTable(qt.QTableWidget):
         # Set the added items' aeshetics.
         #--------------------
         for key, item in self.trackedItems[self.rowCount-1].iteritems():
-            item.setFont(XnatSlicerGlobals.LABEL_FONT)
+            item.setFont(Settings_Hosts.LABEL_FONT)
 
 
 
@@ -823,10 +825,10 @@ def makeEditHostModal(_Settings_Hosts):
     #--------------------
     if not _Settings_Hosts.SettingsFile.isModifiable(selHost['name']):
         _Settings_Hosts.nameLine.setReadOnly(True)
-        _Settings_Hosts.nameLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC)
+        _Settings_Hosts.nameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
         _Settings_Hosts.nameLine.setEnabled(False)
         _Settings_Hosts.urlLine.setReadOnly(True)
-        _Settings_Hosts.urlLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC)
+        _Settings_Hosts.urlLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
         _Settings_Hosts.urlLine.setEnabled(False)
 
 
@@ -1007,17 +1009,17 @@ def makeButtons(_Settings_Hosts):
     """
     addButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Add', 
                                          toolTip = "Need tool-tip.", 
-                                         font = XnatSlicerGlobals.LABEL_FONT,
+                                         font = Settings_Hosts.LABEL_FONT,
                                          size = qt.QSize(90, 20), 
                                          enabled = True)
     editButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Edit', 
                                           toolTip = "Need tool-tip.", 
-                                          font = XnatSlicerGlobals.LABEL_FONT,
+                                          font = Settings_Hosts.LABEL_FONT,
                                           size = qt.QSize(90, 20), 
                                           enabled = True)
     deleteButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Delete', 
                                             toolTip = "Need tool-tip.", 
-                                            font = XnatSlicerGlobals.LABEL_FONT,
+                                            font = Settings_Hosts.LABEL_FONT,
                                             size = qt.QSize(90, 20), 
                                             enabled = True)
     
@@ -1043,6 +1045,6 @@ def makeSharedHostModalObjects(_Settings_Hosts):
         
     urlLine.setEnabled(True)
     nameLine.setEnabled(True) 
-    usernameLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC) 
+    usernameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC) 
 
     return urlLine, nameLine, setDefault, usernameLine 

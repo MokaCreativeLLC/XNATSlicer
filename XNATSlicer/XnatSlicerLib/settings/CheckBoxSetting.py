@@ -1,18 +1,23 @@
 # application
 from __main__ import qt
 
-# external
-from Xnat import *
-from MokaUtils import *
-
 
     
 class CheckBoxSetting(object):
     """ 
+    Class for Settings widgets that aim to make use of CheckBoxes.
+    This class manages events and SettingsFile syncing in a generic way.
     """
 
     def getCheckBoxStorageTag(self, checkBoxKey):
         """
+        Returns a string of a constructed storage tag key.
+
+        @param checkBoxKey:  The key to construct the tag from.
+        @type checkBoxKey: str
+        
+        @return: The check box storage hey.
+        @rtype: str
         """
         return self.__class__.__name__ + '_' + \
                self.CHECKBOXES[checkBoxKey]['tag']
@@ -55,7 +60,6 @@ class CheckBoxSetting(object):
 
 
 
-
     def __syncToFile(self):
         """
         Method specific to syncing the Setting's checkboxes to the SettingsFile.
@@ -74,11 +78,13 @@ class CheckBoxSetting(object):
     
 
 
-
-
     def __syncFileTo(self, checked):
         """
         Method specific to syncing the SettingsFile to the Setting's checkboxes.
+        Also the callback function for when a checkbox is toogled.
+
+        @param checked: The checked state of the CheckBox.
+        @type checked: str
         """
         for key, val in self.CHECKBOXES.iteritems():
             storeTag = self.getCheckBoxStorageTag(key)

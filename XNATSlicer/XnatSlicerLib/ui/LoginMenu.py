@@ -7,21 +7,23 @@ from __main__ import qt, slicer
 # external
 from MokaUtils import *
 
-# module
-from XnatSlicerGlobals import *
-
 
 
 
 class LoginMenu(qt.QWidget):
     """ 
-    LoginMenu is the class that handles all of the UI  
-    to the XnatIo related to logging in to a given 
-    XNAT host.  
+    LoginMenu is the class that handles all of the UI to the XnatIo related to 
+    logging in to a given  XNAT host.  
     Handles UI for loggin into XNAT as well as settings by 
     linking to button clicks to external methods in the
     XnatIo.
     """
+
+    FONT_NAME =  "Arial"
+    FONT_SIZE =  10
+    LABEL_FONT =  qt.QFont(FONT_NAME, FONT_SIZE, 10, False)        
+    LABEL_FONT_BOLD =  qt.QFont(FONT_NAME, FONT_SIZE, 100, False)
+    LABEL_FONT_ITALIC =  qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
 
     EVENT_TYPES = [
         'HOSTSELECTED',
@@ -211,7 +213,8 @@ class LoginMenu(qt.QWidget):
         if not hostName:
             return
         for i in range(0, self.hostDropdown.maxVisibleItems):
-            if self.hostDropdown.itemText(i).lower() == hostName.strip().lower():
+            if self.hostDropdown.itemText(i).lower() == \
+               hostName.strip().lower():
                 self.hostDropdown.setCurrentIndex(i)
                 self.currHostName = self.hostDropdown.itemText(i)
                 break
@@ -339,10 +342,10 @@ def makeCredentialsWidgets(LoginMenu):
     # Username + password label and lines.
     #--------------------
     usernameLabel = qt.QLabel('username:')
-    usernameLabel.setFont(XnatSlicerGlobals.LABEL_FONT_BOLD)
+    usernameLabel.setFont(LoginMenu.LABEL_FONT_BOLD)
     
     passwordLabel = qt.QLabel('password:')
-    passwordLabel.setFont(XnatSlicerGlobals.LABEL_FONT_BOLD)    
+    passwordLabel.setFont(LoginMenu.LABEL_FONT_BOLD)    
     
     usernameLine = qt.QLineEdit()   
     passwordLine = qt.QLineEdit() # encrypted
@@ -355,8 +358,8 @@ def makeCredentialsWidgets(LoginMenu):
     # Sets aesthetics.
     #--------------------
     usernameLine.setText(LoginMenu.defaultUsernameText)
-    usernameLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC)
-    passwordLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC) 
+    usernameLine.setFont(LoginMenu.LABEL_FONT_ITALIC)
+    passwordLine.setFont(LoginMenu.LABEL_FONT_ITALIC) 
 
     passwordLine.setStyleSheet("color: lightgray")
     passwordLine.setText(LoginMenu.defaultPasswordText)
@@ -374,7 +377,7 @@ def makeHostDropdown(LoginMenu):
     """
     
     hostDropdown = qt.QComboBox()
-    hostDropdown.setFont(XnatSlicerGlobals.LABEL_FONT)
+    hostDropdown.setFont(LoginMenu.LABEL_FONT)
     hostDropdown.toolTip = "Select Xnat host"
     return hostDropdown
 
@@ -388,7 +391,7 @@ def makeLoginButton(LoginMenu):
     plt = qt.QPalette()
     plt.setColor(qt.QPalette().Button, qt.QColor(255,255,255))  
     loginButton = qt.QPushButton("Login")
-    loginButton.setFont(XnatSlicerGlobals.LABEL_FONT)    
+    loginButton.setFont(LoginMenu.LABEL_FONT)    
     loginButton.toolTip = "Login to selected Xnat host"    
     loginButton.setFixedSize(48, 24)
     return loginButton
