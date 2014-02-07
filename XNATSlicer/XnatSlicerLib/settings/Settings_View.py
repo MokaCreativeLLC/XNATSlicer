@@ -44,11 +44,12 @@ class Settings_View(FontSetting,
 
     def setup(self):
         """
+        As stated.
         """
         #--------------------
         # Add Sort Buttons section
         #--------------------
-        self.addSortAndFilterButtons()
+        self.__addSortAndFilterButtons()
         self.addSpacing()
 
 
@@ -66,30 +67,10 @@ class Settings_View(FontSetting,
                                       customEditVisible = False) 
 
 
- 
-        
-      
-    def setButtonDown(self, category = None, name = None, 
-                      isDown = True, callSignals = True):
-        """ 
-        Programmatically sets a button down based on
-        the arguments.  The user has the option to allow for
-        the 'clicked()' signals to be called or not.  
-        This is used primarily for default programmatic 
-        manipulation of the buttons, such as loadProjects() in 
-        XNATView, where default filters are applied, but
-        the signals of clicking are not desired, but 
-        self.currentlyToggledFilterButton is still tracked.
-        """
-        if isDown and category == 'sort':
-            self.buttons[category][name].setChecked(True)
-            self.currentlyToggledFilterButton = self.buttons['sort'][name]   
-
-            
-
 
     def __onFilterButtonClicked(self):
         """
+        Callback for when a filter button is clicked.
         """
         MokaUtils.debug.lf("filter clicked!")
         self.Events.runEventCallbacks('FILTERTOGGLED')
@@ -98,10 +79,10 @@ class Settings_View(FontSetting,
 
             
 
-    def addSortAndFilterButtons(self):
-        """  Adds the sort/filter buttons
-             to the settings widgets and
-             connects their click events accordingly.
+    def __addSortAndFilterButtons(self):
+        """  
+        Adds the sort/filter buttons to the settings widgets and connects 
+        their click events accordingly.
         """
         
         #--------------------
@@ -121,18 +102,12 @@ class Settings_View(FontSetting,
         self.buttons['sort']['accessed'].setChecked(False)
 
 
-        
-
-
-
         #--------------------
         # Connect the filter button to
         # the button click.
         #--------------------
         self.buttons['sort']['accessed'].connect('toggled(bool)', 
                                                  self.__onFilterButtonClicked)
-
-
 
         #--------------------
         # Make the button layout

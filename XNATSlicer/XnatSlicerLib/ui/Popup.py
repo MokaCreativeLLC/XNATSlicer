@@ -10,7 +10,6 @@ from MokaUtils import *
 
 # module
 from XnatSlicerUtils import *
-from XnatSlicerGlobals import *
 
 
 
@@ -19,22 +18,28 @@ class XnatClearScenePopup(qt.QMessageBox):
     """
     Popup and its children are used for any needed popup interaction with XNAT.
     It's a generic class that allows the user to create popups for any number
-    of purposes.  The popups are QWidgets but could be more specific QWindow classes
+    of purposes.  The popups are QWidgets but could be more specific QWindow 
+    classes
     as well.
     
     This file contains the subclasses of Popup as well: XnatDownloadPopup.
     
     
     MODALITIES:
-    (from: http://harmattan-dev.nokia.com/docs/library/html/qt4/qt.html#WindowModality-enum)
+    (from: http://harmattan-dev.nokia.com/docs/library/html/qt4/
+     qt.html#WindowModality-enum)
     
-    0   Qt::NonModal		    The window is not modal and does not block input to other windows.
+    0   Qt::NonModal		    The window is not modal and does not block 
+                                    input to other windows.
     
-    1   Qt::WindowModal		    The window is modal to a single window hierarchy and blocks input to 
-    its parent window, all grandparent windows, and all siblings of its 
-    parent and grandparent windows.
+    1   Qt::WindowModal		    The window is modal to a single window 
+                                    hierarchy and blocks input to 
+                                    its parent window, all grandparent 
+                                    windows, and all siblings of its 
+                                    parent and grandparent windows.
     
-    2   Qt::ApplicationModal	The window is modal to the application and blocks input to all windows.
+    2   Qt::ApplicationModal	    The window is modal to the application 
+                                    and blocks input to all windows.
     
     """
 
@@ -132,6 +137,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
     Subclass of the Popup class pertaining
     specifically to downloading files.
     """
+    
+    
 
     def __init__(self, title = "XNAT Download Queue", memDisplay = "MB"):
         """ 
@@ -160,9 +167,6 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.cancelCallback = None
 
         self.rowWidgetHeight = 75
-        #self.show()
-        #for i in range(0, 10):
-        #    self.addDownloadRow('projects/fooProject/subjects/fooSuject/experiments/fooExperiments/scans/fooScan/%s/files/foo_%s.dcm'%(i, i))
 
 
 
@@ -178,15 +182,20 @@ class XnatDownloadPopup(XnatEmptyPopup):
             on the URI
         """
 
-
+        FONT_NAME = 'Arial'
+        FONT_SIZE = '10'
+        LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False)
+        
         #-------------------
         # Cancel button row
         #-------------------
         rowWidget = qt.QWidget()
         rowWidget.setObjectName('downloadRowWidget')
-        rowWidget.setStyleSheet('#downloadRowWidget {border: 1px solid rgb(160,160,160); border-radius: 2px; width: 100%;}')
+        rowWidget.setStyleSheet('#downloadRowWidget {border: 1px '+ 
+                ' solid rgb(160,160,160); border-radius: 2px; width: 100%;}')
         rowWidget.setFixedHeight(self.rowWidgetHeight)
-        rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
+        rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
+                                qt.QSizePolicy.MinimumExpanding)
         layout = qt.QFormLayout()
         rowWidget.setLayout(layout)
 
@@ -199,7 +208,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         textEdit.setStyleSheet("border: none")
         textEdit.setFixedHeight(40)
         textEdit.verticalScrollBar().hide()
-        textEdit.setFont(qt.QFont(XnatSlicerGlobals.FONT_NAME, XnatSlicerGlobals.FONT_SIZE, 10, False))
+        textEdit.setFont(qt.QFont(XnatDownloadPopup.FONT_NAME, 
+                                  XnatDownloadPopup.FONT_SIZE, 10, False))
         layout.addRow(textEdit)
         
 
@@ -221,7 +231,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         #-------------------
         cancelButton = qt.QPushButton()
         cancelButton.setText("Cancel")
-        cancelButton.setFont(XnatSlicerGlobals.LABEL_FONT) 
+        cancelButton.setFont(XnatDownloadPopup.LABEL_FONT) 
         cancelButton.setFixedWidth(60)
         cancelButton.setFixedHeight(19)
 
@@ -267,7 +277,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         def cancelClick():
             rowWidget.setEnabled(False)
             #print "Cancelling download '%s'"%(dlStr)
-            textEdit.setText(textEdit.toHtml().replace('DOWNLOADING', 'CANCELLED'))
+            textEdit.setText(textEdit.toHtml().replace('DOWNLOADING', 
+                                                       'CANCELLED'))
             for key, item in self.downloadRows.iteritems():
                 if item['progressBar'] == progressBar:
                     item['progressBar'].setEnabled(False)
@@ -325,7 +336,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.innerWidget.setLayout(self.innerWidgetLayout)
         self.innerWidget.setObjectName('innerWidget')
         self.innerWidget.setStyleSheet('#innerWidget {width: 100%;}')
-        self.innerWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
+        self.innerWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
+                                       qt.QSizePolicy.MinimumExpanding)
 
 
 
@@ -337,7 +349,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.scrollWidget.verticalScrollBar().setStyleSheet('width: 15px')
         self.scrollWidget.setObjectName('scrollWidget')
         self.scrollWidget.setStyleSheet('#scrollWidget {border: none}')
-        self.scrollWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
+        self.scrollWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
+                                        qt.QSizePolicy.MinimumExpanding)
         self.scrollWidget.setWidgetResizable(True)
       
 
@@ -353,7 +366,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         
         self.innerWidget.update()
         self.masterLayout.addRow(self.scrollWidget)
-        self.setSizePolicy(qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
+                           qt.QSizePolicy.MinimumExpanding)
 
         calcHeight = (self.rowWidgetHeight + 12)* len(self.downloadRows)
         if calcHeight < 800:
@@ -413,14 +427,20 @@ class XnatDownloadPopup(XnatEmptyPopup):
         downloadSize = str(self.downloadRows[uriKey]['size']) + 'MB'
         if downloadSize == '0MB':
             downloadSize = '[Unknown Size]'
-        self.downloadRows[uriKey]['textEdit'].setText("DOWNLOADING<br>%s<br>%sMB out of %s<br>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict']),  
-                                                                                                 self.downloadRows[uriKey]['downloaded'], 
-                                                                                                 downloadSize))
+        self.downloadRows[uriKey]['textEdit'].setText(\
+                    "DOWNLOADING<br>%s<br>%sMB out of %s<br>"%(\
+                     self.makeDownloadPath(\
+                            self.downloadRows[uriKey]['pathDict']),  
+                            self.downloadRows[uriKey]['downloaded'], 
+                            downloadSize))
 
         if self.downloadRows[uriKey]['size'] > 0:
-            self.downloadRows[uriKey]['progressBar'].setValue((self.downloadRows[uriKey]['downloaded'] / self.downloadRows[uriKey]['size']) * 100)
+            self.downloadRows[uriKey]['progressBar'].setValue(\
+                        (self.downloadRows[uriKey]['downloaded'] \
+                         / self.downloadRows[uriKey]['size']) * 100)
         else:
-            self.downloadRows[uriKey]['progressBar'].setValue(self.downloadRows[uriKey]['downloaded'])
+            self.downloadRows[uriKey]['progressBar'].setValue(\
+                                self.downloadRows[uriKey]['downloaded'])
         
 
             
@@ -447,7 +467,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         """
         """
         maxLen = 55
-        return filename if len(filename) < maxLen else '...' + filename[-1 * (maxLen-3):]
+        return filename if len(filename) < maxLen else '...' + \
+            filename[-1 * (maxLen-3):]
 
 
         
@@ -460,7 +481,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         @type uriKey: str
         """
         self.downloadRows[uriKey]['widget'].setEnabled(False)
-        self.downloadRows[uriKey]['textEdit'].setText("CANCELLED<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
+        self.downloadRows[uriKey]['textEdit'].setText("CANCELLED<br><i>%s</i>"\
+                %(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
         
 
 
@@ -473,7 +495,8 @@ class XnatDownloadPopup(XnatEmptyPopup):
         @type uriKey: str
         """
         self.downloadRows[uriKey]['widget'].setEnabled(False)
-        self.downloadRows[uriKey]['textEdit'].setText("FINISHED<br><i>%s</i>"%(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
+        self.downloadRows[uriKey]['textEdit'].setText("FINISHED<br><i>%s</i>"\
+                %(self.makeDownloadPath(self.downloadRows[uriKey]['pathDict'])))
         self.setProgressBarValue(uriKey, 100)
         
 

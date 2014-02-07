@@ -5,7 +5,6 @@ from __main__ import qt
 from MokaUtils import *
 
 # module
-from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
 from Settings import *
 
@@ -22,12 +21,16 @@ class Settings_Hosts(Settings):
     are to be displaed in the 'SettingsWindow' class.
     """
 
-    
+    FONT_NAME =  "Arial"
+    FONT_SIZE =  10
+    LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False) 
+    LABEL_FONT_ITALIC = qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
 
     def setup(self):
         """
+        Creates the necessary widgets for the Setting.
         """
-
+        
         #--------------------
         # Add section Label
         #--------------------
@@ -71,16 +74,16 @@ class Settings_Hosts(Settings):
         # separate UI function.
         #--------------------
         self.addButton, self.editButton, self.deleteButton = makeButtons(self)
-        self.addButton.connect('clicked()', self.showAddHostModal)     
-        self.editButton.connect('clicked()', self.showEditHostModal) 
-        self.deleteButton.connect('clicked()', self.showDeleteHostModal)  
+        self.addButton.connect('clicked()', self.__showAddHostModal)     
+        self.editButton.connect('clicked()', self.__showEditHostModal) 
+        self.deleteButton.connect('clicked()', self.__showDeleteHostModal)  
         
 
         
         #--------------------
         # Make frame for setup window
         #--------------------
-        self.makeFrame()
+        self.__makeFrame()
         
         
 
@@ -98,17 +101,18 @@ class Settings_Hosts(Settings):
         #--------------------
         # Load hosts into host list
         #--------------------
-        self.loadHosts()
+        self.__loadHosts()
 
         
         
         
     def __onHostRowClicked(self):
-        """ Callback for when a user clicks on a given item
-            within the host editor.
+        """ 
+        Callback for when a user clicks on a given item
+        within the host editor.
         """
         try:
-            self.setButtonStates(self.hostTable.currentRowItems['name'])
+            self.__setButtonStates(self.hostTable.currentRowItems['name'])
         except:
             #print "No row items selected"
             return
@@ -116,10 +120,14 @@ class Settings_Hosts(Settings):
         
         
         
-    def setButtonStates(self, hostName):   
-        """ Enables / Disables button based upon the editable
-            quality of the host (provided by the 'hostName'
-            argument).  Some hosts cannot be modified.
+    def __setButtonStates(self, hostName):   
+        """ 
+        Enables / Disables button based upon the editable
+        quality of the host (provided by the 'hostName'
+        argument).  Some hosts cannot be modified.
+
+        @param hostName: The name of the host to to apply the changes to.
+        @type hostName: str
         """
         ##print hostName, self.SettingsFile.isModifiable(hostName) 
         if self.SettingsFile.isModifiable(hostName):
@@ -132,8 +140,9 @@ class Settings_Hosts(Settings):
 
 
         
-    def loadHosts(self):     
-        """ Communicates with Settings to load the stored hosts.
+    def __loadHosts(self):     
+        """ 
+        Loads the hosts into the table widget.
         """
         #MokaUtils.debug.lf("LOAD HOSTS")
         #--------------------
@@ -184,8 +193,8 @@ class Settings_Hosts(Settings):
 
     
     def rewriteHost(self):
-        """ As stated.  Deletes the host then 
-            calls on the internal "writeHost" function.
+        """ 
+        Deletes the host then calls on the internal "writeHost" function.
         """
         #MokaUtils.debug.lf('')
         self.SettingsFile.deleteHost(self.prevName)
@@ -218,7 +227,7 @@ class Settings_Hosts(Settings):
         # from the SettingsFile.
         #--------------------
         if deleted: 
-            self.loadHosts()
+            self.__loadHosts()
             #self.Events.runEventCallbacks('HOSTDELETED')
             
 
@@ -236,8 +245,9 @@ class Settings_Hosts(Settings):
     
     
     def writeHost(self):
-        """ Writes the host both to the SettingsFile,
-            then reloads the hosts from the file.
+        """ 
+        Writes the host both to the SettingsFile,
+        then reloads the hosts from the file.
         """
 
         #MokaUtils.debug.lf()
@@ -293,7 +303,7 @@ class Settings_Hosts(Settings):
         # Reload hosts from the SettingsFile.
         #--------------------
         #self.Events.runEventCallbacks('HOSTADDED')
-        self.loadHosts() 
+        self.__loadHosts() 
 
 
 
@@ -310,15 +320,17 @@ class Settings_Hosts(Settings):
 
     def updateFromSettings(self):
         """
+        Callback function for when the settings file changes.
         """
         #MokaUtils.debug.lf()
         #MokaUtils.debug.lf("UPDATE", self.__class__.__name__)
-        self.loadHosts()
+        self.__loadHosts()
 
     
 
-    def showEditHostModal(self):
-        """ As described.
+    def __showEditHostModal(self):
+        """ 
+        Shows the modal that prompts the user to edit a given host.
         """
         #MokaUtils.debug.lf()
         self.currModal = makeEditHostModal(self)
@@ -328,8 +340,9 @@ class Settings_Hosts(Settings):
         
         
         
-    def showDeleteHostModal(self, message=None):
-        """ As described.
+    def __showDeleteHostModal(self, message=None):
+        """ 
+        Shows the modal that prompts the user to delete a given host.
         """
         #MokaUtils.debug.lf()
         self.currModal = makeDeleteHostModal(self)
@@ -338,8 +351,9 @@ class Settings_Hosts(Settings):
             
             
             
-    def showAddHostModal(self):  
-        """ As described.
+    def __showAddHostModal(self):  
+        """ 
+        Shows the modal that prompts the user to add a given host.
         """ 
         #MokaUtils.debug.lf()
         self.currModal = makeAddHostModal(self)
@@ -348,8 +362,9 @@ class Settings_Hosts(Settings):
 
     
 
-    def makeFrame(self):
-        """ Makes the widget frame.
+    def __makeFrame(self):
+        """ 
+        Makes the widget frame.
         """
         #MokaUtils.debug.lf()
         #--------------------
@@ -374,11 +389,13 @@ class Settings_Hosts(Settings):
 
                   
 class HostTable(qt.QTableWidget):
-    """ Inherits qt.QTableWidget to list the hosts in the 
-        SettingsModal in a table format.  QTableWidgets are
-        a bit quirky compared to other QListWidgets, some of 
-        those quirks are accommodated for below.
+    """ 
+    Inherits qt.QTableWidget to list the hosts in the 
+    SettingsModal in a table format.  QTableWidgets are
+    a bit quirky compared to other QListWidgets, some of 
+    those quirks are accommodated for below.
     """
+
 
     def __init__(self, clickCallback = None): 
         """ Init function.
@@ -386,13 +403,11 @@ class HostTable(qt.QTableWidget):
         super(HostTable, self).__init__(self)
         self.clickCallback = clickCallback
         self.setup()
-        
-
-
 
         
     def setup(self):
-        """ Setup function on __init__.
+        """ 
+        As stated.
         """
         
         #--------------------
@@ -429,7 +444,8 @@ class HostTable(qt.QTableWidget):
         # that utilizes the QTableWidget.
         #
         # See here for more information:
-        # http://www.qtcentre.org/threads/12499-QTableWidget-set-items-disappear-after-new-insertion
+        # http://www.qtcentre.org/threads/12499-QTableWidget-set- + 
+        # items-disappear-after-new-insertion
         #--------------------     
         self.trackedItems = {}
 
@@ -438,13 +454,15 @@ class HostTable(qt.QTableWidget):
         #--------------------
         # Connect interaction event.
         #--------------------   
-        self.connect('currentCellChanged(int, int, int, int)', self.onCurrentCellChanged)
+        self.connect('currentCellChanged(int, int, int, int)', 
+                     self.__onCurrentCellChanged)
 
         
 
 
     def printAll(self):
-        """ Prints the row/column count of the hostTable.
+        """ 
+        Prints the row/column count of the hostTable.
         """
         MokaUtils.debug.lf("PRINT ALL:", self.rowCount, self.columnCount)
 
@@ -452,9 +470,14 @@ class HostTable(qt.QTableWidget):
         
 
     def getRowItems(self, rowNumber = None):
-        """ Returns a dictionary of the row items
-            with a key-value pairing of column name
-            to value.
+        """ 
+        Returns a dictionary of the row items
+        with a key-value pairing of column name
+        to value.
+
+        @param rowNumber: The row number to get the items from.  Defaults to 
+           the stored 'currentRowNumber' if nothing provided.
+        @type rowNumber: int
         """
 
         #--------------------
@@ -463,7 +486,6 @@ class HostTable(qt.QTableWidget):
         if not rowNumber:
             rowNumber = self.currentRowNumber
 
-
             
         #--------------------
         # This happens after a clear and 
@@ -471,7 +493,6 @@ class HostTable(qt.QTableWidget):
         #--------------------
         if rowNumber == -1:
             rowNumber = 0
-
 
 
         #--------------------
@@ -496,8 +517,9 @@ class HostTable(qt.QTableWidget):
         
 
     def clear(self):
-        """ Clears the table of all values, then reapplies
-            then reapplies the column headers.
+        """ 
+        Clears the table of all values, then reapplies
+        then reapplies the column headers.
         """
         #--------------------
         # We have to delete self.trackedItems
@@ -512,8 +534,21 @@ class HostTable(qt.QTableWidget):
     
 
             
-    def onCurrentCellChanged(self, rowNum, colNum, oldRow, oldCol):
-        """  Callback when the cell changes.
+    def __onCurrentCellChanged(self, rowNum, colNum, oldRow, oldCol):
+        """  
+        Callback when the cell changes.
+
+        @param rowNum: The row number of the changed cell.
+        @type rowNum: int
+
+        @param colNum: The column number of the changed cell.
+        @type colNum: int
+
+        @param oldRow: The previously focused cell's row number.
+        @type oldRow: int
+
+        @param oldCol: The previously focused cell's column number.
+        @type oldCol: int
         """
 
         #--------------------
@@ -529,8 +564,12 @@ class HostTable(qt.QTableWidget):
 
         
     def getColumn(self, colName):
-        """ Returns the column index if it's name matches the
-            'colName' argument.
+        """ 
+        Returns the column index if it's name matches the
+        'colName' argument.
+
+        @param colName: The column to get.
+        @type colName: str
         """
         for i in range(0, self.columnCount):
             if self.horizontalHeaderItem(i).text().lower() == colName.lower():
@@ -540,8 +579,20 @@ class HostTable(qt.QTableWidget):
             
 
     def addNameAndUrl(self, name, url, setModfiable = [True, True]):
-        """ Adds a name and url to the table by adding a 
-            new row.
+        """ 
+        Adds a name and url to the table by adding a 
+        new row.
+
+        @param name: The name of the host to add.
+        @type name: str
+
+        @param url: The url of the host to add.
+        @type url: str
+
+        @param setModifiable: Whether the name and url is modfiable (adjusts
+           the QTableWidgetItem's flags acoordinly).  Ideally there would be a 
+           more elegant way to do this.
+        @type setModifiable: list(bool, bool)
         """
 
         #--------------------
@@ -611,7 +662,7 @@ class HostTable(qt.QTableWidget):
         # Set the added items' aeshetics.
         #--------------------
         for key, item in self.trackedItems[self.rowCount-1].iteritems():
-            item.setFont(XnatSlicerGlobals.LABEL_FONT)
+            item.setFont(Settings_Hosts.LABEL_FONT)
 
 
 
@@ -635,11 +686,15 @@ class HostTable(qt.QTableWidget):
         
         
     def addUsername(self, username):
-        """ Adds username to row, storing within the class
-            'trackedItems' and adding it to the table.
-            
-            For more information on 'trackedItems' please
-            see its declaration in the __init__ function.
+        """ 
+        Adds username to row, storing within the class
+        'trackedItems' and adding it to the table.
+        
+        For more information on 'trackedItems' please
+        see its declaration in the __init__ function.
+
+        @param username: The username to add.
+        @type username: str
         """
         self.trackedItems[self.rowCount-1]['stored login'].setText(username)
         self.setItem(self.rowCount-1, self.getColumn('stored login'), \
@@ -649,27 +704,29 @@ class HostTable(qt.QTableWidget):
 
 
 
-        
-###########################################################################################################
+    
+###########################################################################
 #
-#                UI FUNCTIONS
+#                                UI FUNCTIONS
 #
-# These exist because the tend to clutter up
-# __init__ functions.  They deal primarily with 
-# setting up, aesthetics of various QWidgets and modals needed
-# for adding hosts.
+# These exist because they tend to clutter up __init__ functions.  They deal 
+# primarily with setting up the aesthetics of various QWidgets and modals 
+# needed for adding hosts.
 #
-###########################################################################################################
+############################################################################
+def makeAddHostModal(_Settings_Hosts):
+    """
+    Creates the modal for adding hosts.
 
-def makeAddHostModal(hostEditor):
-    """ As stated. 
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @param _Settings_Hosts: Settings_Hosts
     """
     
     #--------------------
     # Clear shared object lines
     #--------------------
-    hostEditor.nameLine.clear()
-    hostEditor.urlLine.clear()
+    _Settings_Hosts.nameLine.clear()
+    _Settings_Hosts.urlLine.clear()
 
 
 
@@ -685,9 +742,9 @@ def makeAddHostModal(hostEditor):
     # Create for line editors
     #--------------------
     currLayout = qt.QFormLayout()
-    currLayout.addRow("Name:", hostEditor.nameLine)
-    currLayout.addRow("URL:", hostEditor.urlLine)
-    currLayout.addRow(hostEditor.setDefault)
+    currLayout.addRow("Name:", _Settings_Hosts.nameLine)
+    currLayout.addRow("URL:", _Settings_Hosts.urlLine)
+    currLayout.addRow(_Settings_Hosts.setDefault)
 
 
 
@@ -713,7 +770,7 @@ def makeAddHostModal(hostEditor):
     #--------------------
     # Make window
     #--------------------
-    addHostModal = qt.QDialog(hostEditor.addButton)
+    addHostModal = qt.QDialog(_Settings_Hosts.addButton)
     addHostModal.setWindowTitle("Add Host")
     addHostModal.setFixedWidth(300)
     addHostModal.setLayout(masterForm)
@@ -724,7 +781,7 @@ def makeAddHostModal(hostEditor):
     #--------------------
     # Clear previous host
     #--------------------
-    hostEditor.prevName = None
+    _Settings_Hosts.prevName = None
 
     
 
@@ -732,7 +789,7 @@ def makeAddHostModal(hostEditor):
     # Button Connectors
     #--------------------
     cancelButton.connect("clicked()", addHostModal.close)
-    saveButton.connect("clicked()", hostEditor.writeHost)   
+    saveButton.connect("clicked()", _Settings_Hosts.writeHost)   
 
     
     return addHostModal
@@ -740,35 +797,39 @@ def makeAddHostModal(hostEditor):
 
 
 
-def makeEditHostModal(hostEditor):
-    """ As stated.
+def makeEditHostModal(_Settings_Hosts):
+    """ 
+    As stated.
+
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @param _Settings_Hosts: Settings_Hosts
     """
 
     #--------------------
     # Get selected strings from host list.
     #--------------------
-    selHost = hostEditor.hostTable.currentRowItems
+    selHost = _Settings_Hosts.hostTable.currentRowItems
 
 
     
     #--------------------
     # Populate the line edits from selecting strings.
     #--------------------
-    hostEditor.nameLine.setText(selHost['name'])
-    hostEditor.urlLine.setText(selHost['url'])
+    _Settings_Hosts.nameLine.setText(selHost['name'])
+    _Settings_Hosts.urlLine.setText(selHost['url'])
 
 
 
     #--------------------
     # Prevent editing of default host. 
     #--------------------
-    if not hostEditor.SettingsFile.isModifiable(selHost['name']):
-        hostEditor.nameLine.setReadOnly(True)
-        hostEditor.nameLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC)
-        hostEditor.nameLine.setEnabled(False)
-        hostEditor.urlLine.setReadOnly(True)
-        hostEditor.urlLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC)
-        hostEditor.urlLine.setEnabled(False)
+    if not _Settings_Hosts.SettingsFile.isModifiable(selHost['name']):
+        _Settings_Hosts.nameLine.setReadOnly(True)
+        _Settings_Hosts.nameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
+        _Settings_Hosts.nameLine.setEnabled(False)
+        _Settings_Hosts.urlLine.setReadOnly(True)
+        _Settings_Hosts.urlLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
+        _Settings_Hosts.urlLine.setEnabled(False)
 
 
         
@@ -776,8 +837,8 @@ def makeEditHostModal(hostEditor):
     # Otherwise, go ahead.
     #--------------------
     else:
-        hostEditor.nameLine.setEnabled(True)
-        hostEditor.urlLine.setEnabled(True)
+        _Settings_Hosts.nameLine.setEnabled(True)
+        _Settings_Hosts.urlLine.setEnabled(True)
 
 
 
@@ -793,17 +854,17 @@ def makeEditHostModal(hostEditor):
     # Layouts.
     #--------------------
     currLayout = qt.QFormLayout()
-    hostEditor.prevName = hostEditor.nameLine.text
-    currLayout.addRow("Edit Name:", hostEditor.nameLine)
-    currLayout.addRow("Edit URL:", hostEditor.urlLine)
+    _Settings_Hosts.prevName = _Settings_Hosts.nameLine.text
+    currLayout.addRow("Edit Name:", _Settings_Hosts.nameLine)
+    currLayout.addRow("Edit URL:", _Settings_Hosts.urlLine)
 
 
 
     #--------------------
     # Default checkbox if default.
     #--------------------
-    if hostEditor.SettingsFile.isDefault(hostEditor.nameLine.text):
-        hostEditor.setDefault.setCheckState(2)
+    if _Settings_Hosts.SettingsFile.isDefault(_Settings_Hosts.nameLine.text):
+        _Settings_Hosts.setDefault.setCheckState(2)
 
 
 
@@ -818,13 +879,13 @@ def makeEditHostModal(hostEditor):
     #--------------------
     # Layouts.
     #--------------------
-    currLayout.addRow(hostEditor.setDefault)
-    hostEditor.usernameLine.setText(hostEditor.\
+    currLayout.addRow(_Settings_Hosts.setDefault)
+    _Settings_Hosts.usernameLine.setText(_Settings_Hosts.\
                                     SettingsFile.getCurrUsername(\
-                                                hostEditor.nameLine.text))
+                                                _Settings_Hosts.nameLine.text))
     currLayout.addRow(spaceLabel)
     currLayout.addRow(unmLabel)
-    currLayout.addRow(hostEditor.usernameLine)
+    currLayout.addRow(_Settings_Hosts.usernameLine)
     
     buttonLayout = qt.QHBoxLayout()
     buttonLayout.addStretch(1)
@@ -840,7 +901,7 @@ def makeEditHostModal(hostEditor):
     #--------------------
     # The modal.
     #--------------------
-    editHostModal = qt.QDialog(hostEditor.addButton)
+    editHostModal = qt.QDialog(_Settings_Hosts.addButton)
     editHostModal.setWindowTitle("Edit Host")
     editHostModal.setFixedWidth(300)
     editHostModal.setLayout(masterForm)
@@ -852,21 +913,25 @@ def makeEditHostModal(hostEditor):
     # Button Connectors
     #--------------------
     cancelButton.connect("clicked()", editHostModal.close)
-    saveButton.connect("clicked()", hostEditor.rewriteHost) 
+    saveButton.connect("clicked()", _Settings_Hosts.rewriteHost) 
 
     return editHostModal
 
 
 
 
-def makeDeleteHostModal(hostEditor):
-    """ As stated.
+def makeDeleteHostModal(_Settings_Hosts):
+    """ 
+    As stated.
+
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @param _Settings_Hosts: Settings_Hosts
     """
 
     #--------------------
     # get selected strings from host list
     #--------------------
-    selHost = hostEditor.hostTable.currentRowItems
+    selHost = _Settings_Hosts.hostTable.currentRowItems
 
 
     
@@ -916,7 +981,7 @@ def makeDeleteHostModal(hostEditor):
     #--------------------
     # Window
     #--------------------
-    deleteHostModal = qt.QDialog(hostEditor.addButton)
+    deleteHostModal = qt.QDialog(_Settings_Hosts.addButton)
     deleteHostModal.setWindowTitle("Delete Host")
     deleteHostModal.setLayout(masterForm)
     deleteHostModal.setWindowModality(1)
@@ -927,7 +992,7 @@ def makeDeleteHostModal(hostEditor):
     # Button Connectors
     #--------------------
     cancelButton.connect("clicked()", deleteHostModal.close)
-    okButton.connect("clicked()", hostEditor.deleteHost) 
+    okButton.connect("clicked()", _Settings_Hosts.deleteHost) 
     
     return deleteHostModal
 
@@ -935,22 +1000,26 @@ def makeDeleteHostModal(hostEditor):
 
 
 
-def makeButtons(hostEditor):
-    """ As described.
+def makeButtons(_Settings_Hosts):
+    """ 
+    As described.
+
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @param _Settings_Hosts: Settings_Hosts
     """
     addButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Add', 
                                          toolTip = "Need tool-tip.", 
-                                         font = XnatSlicerGlobals.LABEL_FONT,
+                                         font = Settings_Hosts.LABEL_FONT,
                                          size = qt.QSize(90, 20), 
                                          enabled = True)
     editButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Edit', 
                                           toolTip = "Need tool-tip.", 
-                                          font = XnatSlicerGlobals.LABEL_FONT,
+                                          font = Settings_Hosts.LABEL_FONT,
                                           size = qt.QSize(90, 20), 
                                           enabled = True)
     deleteButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Delete', 
                                             toolTip = "Need tool-tip.", 
-                                            font = XnatSlicerGlobals.LABEL_FONT,
+                                            font = Settings_Hosts.LABEL_FONT,
                                             size = qt.QSize(90, 20), 
                                             enabled = True)
     
@@ -962,8 +1031,12 @@ def makeButtons(hostEditor):
 
 
 
-def makeSharedHostModalObjects(hostEditor):
-    """ Makes commonly shared UI objects for the Add, Edit popups.
+def makeSharedHostModalObjects(_Settings_Hosts):
+    """ 
+    Makes commonly shared UI objects for the Add, Edit popups.
+
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @param _Settings_Hosts: Settings_Hosts
     """
     urlLine = qt.QLineEdit()
     nameLine = qt.QLineEdit()
@@ -972,6 +1045,6 @@ def makeSharedHostModalObjects(hostEditor):
         
     urlLine.setEnabled(True)
     nameLine.setEnabled(True) 
-    usernameLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC) 
+    usernameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC) 
 
     return urlLine, nameLine, setDefault, usernameLine 

@@ -1,39 +1,35 @@
+# application
+from __main__ import qt
+
 # external
-from Xnat import *
 from MokaUtils import *
-
-# module
-from XnatSlicerGlobals import *
-from MetadataEditorSet import *
-
 
 
     
 class FontSetting(object):
     """ 
+    FontSetting is a parent class that is inherited by any Setting class that
+    aims to make use of a font dropdown.  It creates and manages the various
+    events related to this widget.
     """
-
+    FONT_SIZE = 10
     MAX_FONT_SIZE = 8
     MIN_FONT_SIZE = 21
 
     def createFontSizeDropdown(self, title = "Font Size:" ):
         """ 
-        Adds a fontSize dropdown to the layout
-        of the XnatSetting.  The subclass then
-        needs to specify how to connect the events
-        of the dropdown.
+        Adds a fontSize dropdown to the layout of the XnatSetting.  The 
+        subclass then needs to specify how to connect the events of the 
+        dropdown.
 
         @param title: The title of the dropdown.
         @type title: str
         """
-        
-
-        fontStorageTag = self.getFontStorageTag(title)
-
 
         if not hasattr(self, 'fontDropdowns'):
             self.fontDropdowns = {}
 
+        fontStorageTag = self.getFontStorageTag(title)
 
         #--------------------
         # Derive the storage.
@@ -84,6 +80,13 @@ class FontSetting(object):
 
     def getFontStorageTag(self, string):
         """
+        Makes the FontStorage tag for retreiving data from the SettingsFile.
+
+        @param string: The string to derive the tag from.
+        @type string: str
+
+        @return: The font storage tag constructed from the argument.
+        @rtype: str
         """
         return MokaUtils.string.toCamelCase(string)
 
@@ -92,29 +95,44 @@ class FontSetting(object):
 
     def __constructDefaults(self, section):
         """
+        Assigns the DEFAULT value to the font dropdown pertaining to 'section'.
+
         @param section: The section for reference in the defaults dict.
         @type section: str
         """
         self.DEFAULTS[section] = {}
-        self.DEFAULTS[section]= XnatSlicerGlobals.FONT_SIZE
+        self.DEFAULTS[section]= FontSetting.FONT_SIZE
 
 
 
 
-    def getStoredFont(self, key):
+    def getStoredFont(self, tag):
         """
+        Gets the stored font based on the storage tag.
+
+        @param tag: The tag to construct the storage tag from.
+        @type tag: str
+
+        @return: The stored setting for the font.
+        @rtype: str
         """
         return self.SettingsFile.getSetting(self.currXnatHost, 
-                                            self.getFontStorageTag(key))
+                                            self.getFontStorageTag(tag))
         
         
+
           
     def __onFontSizeChanged(self, size):
         """
+        Callback for the font dropdown change event.
+
+        @param size: Dummy argument for the dropdown change event.
+        @type size: str
         """
-        #print " FONT SIZE CHANGED!"
-        self.__syncFileTo()
         #MokaUtils.debug.lf()
+        # Store in settings file
+        self.__syncFileTo()
+        # Run callbacks.
         self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                       'FONT_SIZE_CHANGED')
         
@@ -123,6 +141,7 @@ class FontSetting(object):
 
     def __syncFileTo(self):
         """
+        Syncs the SettingsFile to the current value on the dropdown.
         """
         for key, dropdownList in self.fontDropdowns.iteritems():
             for dropdown in dropdownList:
@@ -133,6 +152,7 @@ class FontSetting(object):
 
     def __syncToFile(self):
         """
+        Syncs the dropdown to stored value in the SettingsFile.
         """
         for key, dropdownList in self.fontDropdowns.iteritems():
             fontSize = self.SettingsFile.getSetting(self.currXnatHost, 

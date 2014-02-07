@@ -3,7 +3,6 @@ from Xnat import *
 from MokaUtils import *
 
 # module
-from XnatSlicerGlobals import *
 from MetadataEditorSet import *
 
 
@@ -11,9 +10,9 @@ from MetadataEditorSet import *
     
 class MetadataEditorSetting(object):
     """ 
-    
+    Class for Setting widgets that aim to make use of the MetadataEditor class.
+    This class manages events SettingsFile syncing in a generic way.
     """
-  
     DEFAULT_METADATA = Xnat.metadata.DEFAULT_TAGS
     EVENT_TYPES = ['UPDATE', 'ITEMCLICKED']
             
@@ -24,18 +23,29 @@ class MetadataEditorSetting(object):
                                  editVisible = True,
                                  customEditVisible = False):
         """ 
-        Creates any number of metadata managers as 
-        specified by *args, which are string keys that 
-        are used to identify the metadata managers in
-        the MetadataEditorSets dictionary.
-        """
+        Creates any number of metadata managers as specified by arguments.
+        
+        @param section: The section to categorize the editor.
+        @type section: str
 
-        self.EVENT_TYPES = list(set(MetadataEditorSetting.EVENT_TYPES + 
-                                    self.EVENT_TYPES))
+        @param itemType: The item type of the editor (checkboxes or labels).
+        @type itemType: str
+
+        @param editVisible: Whether the editing buttons are visible in the 
+            editor.
+        @type editVisible: bool
+
+        @param customEditVisible: Whether the custom editing buttons are visible
+            in the editor.
+        @type customEditVisible: bool        
+        """
 
         if not hasattr(self, 'MetadataEditorSets'):
             self.MetadataEditorSets = {}
 
+
+        self.EVENT_TYPES = list(set(MetadataEditorSetting.EVENT_TYPES + 
+                                    self.EVENT_TYPES))
 
         #--------------------
         # The editor 
@@ -84,6 +94,7 @@ class MetadataEditorSetting(object):
         
     def __closeCollapsibles(self):
         """
+        Closes all of the collabsible frames of the editor.
         """
         for key, _set in self.MetadataEditorSets.iteritems():
             if _set.collapsibles:
@@ -96,7 +107,7 @@ class MetadataEditorSetting(object):
 
     def __updateUI(self):
         """
-        Deprecated?
+        Placeholder.
         """
         return
 
@@ -107,6 +118,11 @@ class MetadataEditorSetting(object):
 
     def __addCustomItem(self, editor):
         """
+        Propagates the addtion of a custom item to the provided MetadataEditor
+        in the argument.
+
+        @param editor: The MetadataEditor to make the changes to.  
+        @type editor: MetadataEditor
         """
 
         editorSection, storageTag, customStorageTag, \
@@ -117,7 +133,7 @@ class MetadataEditorSetting(object):
                        [lineText] + customItems}
             self.SettingsFile.setSetting(self.currXnatHost, tagDict)
             editor.lineEdit.clear()
-            MokaUtils.debug.lf()
+            #MokaUtils.debug.lf()
             self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
                                           self.__class__.__name__)
 
@@ -135,6 +151,11 @@ class MetadataEditorSetting(object):
 
     def __removeCustomItem(self, editor):
         """
+        Propagates the removal of a custom item to the provided MetadataEditor
+        in the argument.
+
+        @param editor: The MetadataEditor to make the changes to.  
+        @type editor: MetadataEditor
         """
 
         editorSection, storageTag, customStorageTag, \
@@ -168,12 +189,14 @@ class MetadataEditorSetting(object):
         #self.MODULE.SettingsWindow.updateSettingWidgets()
 
 
-        
-        
 
 
     def __setEditorCallbacks(self, editorSet):
         """
+        Applies event callbacks to the given MetadataEditorSet.
+
+        @param editorSet: The MetadataEditorSet to make the changes to.  
+        @type editorSet: MetadataEditorSet
         """        
         for editor in editorSet.allEditors:
             editor.Events.onEvent('UPDATE', self.__syncToFile)
@@ -188,6 +211,8 @@ class MetadataEditorSetting(object):
 
     def __constructDefaults(self, section = 'metadata'):
         """
+        Constructs the default settings for the widget.
+
         @param section: The section for referring to the default.
         @type section: str
         """
@@ -207,6 +232,26 @@ class MetadataEditorSetting(object):
     def getStoredMetadata(self, editorOrEditorSection, level = None, 
                           itemsOnly = False):
         """
+        Gets the stored metadata from the given arguments.
+
+        @param editorOrEditorSection: The metadata editor to derive the 
+            XNAT level and section from OR the editor section string.
+        @type editorOrEditorSection: MetadataEditor | str
+
+        @param level:  The XNAT level of the section to refer to.
+        @type level: str
+
+        @param itemsOnly: Whether to return the stored items only (as opposed
+           to the section, and other metadata surrounding the items).
+        @type itemsOnly: bool
+
+        @return: A tuple potentially containing the following (depending on the
+            itemsOnly argument): 
+            - The tag used to retrieve the metadata from the SettingsFile.
+            - The custom storage tag used to retrieve the meadata from the 
+            Settings file.
+            - The saved non-custom metadata items in the SettingsFile.
+            - The saved custom metadata items in the SettingsFile.
         """
         if isinstance(editorOrEditorSection, MetadataEditor):
             editor = editorOrEditorSection
@@ -251,6 +296,10 @@ class MetadataEditorSetting(object):
 
     def __findMetadataEditorSection(self, editor):
         """
+        Determines the 'section' of the provided metadata editor.
+
+        @param editor: The MetadataEditor to find the section of.  
+        @type editor: MetadataEditor
         """
         for section, editorSet in self.MetadataEditorSets.iteritems():
             if editorSet.hasEditor(editor):
@@ -262,6 +311,17 @@ class MetadataEditorSetting(object):
 
     def linkToSetting(self, localSetKey, Setting, linkedSetKey):
         """
+        Links the current setting to another setting (used for propagating
+        custom metadata items into other editors) by storing it.
+
+        @param localSetKey:  The key to associate the linked setting with.
+        @type localSetKey: str
+
+        @param Setting: The setting to link to.
+        @type Setting: Setting
+
+        @param linkedSetKey: The set within the linked setting to link to.
+        @type linkedSetKey: str
         """
         assert isinstance(Setting, MetadataEditorSetting), "linkToSetting " + \
             "setting must inherit from MetadataEditorSetting!"
@@ -279,6 +339,10 @@ class MetadataEditorSetting(object):
 
     def __syncFileTo(self, editor):
         """
+        Syncs the provided editor to the SettingsFile.
+
+        @param editor: The MetadataEditor to sync the SettingsFile to.  
+        @type editor: MetadataEditor
         """
 
         editorSection, storageTag, customStorageTag, \
@@ -303,6 +367,10 @@ class MetadataEditorSetting(object):
 
     def __syncToFile(self, editor = None):
         """
+        Syncso the SettingsFile to the provided editor.
+
+        @param editor: The MetadataEditor to sync the SettingsFile to.  
+        @type editor: MetadataEditor
         """
 
         #--------------------

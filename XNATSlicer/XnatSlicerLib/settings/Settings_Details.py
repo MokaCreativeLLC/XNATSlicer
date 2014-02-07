@@ -1,3 +1,6 @@
+# python
+from collections import OrderedDict
+
 # external
 from Xnat import *
 
@@ -5,13 +8,14 @@ from Xnat import *
 from Settings import *
 from FontSetting import *
 from MetadataEditorSetting import *
-from XnatSlicerGlobals import *
+from CheckBoxSetting import *
+
 
 
 
     
-class Settings_Details(FontSetting, 
-                       MetadataEditorSetting, Settings):
+class Settings_Details(FontSetting, MetadataEditorSetting, CheckBoxSetting, 
+                       Settings):
     """ 
     Settings_Details is the Settings pertaining to
     the 'NodeDetails' class.  This class specifically
@@ -26,22 +30,36 @@ class Settings_Details(FontSetting,
 
     LABEL_FONT_SIZE = 'Details Font Size' 
     LABEL_METADATA = 'Details Metadata' 
+    CHECKBOXES = OrderedDict([
+        ('empty', {
+            'tag': 'showEmptyMetadata',
+            'desc': 'Display metadata with empty values.',
+            'checked': True,
+            'event': 'SHOWEMPTY'
+        })
+    ])
+
+
 
     def setup(self):
         """
         Method inherited from parent function.
         """
-        #--------------------
-        # Add the fontSizeDropdown
-        #--------------------
-        self.createFontSizeDropdown(self.LABEL_FONT_SIZE)
-        
+        self.createCheckBoxes()
         self.addSpacing()
-
-        #--------------------
-        # Create the metadata managers and their labels.
-        #--------------------
+        self.addSpacing()
+        self.createFontSizeDropdown(self.LABEL_FONT_SIZE)
+        self.addSpacing()
         self.createMetadataEditorSets(self.LABEL_METADATA, 
                                       itemType = 'checkbox', 
                                       editVisible = True,
                                       customEditVisible = False) 
+
+
+
+
+
+
+
+
+        

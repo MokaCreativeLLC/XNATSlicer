@@ -736,8 +736,8 @@ class MokaUtils(object):
 
             elif eventKey in self.__eventTypes and \
                  not eventKey in self.eventCallbacks__:
-                MokaUtils.debug.lf("Warning: dynamically added " + \
-                                   "event key %s"%(eventKey))
+                #MokaUtils.debug.lf("Warning: dynamically added " + \
+                #                   "event key %s"%(eventKey))
                 self.eventCallbacks__[eventKey] = []
                 
             self.eventCallbacks__[eventKey].append(callback)

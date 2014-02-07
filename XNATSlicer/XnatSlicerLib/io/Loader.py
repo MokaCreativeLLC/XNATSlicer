@@ -267,7 +267,7 @@ class Loader_Images(Loader):
         cacheSetting = self.MODULE.Settings['CACHE']
         useCachedSettingList = self.MODULE.SettingsFile.getSetting(
             self.MODULE.LoginMenu.hostDropdown.currentText,
-            cacheSetting.getStorageTag())
+            cacheSetting.getCheckBoxStorageTag('images'))
 
         #MokaUtils.debug.lf("USE CACHED SETTING", useCachedSettingList)
         useCachedSetting = True if (len(useCachedSettingList) > 0 and \

@@ -1,7 +1,5 @@
 # python
 import os
-import sys
-import shutil
 
 # application
 from __main__ import qt
@@ -21,6 +19,12 @@ class SearchBar(qt.QFrame):
     signal of the searchLine to a search method of their choice.
     """
     
+    FONT_NAME = 'Arial'
+    FONT_SIZE = 11
+    LABEL_FONT =  qt.QFont(FONT_NAME, FONT_SIZE, 10, False)        
+    LABEL_FONT_ITALIC =  qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
+
+
     def __init__(self, MODULE):
         """ Init function.
         """
@@ -52,7 +56,8 @@ class SearchBar(qt.QFrame):
         # The search button
         #--------------------------------
         self.button = qt.QPushButton('')
-        self.button.setIcon(qt.QIcon(os.path.join(XnatSlicerGlobals.LOCAL_URIS['icons'], 'search.png')) )
+        self.button.setIcon(qt.QIcon(os.path.join(\
+                        XnatSlicerGlobals.LOCAL_URIS['icons'], 'search.png')) )
         size = qt.QSize(self.widgetHeight, self.widgetHeight)
         self.button.setFixedSize(size)
         self.button.connect('clicked()', self.onClearButtonClicked)
@@ -82,7 +87,8 @@ class SearchBar(qt.QFrame):
         #
         # Widget aesthetics
         #
-        self.setStyleSheet('border: 1px solid rgb(160,160,160); border-radius: 3px;')
+        self.setStyleSheet('border: 1px solid rgb(160,160,160); ' + 
+                           'border-radius: 3px;')
         self.setFixedHeight(self.widgetHeight)
         #
         # Search box aesthetics
@@ -136,24 +142,27 @@ class SearchBar(qt.QFrame):
                 
 
     def applyTextStyle(self, mode):
-        """ Applies a stylistic change to text depending on the
-            'mode' argument specified.  Empty searchLines are 
-            italicized.
+        """ 
+        Applies a stylistic change to text depending on the
+        'mode' argument specified.  Empty searchLines are 
+        italicized.
         """
         if mode == 'empty':
-            self.searchLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC) 
+            self.searchLine.setFont(SearchBar.LABEL_FONT_ITALIC) 
             palette = qt.QPalette();
             color = qt.QColor(150,150,150)
             palette.setColor(6, color);
             self.searchLine.setPalette(palette);
             self.searchLine.update()
-            self.searchLine.setFont(XnatSlicerGlobals.LABEL_FONT_ITALIC) 
-            self.searchLine.setObjectName("searchLine")
-            self.searchLine.setStyleSheet("#searchLine {color: lightgray; border: none}")
+            self.searchLine.setFont(SearchBar.LABEL_FONT_ITALIC) 
+            self.searchLine.setObjectName('searchLine')
+            self.searchLine.setStyleSheet('#searchLine {color: lightgray;' 
+                                          + 'border: none}')
         
         elif mode == 'not empty':
-            self.searchLine.setStyleSheet("#searchLine {color: rgb(20,40, 200); border: none}")
-            self.searchLine.setFont(XnatSlicerGlobals.LABEL_FONT) 
+            self.searchLine.setStyleSheet('#searchLine {color: rgb(20,40,' + 
+                                          '200); border: none}')
+            self.searchLine.setFont(SearchBar.LABEL_FONT) 
             palette = qt.QPalette();
             color = qt.QColor(0,0,0)
             palette.setColor(6, color);
@@ -163,10 +172,11 @@ class SearchBar(qt.QFrame):
             
         
     def onSearchLineFocused(self):
-        """ Signal method for when the user interacts with the 
-            searchLine.  We reapply the default text if the user
-            clears the search line or deletes all the way to the 
-            0 cursor position.
+        """ 
+        Signal method for when the user interacts with the 
+        searchLine.  We reapply the default text if the user
+        clears the search line or deletes all the way to the 
+        0 cursor position.
         """
 
 
@@ -190,11 +200,12 @@ class SearchBar(qt.QFrame):
             
 
     def onClearButtonClicked(self):
-        """ Callback function for when the clear button is clicked.
-            Applies the default text in the searchLine and awaits the
-            user to click ont the searchLine so it can clear it by linking
-            the 'cursorPositionChanged' signal to 'onSearchBoxCursorPositionChanged'
-            function.
+        """ 
+        Callback function for when the clear button is clicked.
+        Applies the default text in the searchLine and awaits the
+        user to click ont the searchLine so it can clear it by linking
+        the 'cursorPositionChanged' signal to 'onSearchBoxCursorPositionChanged'
+        function.
         """
 
         
@@ -215,9 +226,10 @@ class SearchBar(qt.QFrame):
         
 
     def getText(self):
-        """ As stated.  Generic method for classes that access
-            the SearchBar without going into the depth of 
-            the widget
+        """ 
+        As stated.  Generic method for classes that access
+        the SearchBar without going into the depth of 
+        the widget
         """
         return self.searchLine.text.strip()
 
@@ -225,8 +237,8 @@ class SearchBar(qt.QFrame):
 
     
     def getButton(self):
-        """ Returns the button of the SearchBar, which
-            is the 'clear' button.
+        """ 
+        Returns the button of the SearchBar, which is the 'clear' button.
         """
         return self.button
 
@@ -234,7 +246,8 @@ class SearchBar(qt.QFrame):
     
 
     def getSearchLine(self):
-        """ As stated.
+        """ 
+        As stated.
         """
         return self.searchLine
 
@@ -242,10 +255,11 @@ class SearchBar(qt.QFrame):
     
 
     def connect(self, function):
-        """ For external classes to link the 'returnPressed' signal
-            to a given function.  In this case, it's a search method
-            provided by the View class (and subclasses) and
-            the XnatIo class.
+        """ 
+        For external classes to link the 'returnPressed' signal
+        to a given function.  In this case, it's a search method
+        provided by the View class (and subclasses) and
+        the XnatIo class.
         """
         self.searchLine.connect("returnPressed()", function)
     
