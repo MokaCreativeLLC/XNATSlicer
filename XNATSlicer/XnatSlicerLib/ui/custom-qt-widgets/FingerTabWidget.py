@@ -1,34 +1,22 @@
+# application
 from __main__ import qt
-
-import os
-import glob
-import sys
-
-
-
-
-comment = """
-FingerTabWidget is a subclass of QWidget that allows for the creation
-and display of finger-tabbed pages.  Finger tabs are horizontally layed out tabs
-on the left of a given widget.
-
-TODO:
-"""
-
 
 
 
 class FingerTabWidget(qt.QWidget):
-    """ Descriptor above.
+    """ 
+    FingerTabWidget is a subclass of QWidget that allows for the creation
+    and display of finger-tabbed pages.  Finger tabs are horizontally layed 
+    out tabs on the left of a given widget.
     """
     
     def __init__(self, parent, *args, **kwargs):
-        """ Init function.
+        """ 
+        Init function.
         """
 
         super(FingerTabWidget, self).__init__(parent)
 
-        
         
         #--------------------
         # Define sizing parameters.
@@ -38,17 +26,17 @@ class FingerTabWidget(qt.QWidget):
         self.tabWidth = 120
 
 
-    
         #--------------------
         # Make and style 'tabColumn', which is a qFrame.
         #--------------------  
         self.tabColumn = qt.QFrame(self)
         self.tabColumn.setFixedWidth(self.tabWidth)
         self.tabColumn.setObjectName('tabColumn')
-        self.tabColumn.setStyleSheet('#tabColumn {background:#E8E8E8 ; height: 4000px;' + 
-                                     'border-right-width: 1px;  border-right-color: gray;' + 
-                                     'border-right-style: solid; margin-top: 5px;' +  
-                                     'margin-left: 5px; margin-bottom: 5px}')
+        self.tabColumn.setStyleSheet(
+                  '#tabColumn {background:#E8E8E8 ; height: 4000px;' + 
+                  'border-right-width: 1px;  border-right-color: gray;' + 
+                  'border-right-style: solid; margin-top: 5px;' +  
+                  'margin-left: 5px; margin-bottom: 5px}')
 
 
 
@@ -80,7 +68,8 @@ class FingerTabWidget(qt.QWidget):
         #--------------------  
         self.widgetStack = qt.QWidget(self)
         self.widgetStack.setObjectName("widgetStack")
-        self.widgetStack.setStyleSheet("#widgetStack{ border: none; background: transparent}")
+        self.widgetStack.setStyleSheet("#widgetStack{ border: none; " 
+                                       + "background: transparent}")
 
 
 
@@ -91,7 +80,8 @@ class FingerTabWidget(qt.QWidget):
         # and tabs of the widget.
         #--------------------  
         self.widgetStackLayout = qt.QHBoxLayout()
-        self.widgetStackLayout.setContentsMargins(0,self.marginVal,self.marginVal,self.marginVal)
+        self.widgetStackLayout.setContentsMargins(0,self.marginVal,
+                                                  self.marginVal,self.marginVal)
         self.widgetStackLayout.addSpacing(self.tabWidth - 1)
         self.widgetStack.setLayout(self.widgetStackLayout)
 
@@ -115,21 +105,27 @@ class FingerTabWidget(qt.QWidget):
         # Set their styles as well.
         #--------------------    
         self.buttonGroup = qt.QButtonGroup(self)
-        self.buttonGroup.connect('buttonClicked(QAbstractButton*)', self.onTabClicked)
+        self.buttonGroup.connect('buttonClicked(QAbstractButton*)', 
+                                 self.onTabClicked)
         self.tabButtons = []
         self.tabWidgets = []
         self.tabObjectName = 'fingerTab'
-        self.tabToggledStyle =  '#fingerTab {border: 1px solid gray;    border-right-width: 1px;  border-right-color: white; background-color: white;}'
-        self.tabUntoggledStyle ='#fingerTab {border: 1px solid #D0D0D0; border-right-width: 1px;  border-right-color: gray;  background-color: #C0C0C0;}'
+        self.tabToggledStyle =  '#fingerTab {border: 1px solid gray;' + \
+                                'border-right-width: 1px;  ' + \
+                                'border-right-color: white; ' + \
+                                'background-color: white;}'
+        self.tabUntoggledStyle ='#fingerTab {border: 1px solid #D0D0D0; ' + \
+            'border-right-width: 1px;  border-right-color: gray; ' + \
+            'background-color: #C0C0C0;}'
         self.tabToggledFont = qt.QFont('Arial', 12, 100, False)
         self.tabUntoggledFont = qt.QFont('Arial', 12, 25, False)
 
 
         
         #--------------------
-        # Add 'tabColumn' and 'widgetStack' to 'innerWindowLayout'.  Set the current
-        # index of the widgetStack (this will allow for the black
-        # borders between the tabs and the windows to connect).
+        # Add 'tabColumn' and 'widgetStack' to 'innerWindowLayout'.  
+        # Set the current index of the widgetStack (this will allow for the 
+        # black borders between the tabs and the windows to connect).
         #--------------------  
         self.innerWindowLayout.addWidget(self.tabColumn)
         self.innerWindowLayout.addWidget(self.widgetStack)
@@ -251,9 +247,11 @@ class FingerTabWidget(qt.QWidget):
     
 
     def addTab(self, innerContentsWidget, tabName):
-        """ Creates a tab button and an inner contents widget
-            to add to the tabPage stack. The arguments are 'innerContentsWidget' 
-            which is the inner contents and the 'tabName.'
+        """ 
+        Creates a tab button and an inner contents widget
+        to add to the tabPage stack. The arguments are 
+        'innerContentsWidget' 
+        which is the inner contents and the 'tabName.'
         """
 
         
@@ -296,3 +294,66 @@ class FingerTabWidget(qt.QWidget):
         self.setLayout(None)
         self.setLayout(self.innerWindowLayout)
         self.innerWindowLayout.setCurrentIndex(0)
+
+
+
+
+    def setAllTabsEnabled(self, enabled):
+        """
+        Sets all tabs either enabled or disabled.
+
+        @param enabled: The state of the tabs.
+        @type enabled: bool
+        """
+        for i in range(0, len(self.tabButtons)):
+            self.tabButtons[i].setEnabled(enabled)
+            self.tabWidgets[i].setEnabled(enabled)
+        
+
+
+
+    def setTabEnabled(self, tabName):
+        """
+        Sets a tabs either enabled or disabled.
+
+        @param tabName: The tab name to enable / disable.
+        @type tabName: str
+        """
+        for i in range(0, len(self.tabButtons)):
+            if tabName == self.tabButtons[i].text:
+                self.tabButtons[i].setEnabled(True)
+                self.tabWidgets[i].setEnabled(True)
+                return
+
+
+
+    
+    def getTabIndex(self, tabName):
+        """
+        @param tabName: The tab name to refer to.
+        @type tabName: str
+
+        @return: The index of the tabName.
+        @rtype: int
+        """
+        for i in range(0, len(self.tabButtons)):
+            if tabName == self.tabButtons[i].text:
+                return i
+
+
+
+
+    def setTab(self, tabName):
+        """ 
+        Changes the settingsAreaLayout index (a QStackedLayout)
+        to the relevant settings widget based on the 'settingsName'
+        argument.
+
+        @param tabName: The tab name to refer to.
+        @type tabName: str
+        """
+
+        if not tabName or len(tabName.strip()) == 0:
+            self.setCurrentIndex(self.currentIndex)
+        else:
+            self.setCurrentIndex(self.getTabIndex(tabName))

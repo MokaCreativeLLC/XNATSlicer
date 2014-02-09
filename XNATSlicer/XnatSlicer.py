@@ -805,6 +805,7 @@ class XnatSlicerWidget:
       for key in self.__loggedIn:
         self.__loggedIn[key] = False
       self.__loggedIn[self.LoginMenu.currHostName] = True
+      self.__setSettingsWindowLoggedIn()
       
 
         
@@ -898,12 +899,14 @@ class XnatSlicerWidget:
 
 
 
-
         
     def onLoginFailed(self, callback = None):
       """
       """
+      for key in self.__loggedIn:
+        self.__loggedIn[key] = False
       self.__contractCollapsibles(callback)
+      self.__setSettingsWindowLoggedOut()
         
 
 
@@ -1208,6 +1211,7 @@ class XnatSlicerWidget:
       As stated.
       """
       isFontChange = args and 'FONT_SIZE_CHANGED' in args
+      isHostChange = args and self.Settings['HOSTS'].__class__.__name__ in args
 
       #MokaUtils.debug.lf(args[0])
       for key, Setting in self.Settings.iteritems():
@@ -1218,8 +1222,7 @@ class XnatSlicerWidget:
         self.NodeDetails.updateFromSettings()
       if hasattr(self, 'View'):
         self.View.updateFromSettings()
-      if hasattr(self, 'LoginMenu') and not isFontChange:
-        #MokaUtils.debug.lf()
+      if hasattr(self, 'LoginMenu') and isHostChange:
         self.LoginMenu.updateFromSettings()
       #except Exception, e:
       #  print (MokaUtils.debug.lf(str(e)))
@@ -1323,7 +1326,25 @@ class XnatSlicerWidget:
       
       # This exists basically for running the collapse anim
       self.__loggedIn = {}
-      self.LoginMenu.loadDefaultHost()   
+      self.LoginMenu.loadDefaultHost() 
+      self.__setSettingsWindowLoggedOut()
+
+
+
+
+    def __setSettingsWindowLoggedOut(self):
+      """
+      """
+      self.SettingsWindow.setAllTabsEnabled(False)
+      self.SettingsWindow.setTabEnabled('Hosts')
+
+
+
+
+    def __setSettingsWindowLoggedIn(self):
+      """
+      """
+      self.SettingsWindow.setAllTabsEnabled(True)
 
 
 

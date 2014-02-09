@@ -10,7 +10,6 @@ from XnatSlicerUtils import *
 
 
 
-
 class NodeDetails(qt.QWidget):
     """
     NodeDetails inherits QTextEdit and is the display widget
@@ -23,24 +22,23 @@ class NodeDetails(qt.QWidget):
     DEFAULT_FONT_SIZE = 11
     DEFAULT_FONT = qt.QFont('Arial', DEFAULT_FONT_SIZE, 10, False)  
 
-    def __init__(self, Setting = None, numColumns = 2):
+    def __init__(self, Setting = None):
         """ 
         @param Setting: The Setting to associate with the widget 
             (i.e. Setting_Details)
         @type Setting: Setting
         """
-
+    
         super(NodeDetails, self).__init__()
 
-        self.Setting = Setting
-        self.Setting.Events.onEvent('SHOWEMPTY', self.__showEmptyMetadata)
         self.storedDetailsDict = None
+        self.Setting = Setting
         self.currFont = NodeDetails.DEFAULT_FONT
 
         self._layout = qt.QFormLayout()
         self._layout.setContentsMargins(0,0,0,0)
 
-        self.numColumns = numColumns
+        self.numColumns = 2
             
         self.__textViewer = qt.QTextEdit(self)
         self.__textViewer.setReadOnly(True)
@@ -50,9 +48,17 @@ class NodeDetails(qt.QWidget):
 
         self._layout.addWidget(self.__textViewer)
         self.setLayout(self._layout)
-        self.updateFontFromSettings()
+
         
         self.__showEmptyMetadata = True
+
+        self.Setting.Events.onEvent('SHOWEMPTY', self.__toggleEmptyMetadata)
+        #--------------------
+        # NOTE: We call this so that the callback above will sync before load.
+        #-------------------- 
+        self.Setting.syncToFile()
+        self.updateFromSettings()
+        
 
 
 
@@ -80,13 +86,14 @@ class NodeDetails(qt.QWidget):
 
 
         
-    def __showEmptyMetadata(self, checked):
+    def __toggleEmptyMetadata(self, checked):
         """
         Stores the internal variable to show empty metadata values.
 
         @param checked: Whether to show the empty metadata.
         @type checked: bool
         """
+
         self.__showEmptyMetadata = checked
         self.setXnatNodeText(None)
 
@@ -143,7 +150,7 @@ class NodeDetails(qt.QWidget):
             detailsDict = self.storedDetailsDict
         else:
             self.storedDetailsDict = detailsDict
-
+    
         if not detailsDict:
             return
 
@@ -201,6 +208,7 @@ class NodeDetails(qt.QWidget):
         colCount = 0
         detailsText = """<table cellpadding="2">
 <tr>"""
+        value = ''
         for key, value in detailsDict.iteritems():
             if key in storedMetadata:
                 if key in Xnat.metadata.DEFAULT_DATE_TAGS:

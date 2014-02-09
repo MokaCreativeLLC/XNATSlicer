@@ -3,6 +3,7 @@ from __main__ import qt
 
 # external 
 from Xnat import *
+from MokaUtils import *
 
 # module
 from AnimatedCollapsible import *
@@ -101,6 +102,8 @@ class MetadataEditorSet(qt.QFrame):
             collapsible.suspendAnim(False)
 
 
+
+
     @property
     def allEditors(self):
         """
@@ -121,6 +124,7 @@ class MetadataEditorSet(qt.QFrame):
 
 
 
+
     def loopEditors(self, callback):
         """
         """
@@ -128,9 +132,7 @@ class MetadataEditorSet(qt.QFrame):
             callback(editor)
 
 
-
-
-            
+  
         
     def construct(self):
         """ Constructs the MetadataEditorSet widget.
@@ -181,10 +183,6 @@ class MetadataEditorSet(qt.QFrame):
             self.collapsibleLayouts[xnatLevel].\
                 addWidget(self.customMetadataEditors[xnatLevel], 1, 1, 1, 2)
             
-
-
-   
-
 
             #
             # Set DEFAULT label per xnat level.
@@ -292,8 +290,6 @@ class MetadataEditorSet(qt.QFrame):
 
 
 
-
-
     def setEditButtonsVisible(self, visible = None):
         """ Hides or shows the 'edit' metadata buttons
             that reside at the top of every collapsible
@@ -308,28 +304,25 @@ class MetadataEditorSet(qt.QFrame):
                 button.setVisible(self.editButtonsVisible)
 
 
-            
-
+                
 
     def editCustomClicked(self, button):
-        """ Callback when any of the 'editCustomButtons'
-            are clicked.  Descriptors below.
+        """ 
+        Callback when any of the 'editCustomButtons'
+        are clicked.  Descriptors below.
         """
         for xnatLevel, _button in self.editCustomButtons.iteritems():
             if button == _button:
                 self.Events.runEventCallbacks('editCustomClicked', 
                                               button, xnatLevel)
                 
-
-
-
-
         
 
                 
     def setCustomEditVisible(self, visible):
-        """ Sets the 'editLine' of every MetadataEditor 
-            visible.
+        """ 
+        Sets the 'editLine' of every MetadataEditor 
+        visible.
         """
         for key, metadataEditor in self.customMetadataEditors.iteritems():
             metadataEditor.setEditLineVisible(visible)
@@ -344,7 +337,7 @@ class MetadataEditorSet(qt.QFrame):
         of every MetadataEditor contained in the 
         MetadataEditorSet.
         """
-
+        MokaUtils.debug.lf()
         #--------------------
         # Updates the layout.
         #--------------------

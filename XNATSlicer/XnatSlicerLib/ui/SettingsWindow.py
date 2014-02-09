@@ -20,23 +20,13 @@ class SettingsWindow(FingerTabWidget):
         """ Descriptor
         """      
 
-
-        
         #--------------------
         # Call parent init.
         #--------------------
         super(SettingsWindow, self).__init__(parent)
-
         self.setWindowTitle("XNATSlicer Settings")
- 
         self.MODULE = MODULE
         self.settingsDict = {}
-
-
-        #self.setTabPosition(2)
-
-        #self.tabBar().setStyle(newStyle);
-
 
         
         #--------------------
@@ -46,26 +36,13 @@ class SettingsWindow(FingerTabWidget):
         self.setFixedHeight(400)
         self.setWindowModality(0)
         self.hide()
-
-        
-        
-
         #self.masterLayout.addWidget(self.closeButton, 1, 1)
-
-
-
         self.settingsWidgets = []
-
-
-
         self.connect('currentChanged(int)', self.updateSettingWidgets)
-
-
         self.addCancelAndDoneButton()
 
-
-
     
+
         
     def addCancelAndDoneButton(self):
         """
@@ -84,20 +61,15 @@ class SettingsWindow(FingerTabWidget):
             
         self.cancelButton.connect('clicked()', restoreSettings)
 
-        
-        
+
         doneButtonRow = qt.QHBoxLayout()
         doneButtonRow.addStretch()
         doneButtonRow.addWidget(self.doneButton)
         doneButtonRow.addWidget(self.cancelButton)
         #doneButtonRow.addSpacing(5)
 
-
-
-        
         doneButtonRow.setContentsMargins(5,5,5,5)
         self.mainWidgetLayout.addLayout(doneButtonRow)
-
 
 
         
@@ -106,8 +78,6 @@ class SettingsWindow(FingerTabWidget):
         """
         """
 
-
-        
         ##print "(Settings Window) SETTINGS WINDOW UPDATE:"
         #--------------------
         # Remove the metadata editor from the previous settings.
@@ -131,9 +101,7 @@ class SettingsWindow(FingerTabWidget):
         """ 
 
         self.setTab(settingName)
-
         self.MODULE.SettingsFile.backupCurrentSettings()
-        
         #--------------------
         # Reposition window if argument is true.
         #--------------------
@@ -144,7 +112,6 @@ class SettingsWindow(FingerTabWidget):
             y = screenMainPos.y() + mainWindow.height/2 - self.height/2
             self.move(qt.QPoint(x,y))
 
-            
 
         #--------------------
         # Show the window.
@@ -152,7 +119,6 @@ class SettingsWindow(FingerTabWidget):
         self.show()
         self.raise_()
         
-
         
         #--------------------
         # Sync the Metadata settings dropdown with the login menu
@@ -160,29 +126,6 @@ class SettingsWindow(FingerTabWidget):
         self.MODULE.Settings['METADATA'].update()
         self.updateSettingWidgets()
         
-
-
-        
-
-        
-
-    def setTab(self, settingName):
-        """ Changes the settingsAreaLayout index (a QStackedLayout)
-            to the relevant settings widget based on the 'settingsName'
-            argument.
-        """
-
-        if not settingName or len(settingName.strip()) == 0:
-            self.setCurrentIndex(self.currentIndex)
-            
-        for i in range(0, len(self.settingsWidgets)):
-            sDict = self.settingsWidgets[i]
-            ##print "***********", sDict, settingName
-            if sDict['name'] == settingName:
-                self.setCurrentIndex(i)
-                return
-        
-
             
 
         
@@ -196,12 +139,12 @@ class SettingsWindow(FingerTabWidget):
         
 
 
-    def addSetting(self, settingName, widget = None):
+    def addSetting(self, tabName, widget = None):
         """ Inserts a setting into the settings window.
         """
 
-        self.settingsWidgets.append({'widget': widget, 'name': settingName})
-        self.addTab(widget, settingName)
+        self.settingsWidgets.append({'widget': widget, 'name': tabName})
+        self.addTab(widget, tabName)
         widget.update()
 
 
@@ -286,17 +229,17 @@ class SettingsLister(qt.QTextEdit):
 
 
             
-    def selectSetting(self, settingName):
+    def selectSetting(self, tabName):
         """ Highlights a settingsName within the 
             text of the object.
         """
         
         #--------------------
         # Get the text of the widget
-        # then find the index of the 'settingName'
+        # then find the index of the 'tabName'
         #--------------------
         text = self.toPlainText()
-        settingNameIndex = text.find(settingName)
+        tabNameIndex = text.find(tabName)
 
 
 
@@ -305,8 +248,8 @@ class SettingsLister(qt.QTextEdit):
         # the text based on the index name and text length.
         #--------------------
         cursor = qt.QTextCursor(self.textCursor())
-        cursor.setPosition(settingNameIndex, 0);
-        cursor.setPosition(settingNameIndex + len(settingName), 1)
+        cursor.setPosition(tabNameIndex, 0);
+        cursor.setPosition(tabNameIndex + len(tabName), 1)
         self.setTextCursor(cursor)
 
         
@@ -367,8 +310,9 @@ class SettingsLister(qt.QTextEdit):
 
 class CustomTabStyle(qt.QProxyStyle):
     """
-       Reinterpreted from C++ here:
-       http://www.qtcentre.org/threads/13293-QTabWidget-customization?highlight=QTabWidget
+    Reinterpreted from C++ here:
+    http://www.qtcentre.org/threads/13293-QTabWidget-customization
+        ?highlight=QTabWidget
     """
 
 
@@ -390,18 +334,12 @@ class CustomTabStyle(qt.QProxyStyle):
     def drawControl(self, element, option, painter, widget):
         """
         """
-
-        
         if element == qt.QStyle.CE_TabBarTabLabel:
             #if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             tab = qt.QStyleOptionTab
             opt.shape = qt.QTabBar.RoundedNorth
             qt.QProxyStyle.drawControl(element, opt, painter, widget)
             return       
-        
-            
-
-            
         
         qt.QProxyStyle.drawControl(element, option, painter, widget)
     
