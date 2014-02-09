@@ -138,7 +138,9 @@ class XnatDownloadPopup(XnatEmptyPopup):
     specifically to downloading files.
     """
     
-    
+    FONT_NAME = 'Arial'
+    FONT_SIZE = 10
+    LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False)
 
     def __init__(self, title = "XNAT Download Queue", memDisplay = "MB"):
         """ 
@@ -182,9 +184,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
             on the URI
         """
 
-        FONT_NAME = 'Arial'
-        FONT_SIZE = '10'
-        LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False)
+
         
         #-------------------
         # Cancel button row

@@ -12,42 +12,17 @@ from VariableItemListWidget import *
 
 class MetadataEditor(qt.QFrame):
     """
-    MetadataEditor is the editor widget that resides
-    twice in every XnatMetadaManager section, or XnatLevel.
-    Like the "Settings" widgets, it is also in 
-    communication with the SettingsFile as the 
-    metadata that exists within its lists are loaded, synced
-    and stored within the SettingsFile.  It is also 
-    in touch with XnatGlobals to refer to any default
-    metadata that may exist within all XNAT hosts.
-    
-    The user must specifiy the XnatLevel that the 
-    MetadataEditor belongs to as an argument
-    in the __init__ function.
-
-    XnatMetadataEdtior is a
-    parent class of the specific metadata editors:
-    XnatMetadataEditor_Defaults, XnatMetadataEditor_Custom.
-    It contains functions shared between the two.
-    
-    Each subclass of XnatMetadataEdtior resides in one 
-    section of the MetadataEditorSet.For example, there are 
-    two MetadataEditors in the 'projects' section,
-    (XnatMetadataEditor_Defaults, XnatMetadataEditor_Custom)
-    two in the 'subjects' section (XnatMetadataEditor_Defaults, 
-    XnatMetadataEditor_Custom), etc.  
-
-    With respect to the child classes of the MetadataEditor,
-    the user can further customize each edtior.  For instance,
-    if the list items are to be checkboxes, or if the "Add" and
-    "Remove" buttons are visible. 
+    MetadataEditor is the parent class of the MetadataEditor widgets that 
+    reside twice in every MetadataEditorSet: MetadataEditor_Custom 
+    and MetadataEditor_Default.  MetadataEditor contains a variety of shared
+    functions between the aforementioned child classes.
     """
-    
 
     EVENT_TYPES = [
         'UPDATE',
         'ITEMCLICKED'
     ] 
+
 
 
     def __init__(self, xnatLevel):
@@ -308,15 +283,15 @@ class MetadataEditor(qt.QFrame):
 
 
     def onItemClicked(self, item):
-        """ Callback for when an item in the listWidget
-            is clicked.
+        """ 
+        Callback for when an item in the listWidget
+        is clicked.
         """
-
-        
         #--------------------
         # If the item is a checkbox
         #--------------------
         if item.flags() == 48:
+            #MokaUtils.debug.lf()
             self.Events.runEventCallbacks('ITEMCLICKED', self)
             
 

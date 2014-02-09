@@ -5,14 +5,12 @@ from __main__ import qt
 from Settings import *
 from FontSetting import *
 from MetadataEditorSetting import *
-from XnatSlicerGlobals import *
 from XnatSlicerUtils import *
 
 
 
         
-class Settings_View(FontSetting, 
-                    MetadataEditorSetting, Settings):
+class Settings_View(FontSetting, MetadataEditorSetting, Settings):
     """ 
     Descriptor above.
     Settings_View is the Settings pertaining to
@@ -33,6 +31,7 @@ class Settings_View(FontSetting,
     are to be displaed in the 'SettingsWindow' class.
     """
   
+    LABEL_FONT = qt.QFont('Arial', 10, 10, False) 
     LABEL_FONT_SIZE = 'View Font Size' 
     LABEL_METADATA = 'Info. Column Metadata'
     DEFAULT_METADATA = Xnat.metadata.DEFAULT_TAGS_LITE 
@@ -54,14 +53,14 @@ class Settings_View(FontSetting,
 
 
 
-        self.createFontSizeDropdown(self.LABEL_FONT_SIZE)
+        self.createFontSizeDropdown(Settings_View.LABEL_FONT_SIZE)
         self.addSpacing()
 
 
         #--------------------
         # Create the metadata manager type.
         #--------------------        
-        self.createMetadataEditorSets(self.LABEL_METADATA, 
+        self.createMetadataEditorSets(Settings_View.LABEL_METADATA, 
                                       itemType = 'checkbox', 
                                       editVisible = True,
                                       customEditVisible = False) 
@@ -94,7 +93,7 @@ class Settings_View(FontSetting,
            XnatSlicerUtils.generateButton(iconOrLabel = 'Last Accessed', 
            toolTip = "Sort projects, prioritizing those " + 
                                           "accessed by current user.", 
-           font = XnatSlicerGlobals.LABEL_FONT,
+           font = Settings_View.LABEL_FONT,
            size = qt.QSize(90, 20), 
            enabled = True)}
       

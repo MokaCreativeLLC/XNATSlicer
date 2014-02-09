@@ -167,6 +167,7 @@ class Settings(qt.QScrollArea):
 
 
 
+
     def __resetFrame(self):
         """
         As stated.  Necessary because frames do not dynamically 
@@ -182,6 +183,7 @@ class Settings(qt.QScrollArea):
         if hasattr(self, 'masterLayout'):
             self.frame.setLayout(self.masterLayout)
         slicer.app.processEvents()
+
 
 
 

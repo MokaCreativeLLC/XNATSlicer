@@ -1,6 +1,10 @@
 # application
 from __main__ import qt
 
+# external
+from MokaUtils import *
+
+
 
     
 class CheckBoxSetting(object):
@@ -20,7 +24,7 @@ class CheckBoxSetting(object):
         @rtype: str
         """
         return self.__class__.__name__ + '_' + \
-               self.CHECKBOXES[checkBoxKey]['tag']
+            self.CHECKBOXES[checkBoxKey]['tag']
 
 
 
@@ -60,19 +64,23 @@ class CheckBoxSetting(object):
 
 
 
+
     def __syncToFile(self):
         """
         Method specific to syncing the Setting's checkboxes to the SettingsFile.
         """
+        #MokaUtils.debug.lf()
         for key, val in self.CHECKBOXES.iteritems():
             storeTag = self.getCheckBoxStorageTag(key)
             setting = self.SettingsFile.getSetting(self.currXnatHost, storeTag)
             checked = 2 if 'True' in setting[0] else 0
+            #MokaUtils.debug.lf(storeTag, setting, checked)
             self.CHECKBOXES[key]['widget'].setCheckState(checked)
             try:
                 self.Events.runEventCallbacks(self.CHECKBOXES[key]['event'], 
                                               checked)
             except Exception, e:
+                #MokaUtils.debug.lf(str(e))
                 pass
         self.updateUI()
     
