@@ -511,10 +511,10 @@ class XnatSlicerWidget:
       """
       """
       self.dicomDBMessage = qt.QMessageBox (2, "Setup error", 
-                                            "XNATSlicer cannot " + \
-                                            "proceed without a DICOM " + \
-                                            "database.  XNATSlicer will " + \
-                                            "now open the DICOM module "+ \ 
+                                            "XNATSlicer cannot " + 
+                                            "proceed without a DICOM " + 
+                                            "database.  XNATSlicer will " + 
+                                            "now open the DICOM module " +  
                                             "so you can set one up.")
       self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', 
                                   SlicerUtils.showDicomDetailsPopup)
