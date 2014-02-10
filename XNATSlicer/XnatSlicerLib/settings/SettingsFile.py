@@ -478,6 +478,7 @@ class SettingsFile:
         empty array otherwise.
     @rtype: list
     """
+
     val = self.database.value(hostName + "/" + tag)
 
     if val:

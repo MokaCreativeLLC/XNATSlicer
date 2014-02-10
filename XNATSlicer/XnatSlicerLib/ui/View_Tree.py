@@ -106,15 +106,17 @@ class View_Tree(View, qt.QTreeWidget):
         # bar.  Have yet to pinpoint why this happens.
         #--------------------
         self.verticalScrollBar().setStyleSheet('width: 15px')
-
-
         self.updateFromSettings()
+
 
 
 
     def updateFontFromSettings(self):
         """
         """
+        if not self.Setting.currXnatHost:
+            return
+            
         storedFontSetting = self.Setting.getStoredFont(
                            self.Setting.LABEL_FONT_SIZE)
         storedFont = int(storedFontSetting[0]) if \

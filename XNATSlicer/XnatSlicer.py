@@ -66,46 +66,9 @@ from Settings_View import *
 
 
 
-
-
-
-comment = """
-XNAT Software License Agreement
-
-Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / 
-Washington University
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this 
-list of conditions and the following disclaimer.  Redistributions in binary 
-form must reproduce the above copyright notice, this list of conditions and 
-the following disclaimer in the documentation and/or other materials provided 
-with the distribution.  Neither the names of Washington University, Harvard 
-University and HHMI nor the names of its contributors may be used to endorse 
-or promote products derived from this software without specific prior written 
-permission.
-
-THIS SOFTWARE IS PROVIDED BY The COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, The IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL The COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF The USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
-
-
-
-
 class XnatSlicer:
   """ 
-  This is the class that interfaces with Slicer.
+  Interfaces with Slicer.
   This is not to be confused with the actual XnatSlicerWidget class
   which is below this one.
   """
@@ -130,8 +93,6 @@ class XnatSlicer:
         "Research Group at WashU-St.Louis (sunilk@mokacreativellc.com)"
       self.parent = parent
 
-
-      
       #--------------------------------
       # Add this test to the SelfTest module's list for 
       # discovery when the module is created.
@@ -161,8 +122,12 @@ class XnatSlicerWidget:
     XnatSlicerLib classes and methods converge.
     """
 
-
-    COLLAPSIBLE_KEYS = ['login', 'viewer', 'details', 'tools']
+    COLLAPSIBLE_KEYS = [
+      'login', 
+      'viewer', 
+      'details', 
+      'tools'
+    ]
     
     def __init__(self, parent = None):
         """ 
@@ -180,119 +145,16 @@ class XnatSlicerWidget:
             self.setup()
             self.parent.show()
 
-        #--------------------------------
-        # Construct all needed directories
-        # if not there...
-        #--------------------------------
-        XnatSlicerUtils.constructNecessaryModuleDirectories()
-
-
-
-        #--------------------------------
-        # Collapse the data probe button
-        #--------------------------------
-        self.__collapseDataProbe()
-
-
-        #--------------------------------
-        # Xnat IO
-        #--------------------------------
         self.XnatIo = None 
-
-        
-        #--------------------------------
-        # Set the layout
-        #--------------------------------
         self.layout = self.parent.layout()
 
+        XnatSlicerUtils.constructNecessaryModuleDirectories()
 
-        #-------------------
-        # SettingsFile
-        #-------------------
-        self.SettingsFile = SettingsFile(slicer.qMRMLWidget(), 
-            XnatSlicerGlobals.LOCAL_URIS['settings'], self)
-    
-
-        #-------------------
-        # Settings
-        #-------------------
-        self.__initSettings()
+        self.__collapseDataProbe()
+        self.__initComponents()
+        self.__addObservers()
 
 
-        #-------------------
-        # Login Menu
-        #-------------------
-        self.__initLoginMenu()
-        
-
-        #--------------------------------
-        # SearchBar
-        #--------------------------------
-        self.SearchBar = SearchBar(MODULE = self)
-
-      
-        #--------------------------------
-        # Viewer
-        #--------------------------------
-        self.View = View_Tree(self, self.Settings['VIEW'])  
-        
-        
-        
-        #--------------------------------
-        # Node Details
-        #--------------------------------
-        self.NodeDetails = NodeDetails(self.Settings['DETAILS'])
-        self.__setNodeDetailsCallbacks()
-        
-
-        
-        #--------------------------------
-        # Xnat Buttons
-        #--------------------------------
-        self.Buttons = Buttons(self.parent, MODULE=self)  
-        
-        
-
-
-        #--------------------------------
-        # Xnat Folder Maker
-        #--------------------------------
-        self.FolderMaker = FolderMaker(None, self)
-
-
-
-        
-        #--------------------------------
-        # Init gui
-        #--------------------------------
-        self.initGUI()
-        
-        
-        
-        #--------------------------------
-        # Listeners/observers from gui
-        #--------------------------------
-        slicer.mrmlScene.AddObserver(slicer.mrmlScene.EndCloseEvent, 
-                                     self.sceneClosedListener)
-        slicer.mrmlScene.AddObserver(slicer.mrmlScene.EndImportEvent, 
-                                     self.sceneImportedListener)
-
-
-
-        #--------------------------------
-        # Tester
-        #--------------------------------
-        #self.tester = XnatSlicerTest(self)
-
-
-
-        #--------------------------------
-        # Clean the temp dir
-        #--------------------------------
-        self.cleanCacheDir(200)
-
-        
-      
 
       
     def onReload(self, moduleName = "XnatSlicer"):
@@ -380,8 +242,82 @@ class XnatSlicerWidget:
     
 
 
+    def __addObservers(self):
+      """
+      """
+      slicer.mrmlScene.AddObserver(slicer.mrmlScene.EndCloseEvent, 
+                                   self.__sceneClosedListener)
+
+
+
+    def __initComponents(self):
+      """
+      """
+      self.__initSettingsFile()
+      self.__initSettings()
+      self.__initLoginMenu()
+      self.__initSearchBar()
+      self.__initView()
+      self.__initNodeDetails()
+      self.__initButtons()
+      self.__initFolderMaker()
+      self.__initGui()
+      self.__initTester()
+
+
         
-    def sceneClosedListener(self, caller, event):
+
+    def __initView(self):
+      """
+      """
+      self.View = View_Tree(self, self.Settings['VIEW'])  
+
+
+
+    def __initSearchBar(self):
+      """
+      """
+      self.SearchBar = SearchBar(MODULE = self)
+
+
+
+    def __initSettingsFile(self):
+      """
+      """
+      self.SettingsFile = SettingsFile(slicer.qMRMLWidget(), 
+                    XnatSlicerGlobals.LOCAL_URIS['settings'], self)
+      
+
+    def __initNodeDetails(self):
+      """
+      """
+      self.NodeDetails = NodeDetails(self.Settings['DETAILS'])
+      self.__setNodeDetailsCallbacks()
+        
+
+
+    def __initButtons(self):
+      """
+      """
+      self.Buttons = Buttons(self.parent, MODULE=self)  
+        
+        
+
+    def __initFolderMaker(self):
+      """
+      """
+      self.FolderMaker = FolderMaker(None, self)
+
+
+
+    def __initTester(self):
+      """
+      """
+      #self.tester = XnatSlicerTest(self)
+
+
+        
+    def __sceneClosedListener(self, caller, event):
         """
         Actions for when the user closes a scene from the GUI.
 
@@ -394,28 +330,9 @@ class XnatSlicerWidget:
         self.View.sessionManager.clearCurrentSession()  
 
 
-
-        
-    def sceneImportedListener(self, caller, event): 
-        """
-        Actions for when the user imports a scene from the GUI.
-        NOTE: This technically is not used, as the user must refer to files 
-        from an XNAT location. Nonetheless, it is implemented in the event 
-        that it is needed.
-
-        @param caller: The object calling the event.
-        @type caller: vtk.vtkObject
-        @param event: The unsigned long int value of the vent.
-        @type event: number
-        """
-        if self.View.lastButtonClicked == None:
-            #print("'Import Data' called. Resetting Xnat session data.")
-            self.View.sessionManager.clearCurrentSession() 
-    
-
             
             
-    def initGUI(self):  
+    def __initGui(self):  
         """ 
         Initializes the GUI of the XNATSlicer widget.
         """
@@ -456,15 +373,9 @@ class XnatSlicerWidget:
             
         #--------------------------------
         # DEFINE: Main layout
-        #
-        # set in '__resetMainLayout'
         #--------------------------------  
         self.__mainLayout = None
                 
-        #self.mainCollapsibleButton.setLayout(self.__mainLayout)
-        
-
-
         
         #--------------------------------
         # Set LOGIN Group Box.
@@ -478,32 +389,10 @@ class XnatSlicerWidget:
         #--------------------------------
         self.Viewer = Viewer(self)
         self.collapsibles['viewer'].setContents(self.Viewer)
-
-
-
-        #--------------------------------
-        # Set DETAILS Group Box.
-        #-------------------------------- 
-        #
-        # Add detauls layout to group box.
-        #
         self.collapsibles['details'].setContents(self.NodeDetails)
-
-
-        
-
-        
-        #--------------------------------
-        # Set TOOLS Group Box.
-        #-------------------------------- 
-        #
-        # Add tools layout to group box.
-        #
         self.collapsibles['tools'].setContents(self.Buttons.toolsWidget) 
 
  
-
-        
         #--------------------------------
         # Add collapsibles to main layout.
         #--------------------------------
@@ -581,47 +470,67 @@ class XnatSlicerWidget:
 
 
 
-        
-    def cleanCacheDir(self, maxSize):
-        """ 
-        Empties contents of the temp directory based on the maxSize argument.
 
-        @param maxSize: The maximum size in MB allowed for the cache directory.
-        @type maxSize: An number >= 0.
-        """
-
-        if maxSize < 0:
-          raise Exception("'maxSize' argument must be greater than or" + 
-                          " equal to 0!")
-
-
-        folder = XnatSlicerGlobals.CACHE_URI
-        folder_size = 0
-
-
-        
-        #--------------------------------
-        # Loop through files to get file sizes.
-        #--------------------------------
-        for (path, dirs, files) in os.walk(folder):
-          for file in files:
-            folder_size += os.path.getsize(os.path.join(path, file))
-        #print ("XnatSlicer Data Folder = %0.1f MB" % (folder_size/(1024*1024.0)))
-
-
-        
-        #--------------------------------
-        # If the folder size exceeds limit, remove contents.
-        #--------------------------------
-        folder_size = math.ceil(folder_size/(1024*1024.0))
-        if folder_size > maxSize:
-          shutil.rmtree(folder)
-          os.mkdir(folder)
+    def __checkSSLInstalled(self):
+      """
+      """
+      try:      
+        import ssl
+        httplib.HTTPSConnection
+        return True
+        #MokaUtils.debug.lf("XnatSlicer Module: SSL is installed!")
+      except Exception, e:
+            return False
 
 
 
+    def __showSSLError(self):
+      """
+      """
+      strs = "XnatSlicer cannot operate on this version of " + \
+             "Slicer because SSL is not installed."
+      strs += "Please download the latest version of Slicer from " + \
+              "http://www.slicer.org ."
+      #print("XnatSlicer Module: %s"%(strs))
+      qt.QMessageBox.warning(slicer.util.mainWindow(), 
+                             "No SSL", "%s"%(strs))
+
+
+
+    def __checkDicomDBExists(self):
+      """
+      """
+      if not slicer.dicomDatabase:
+        return False
+      return True
+
+
+
+
+    def __showDicomDBError(self):
+      """
+      """
+      self.dicomDBMessage = qt.QMessageBox (2, "Setup error", 
+                                            "XNATSlicer cannot " + \
+                                            "proceed without a DICOM " + \
+                                            "database.  XNATSlicer will " + \
+                                            "now open the DICOM module "+ \ 
+                                            "so you can set one up.")
+      self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', 
+                                  SlicerUtils.showDicomDetailsPopup)
+      self.dicomDBMessage.show()
 
                 
+
+
+    def __jsonError(self, host, user, response):
+      """
+      """
+      return Error(host, user, response)
+    
+
+
+
     def beginXnat(self):
         """ 
         Opens the View class to allow for user interaction.
@@ -629,60 +538,24 @@ class XnatSlicerWidget:
         before allowing the login process to begin.
         """
 
-        #--------------------
-        # Can SSL be imported?
-        #--------------------
-        #print("XnatSlicer Module: Checking if SSL is installed...")
-        try:      
-            import ssl
-            httplib.HTTPSConnection
-            #print("XnatSlicer Module: SSL is installed!")
+        if not self.__checkSSLInstalled():
+          self.__showSSLError()
+          return
 
-            
-
-        #--------------------
-        # If not, kick back OS error
-        #--------------------
-        except Exception, e:
-            strs = "XnatSlicer cannot operate on this version of " + \
-                   "Slicer because SSL is not installed."
-            strs += "Please download the latest version of Slicer from " + \
-                    "http://www.slicer.org ."
-            #print("XnatSlicer Module: %s"%(strs))
-            qt.QMessageBox.warning(slicer.util.mainWindow(), 
-                                   "No SSL", "%s"%(strs))
-            return
-                
-
-
-        #----------------------
-        # Check dicom database.  Error if none.
-        #----------------------
-        if not slicer.dicomDatabase:
-          self.dicomDBMessage = qt.QMessageBox (2, "Setup error", 
-                                                "XNATSlicer cannot " + \
-          "proceed without a DICOM database.  XNATSlicer will now open" + \
-                                    " the DICOM module so you can set one up.")
-          self.dicomDBMessage.connect('buttonClicked(QAbstractButton*)', 
-                                      SlicerUtils.showDicomDetailsPopup)
-          self.dicomDBMessage.show()
-          self.__contractCollapsibles()
-          return  
-
-
+          
+        if not self.__checkDicomDBExists():
+          self.__showDicomDBError()
+          return
         
         #--------------------
         # Init XnatIo.
         #--------------------
-        self.XnatIo = Xnat.io(self.SettingsFile.\
-                        getAddress(self.LoginMenu.hostDropdown.currentText), 
-                              self.LoginMenu.usernameLine.text,
-                              self.LoginMenu.passwordLine.text)
-        def jsonError(host, user, response):
-            return Error(host, user, response)
-        self.XnatIo.onEvent('jsonError', jsonError)        
+        self.XnatIo = Xnat.io(\
+        self.SettingsFile.getAddress(self.LoginMenu.hostDropdown.currentText), 
+                    self.LoginMenu.usernameLine.text,
+                    self.LoginMenu.passwordLine.text)
 
-
+        self.XnatIo.onEvent('jsonError', self.__jsonError)        
 
         #--------------------
         # Begin communicator
@@ -691,6 +564,11 @@ class XnatSlicerWidget:
 
 
 
+
+    def __onAnimatedCollapsibleAnimate(self):
+      """
+      """
+      self.__mainLayout.update()
 
 
 
@@ -707,15 +585,11 @@ class XnatSlicerWidget:
             self.__mainLayout.addWidget(self.collapsibles[key])
           self.mainCollapsibleButton.setLayout(self.__mainLayout)
         
-
-
         #--------------------
         # Update mainLayout when animating
         #--------------------
-        def onAnimatedCollapsibleAnimate():
-            self.__mainLayout.update()
         for key, collapsible in self.collapsibles.iteritems():
-            collapsible.onEvent('animate', onAnimatedCollapsibleAnimate)
+            collapsible.onEvent('animate', self.__onAnimatedCollapsibleAnimate)
             
 
 
@@ -817,8 +691,10 @@ class XnatSlicerWidget:
       """
       """
       self.__filterToggled()
+      self.__syncSettingsToCurrHost()
       self.__expandCollapsibles(callback)
       self.__storeLoginHost()
+
 
 
 
@@ -832,14 +708,10 @@ class XnatSlicerWidget:
         @param callback: The callback to run when the animation is finished.
         @type callback: function
         """
-        
 
-
- 
         self.__configTargetHeights('loginSuccessful')
         
         
-
         #--------------------
         # Create animation chain callbacks.
         #-------------------- 
@@ -886,16 +758,10 @@ class XnatSlicerWidget:
         self.collapsibles['details'].onEvent('expanded', expandTools)           
         self.collapsibles['tools'].onEvent('expanded', clearChain)
         self.collapsibles['login'].onEvent('collapsed', expandViewer)
-        #self.collapsibles['viewer'].onEvent('expanded', clearChain)
-        #self.collapsibles['details'].onEvent('expanded', expandViewer)         
-        #self.collapsibles['tools'].onEvent('expanded', expandDetails)
-        #self.collapsibles['login'].onEvent('collapsed', expandTools)
-            
+
         
         #--------------------
-        # Fire off the animation chain,
-        # first by compressing the 'Login'
-        # collapsible.
+        # Fire off the animation chain.
         #--------------------              
         self.collapsibles['login'].setChecked(False)
 
@@ -1203,10 +1069,6 @@ class XnatSlicerWidget:
 
 
 
-      
-
-
-
     def __setSettingsCallbacks(self):
         """
         """
@@ -1337,7 +1199,6 @@ class XnatSlicerWidget:
 
 
 
-
     def __showHostWindow(self, *args):
       """
       As stated.
@@ -1349,6 +1210,18 @@ class XnatSlicerWidget:
 
 
 
+    def __syncSettingsToCurrHost(self, host = None):
+      """
+      """
+      if not host:
+        host = self.LoginMenu.hostDropdown.currentText
+      for key, Setting in self.__Settings.iteritems():
+        Setting.currXnatHost = host
+        #MokaUtils.debug.lf(Setting.__class__.__name__)
+        Setting.syncToFile()
+        slicer.app.processEvents()
+
+      
 
     def __onHostSelected(self, host):
       """
@@ -1357,14 +1230,12 @@ class XnatSlicerWidget:
       @param host: The selected host:
       @type host: str
       """
-      for key, Setting in self.__Settings.iteritems():
-        Setting.currXnatHost = host
-        #MokaUtils.debug.lf(Setting.__class__.__name__)
-        Setting.syncToFile()
 
       if not host in self.__loggedIn or not self.__loggedIn[host]:
-        self.__contractCollapsibles()
+        self.__contractCollapsibles(self.__syncSettingsToCurrHost)
       else:
+        self.__syncSettingsToCurrHost()
+        
         self.__expandCollapsibles()
 
 

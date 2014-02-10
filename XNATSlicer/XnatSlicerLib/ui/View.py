@@ -109,10 +109,10 @@ class View(object):
         #----------------------
         # Load projects ino View.
         #----------------------
-        self.loadProjects(filters = None, projectContents = projectContents)
-        slicer.app.processEvents()
         if not skipAnim:
             self.MODULE.onLoginSuccessful()
+            self.loadProjects(filters = None, projectContents = projectContents)
+            slicer.app.processEvents()
         self.MODULE.Buttons.setEnabled(buttonKey='addFolder', enabled=True) 
 
 

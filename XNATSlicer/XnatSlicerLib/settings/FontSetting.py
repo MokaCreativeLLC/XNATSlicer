@@ -88,7 +88,7 @@ class FontSetting(object):
         @return: The font storage tag constructed from the argument.
         @rtype: str
         """
-        return MokaUtils.string.toCamelCase(string)
+        return MokaUtils.string.toCamelCase(self.__class__.__name__ + string)
 
 
 
@@ -116,6 +116,8 @@ class FontSetting(object):
         @return: The stored setting for the font.
         @rtype: str
         """
+        if not self.currXnatHost:
+            return []
         return self.SettingsFile.getSetting(self.currXnatHost, 
                                             self.getFontStorageTag(tag))
         
