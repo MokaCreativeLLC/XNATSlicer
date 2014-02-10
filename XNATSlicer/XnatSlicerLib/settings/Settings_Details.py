@@ -18,8 +18,8 @@ class Settings_Details(FontSetting, MetadataEditorSetting, CheckBoxSetting,
     Settings_Details is the Settings pertaining to the 'NodeDetails' class. 
     """
 
-    LABEL_FONT_SIZE = 'Details Font Size' 
-    LABEL_METADATA = 'Details Metadata' 
+    LABEL_FONT_SIZE = 'Font Size' 
+    LABEL_METADATA = 'Metadata' 
     CHECKBOXES = OrderedDict([
         ('empty', {
             'tag': 'showEmptyMetadata',
@@ -35,6 +35,7 @@ class Settings_Details(FontSetting, MetadataEditorSetting, CheckBoxSetting,
         """
         Method inherited from parent function.
         """
+        self.addSection('Display')
         self.createCheckBoxes()
         self.addSpacing()
         self.addSpacing()

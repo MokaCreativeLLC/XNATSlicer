@@ -332,12 +332,18 @@ class Settings(qt.QScrollArea):
 
 
 
-    def addSection(self, title, qobject):
+    def addSection(self, title, qWidgetOrLayout = None):
         """ 
         Adds a section to the Settings by
         creating a label, the title of which is specified
         in the 'title' argument, and then adding the 
-        relevant qobject to the masterLayout.
+        relevant qWidgetOrLayout to the masterLayout.
+
+        @param title: The title of the section.
+        @type title: str
+
+        @param qWidgetOrLayout: The qt Object to add to the section.
+        @param qWidgetOrLayout: qt.QWidget or qt.QLayout
         """
 
         #--------------------
@@ -349,12 +355,13 @@ class Settings(qt.QScrollArea):
 
 
         #--------------------
-        # Add the qobject.
+        # Add the qWidgetOrLayout.
         #-------------------- 
-        if 'layout' in qobject.className().lower():
-            self.masterLayout.addLayout(qobject)
-        else:
-            self.masterLayout.addWidget(qobject)
+        if qWidgetOrLayout:
+            if 'layout' in qWidgetOrLayout.className().lower():
+                self.masterLayout.addLayout(qWidgetOrLayout)
+            else:
+                self.masterLayout.addWidget(qWidgetOrLayout)
 
 
         self.updateUI()

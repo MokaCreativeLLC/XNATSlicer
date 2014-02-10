@@ -186,13 +186,11 @@ class LoginMenu(qt.QWidget):
         self.resetHostDropdown()
 
         
-
         #--------------------
         # Set host dropdown to default stored hostName.
         #--------------------
         defaultName = self.MODULE.SettingsFile.getDefault()
         self.setHost(defaultName)
-
 
         
         #--------------------
@@ -209,7 +207,7 @@ class LoginMenu(qt.QWidget):
             to the name specified in the 'hostName' argument by
             looping through all of its visible items.
         """
-
+        #MokaUtils.debug.lf(hostName)
         if not hostName:
             return
         for i in range(0, self.hostDropdown.maxVisibleItems):
@@ -329,8 +327,6 @@ class LoginMenu(qt.QWidget):
         self.Events.runEventCallbacks('HOSTSELECTED', selHostName)
 
 
-            
-            
 
 
 def makeCredentialsWidgets(LoginMenu):

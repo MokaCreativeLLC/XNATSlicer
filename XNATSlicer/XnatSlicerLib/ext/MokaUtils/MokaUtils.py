@@ -698,6 +698,7 @@ class MokaUtils(object):
                                  "a string list for event types!"
             self.__eventTypes = __eventTypes
             self.eventCallbacks__ = {}
+            self.__suspendedEvents = []
             for eventType in self.__eventTypes:
                 self.eventCallbacks__[str(eventType)] = []
 
@@ -710,6 +711,37 @@ class MokaUtils(object):
             @rtype: str
             """
             return self.__eventTypes
+
+
+
+        def suspendEvent(self, eventKey):
+            """
+            Suspend on event.
+
+            @param eventKey: The eventKey descriptor. 
+            @type eventKey: string
+            """
+            if not eventKey in self.__eventTypes:
+                raise Exception("MokaUtils.Events (onEvent): " + \
+                                "invalid event type '%s'"%(eventKey))
+            if not eventKey in self.__suspendedEvents:
+                self.__suspendedEvents.append(eventKey)
+
+
+
+
+        def suspendEvents(self, suspend):
+            """
+            Suspend all events.
+
+            @param suspend: Toggle event suspsension.
+            @type suspend: bool
+            """
+            self.__suspendedEvents = []
+            if suspend:
+                for eventKey in self.__eventTypes:
+                    self.__suspendedEvents.append(eventKey)                    
+
 
 
 
@@ -765,7 +797,10 @@ class MokaUtils(object):
                     "type '%s'.  Options are: %s"%(event, self.__eventTypes))
             for callback in self.eventCallbacks__[event]:
                 #print "EVENT CALLBACK", event
-                callback(*args)
+                if not event in self.__suspendedEvents:
+                    callback(*args)
+
+
 
 
         def clearEvents(self, eventKey = None):

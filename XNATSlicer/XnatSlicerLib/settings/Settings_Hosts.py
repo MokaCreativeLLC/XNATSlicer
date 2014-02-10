@@ -23,8 +23,24 @@ class Settings_Hosts(Settings):
 
     FONT_NAME =  "Arial"
     FONT_SIZE =  10
-    LABEL_FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False) 
-    LABEL_FONT_ITALIC = qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
+    FONT = qt.QFont(FONT_NAME, FONT_SIZE, 10, False) 
+    FONT_ITALIC = qt.QFont(FONT_NAME, FONT_SIZE, 10, True)
+
+    PERMANENT_HOSTS = {
+        'Central': {
+            'url': 'https://central.xnat.org',
+            'username': ''
+        }
+    }
+    DEFAULT_HOSTS = {
+        'CNDA': {
+            'url': 'https://cnda.wustl.edu',
+            'username': ''
+        }
+    }
+    DEFAULT_HOSTS = dict(DEFAULT_HOSTS.items() + PERMANENT_HOSTS.items())
+
+    
 
     def setup(self):
         """
@@ -63,8 +79,11 @@ class Settings_Hosts(Settings):
         # are outside of the scope of the class
         # and are made by a UI-making function below.
         #--------------------
-        self.urlLine, self.nameLine, self.setDefault, \
-        self.usernameLine = makeSharedHostModalObjects(self)
+        self.lineEdits, \
+        self.errorLines, \
+        self.checkBoxes = makeSharedHostModalObjects(self)
+        self.lineEdits['hostname'].connect('textChanged(const QString)',
+                                           self.__onHostNameLineChanged)
         
         
         
@@ -120,7 +139,7 @@ class Settings_Hosts(Settings):
         
         
         
-    def __setButtonStates(self, hostName):   
+    def __setButtonStates(self, hostName = None):   
         """ 
         Enables / Disables button based upon the editable
         quality of the host (provided by the 'hostName'
@@ -129,13 +148,9 @@ class Settings_Hosts(Settings):
         @param hostName: The name of the host to to apply the changes to.
         @type hostName: str
         """
-        ##print hostName, self.SettingsFile.isModifiable(hostName) 
-        if self.SettingsFile.isModifiable(hostName):
-            self.deleteButton.setEnabled(True)
-            self.editButton.setEnabled(True)
-        else:
-            self.deleteButton.setEnabled(False)
-            self.editButton.setEnabled(True)
+        self.deleteButton.setEnabled(not hostName in self.PERMANENT_HOSTS)
+        self.editButton.setEnabled(True)
+
 
 
 
@@ -163,19 +178,11 @@ class Settings_Hosts(Settings):
         # Iterate through dictionary and apply text to the host table.
         #--------------------
         for name in hostDictionary:
-            
-            #
-            # Apply style if default
-            #
-            setModfiable = [True, True]
-            if not self.SettingsFile.isModifiable(name):
-                setModfiable = [False, False]
                 
             #
             # Add name and URL to host table.
             #
-            self.hostTable.addNameAndUrl(name, hostDictionary[name], 
-                                         setModfiable)
+            self.hostTable.addNameAndUrl(name, hostDictionary[name])
 
             #
             # Get curr username
@@ -187,21 +194,98 @@ class Settings_Hosts(Settings):
             #
             if len(currName) > 0:
                 self.hostTable.addUsername(currName) 
+                
 
 
+
+    def __stylizeErrorString(self, string):
+        """
+        Retruns a stylzed error string.
+
+        @param string: The string to stylize.
+        @type string: str
+
+        @return: The stylized string.
+        @rtype: str
+        """
+        return  '<font color=\"red\"><i>* %s</i></font>' %(string)
+        
+
+
+
+    def __onHostNameLineChanged(self, string):
+        """
+        As stated.
+
+        @param string: The string of the hostname line.
+        @type string: str
+        """
+        if not self.__validateHostName():
+            if hasattr(self, 'saveButtons'):
+                for key, button in self.saveButtons.iteritems():
+                    button.setEnabled(False)
+            return
+
+        if hasattr(self, 'saveButtons'):
+            for key, button in self.saveButtons.iteritems():
+                button.setEnabled(True)
+
+
+
+
+    def __validateHostName(self):
+        """
+        As stated.
+
+        @return: The whether the host name is valid.
+        @rtype: bool
+        """
+        nameLine = self.lineEdits['hostname'].text.strip("")
+        if self.hostExists(nameLine):
+            errorString = 'Host name \'%s\' is already taken.'%(nameLine)
+            errorString = self.__stylizeErrorString(errorString)
+            self.errorLines['hostname'].setText(errorString)
+            return False
+        self.errorLines['hostname'].setText('')
+        return True
+        
 
 
     
-    def rewriteHost(self):
+    def modifyHost(self):
         """ 
-        Deletes the host then calls on the internal "writeHost" function.
+        As stated.
         """
-        #MokaUtils.debug.lf('')
-        self.SettingsFile.deleteHost(self.prevName)
-        self.prevName = None
-        self.writeHost()
+        #MokaUtils.debug.lf('REWRITE')
+
+        self.currModal.close()
+        hostName = self.lineEdits['hostname'].text.strip()
+
+        self.__setNonCriticalSettings()
+
         self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
-                                      self.__class__.__name__)
+                                      self.__class__.__name__, 'HOST_MODIFIED',
+                                      hostName)
+
+
+
+    def __setNonCriticalSettings(self):
+        """
+        """
+        #--------------------
+        # Set host to default if checkbox is checked.
+        # 'Default' means it will be the host that is
+        # selected automatically on loadup.
+        #--------------------
+        if self.checkBoxes['setdefault'].isChecked():
+            self.SettingsFile.setDefault(self.lineEdits['hostname'].text)   
+
+        #--------------------
+        # Set hosts associated username accordingly.
+        #--------------------
+        if len(self.lineEdits['username'].text.strip()) != 0:
+            self.SettingsFile.setCurrUsername(self.lineEdits['hostname'].text, 
+                                              self.lineEdits['username'].text)
 
 
     
@@ -228,9 +312,6 @@ class Settings_Hosts(Settings):
         #--------------------
         if deleted: 
             self.__loadHosts()
-            #self.Events.runEventCallbacks('HOSTDELETED')
-            
-
 
             
         #--------------------
@@ -239,64 +320,63 @@ class Settings_Hosts(Settings):
         self.currModal.close()
         self.currModal = None
         self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
-                                      self.__class__.__name__)
+                                      self.__class__.__name__, 'HOST_DELETED', 
+                                      hostStr['name'])
+
+
+
+    def hostExists(self, hostName):
+        """
+        @param hostName: The host name to check
+        @type hostName: str
+
+        @return: Whether the host name exists.
+        @rtype: bool
+        """
+        for rowDict, item in self.hostTable.trackedItems.iteritems():
+            if item['name'].text() == hostName:
+                return True
+        return False
+
 
 
     
-    
-    def writeHost(self):
+    def writeHost(self, runEvents = True):
         """ 
         Writes the host both to the SettingsFile,
         then reloads the hosts from the file.
+
+        @param runEvents: Option to run event callbacks.
+        @type runEvents: bool
         """
 
-        #MokaUtils.debug.lf()
         #--------------------
-        # Check if the nameLine's name is
-        # is modifiable as per the SettingsFile.
+        # Close popup
         #--------------------
-        modifiable = self.SettingsFile.isModifiable(self.nameLine.text.\
-                                                    strip(""))
-
+        self.currModal.close()
+        self.currModal = None
 
 
         #--------------------
         # Determine if enetered host was set to default,
         # which means it will be loaded up on startup.
         #--------------------
+        modifiable = self.lineEdits['hostname'] in self.PERMANENT_HOSTS
         modStr = str(modifiable)
-        checkStr = str(self.setDefault.isChecked())
+        checkStr = str(self.checkBoxes['setdefault'].isChecked())
         
         
         
         #--------------------
         # Save Host to SettingsFile.
         #--------------------
-        self.SettingsFile.saveHost(self.nameLine.text, 
-                                              self.urlLine.text, 
-                                              isModifiable = modifiable, 
-                                              isDefault = self.setDefault.\
+        self.SettingsFile.saveHost(self.lineEdits['hostname'].text, 
+                                   self.lineEdits['url'].text, 
+                                   isModifiable = modifiable, 
+                                   isDefault = self.checkBoxes['setdefault'].\
                                    isChecked())
 
-        
-
-        #--------------------
-        # Set host to default if checkbox is checked.
-        # 'Default' means it will be the host that is
-        # selected automatically on loadup.
-        #--------------------
-        if self.setDefault.isChecked():
-            self.SettingsFile.setDefault(self.nameLine.text)   
-
-
-
-        #--------------------
-        # Set hosts associated username accordingly.
-        #--------------------
-        if self.usernameLine.text != "":
-            self.SettingsFile.setCurrUsername(self.nameLine.text, 
-                                              self.usernameLine.text)
-
+        self.__setNonCriticalSettings()
 
 
         #--------------------
@@ -305,16 +385,10 @@ class Settings_Hosts(Settings):
         #self.Events.runEventCallbacks('HOSTADDED')
         self.__loadHosts() 
 
-
-
-        #--------------------
-        # Close popup
-        #--------------------
-        self.currModal.close()
-        self.currModal = None
-
-        self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
-                                      self.__class__.__name__)
+        if runEvents:
+            self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
+                                          self.__class__.__name__, 'HOST_ADDED',
+                                          self.lineEdits['hostname'].text)
 
 
 
@@ -328,6 +402,7 @@ class Settings_Hosts(Settings):
 
     
 
+
     def __showEditHostModal(self):
         """ 
         Shows the modal that prompts the user to edit a given host.
@@ -336,6 +411,8 @@ class Settings_Hosts(Settings):
         self.currModal = makeEditHostModal(self)
         self.currModal.setWindowModality(1)
         self.currModal.show()  
+        for key, line in self.errorLines.iteritems():
+            line.setText('')
         
         
         
@@ -510,7 +587,7 @@ class HostTable(qt.QTableWidget):
                 
                 return returner
         except Exception, e:
-            MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
+            #MokaUtils.debug.lf("Skipping (Ref: '%s')"%(str(e)))
             pass
 
 
@@ -578,7 +655,7 @@ class HostTable(qt.QTableWidget):
 
             
 
-    def addNameAndUrl(self, name, url, setModfiable = [True, True]):
+    def addNameAndUrl(self, name, url):
         """ 
         Adds a name and url to the table by adding a 
         new row.
@@ -588,38 +665,15 @@ class HostTable(qt.QTableWidget):
 
         @param url: The url of the host to add.
         @type url: str
-
-        @param setModifiable: Whether the name and url is modfiable (adjusts
-           the QTableWidgetItem's flags acoordinly).  Ideally there would be a 
-           more elegant way to do this.
-        @type setModifiable: list(bool, bool)
         """
 
-        #--------------------
-        # Create the modifiable flags corresponding with
-        # the 'setModifiable' argument for
-        # feeding into the SettingsFile.
-        #--------------------
-        flags = []
-        for state in setModfiable:
-            if state:
-                flags.append(None)
-            else:
-                flags.append(1)
-
-                
-
+                                                      
         #--------------------
         # Add the hostName and hostUrl items
         # accordingly.
         #--------------------                
         hostNameItem = qt.QTableWidgetItem(name)
-        if flags[0]:
-            hostNameItem.setFlags(flags[0])
-        
         hostUrlItem = qt.QTableWidgetItem(url)
-        if flags[1]:
-            hostUrlItem.setFlags(flags[1])
 
 
             
@@ -662,7 +716,7 @@ class HostTable(qt.QTableWidget):
         # Set the added items' aeshetics.
         #--------------------
         for key, item in self.trackedItems[self.rowCount-1].iteritems():
-            item.setFont(Settings_Hosts.LABEL_FONT)
+            item.setFont(Settings_Hosts.FONT)
 
 
 
@@ -683,7 +737,6 @@ class HostTable(qt.QTableWidget):
         
 
 
-        
         
     def addUsername(self, username):
         """ 
@@ -721,78 +774,11 @@ def makeAddHostModal(_Settings_Hosts):
     @param _Settings_Hosts: The widget that is the parent of the modal.
     @param _Settings_Hosts: Settings_Hosts
     """
-    
-    #--------------------
-    # Clear shared object lines
-    #--------------------
-    _Settings_Hosts.nameLine.clear()
-    _Settings_Hosts.urlLine.clear()
-
-
-
-    #--------------------    
-    # Buttons
-    #--------------------
-    saveButton = qt.QPushButton("OK")
-    cancelButton = qt.QPushButton("Cancel")
-
-
-
-    #--------------------
-    # Create for line editors
-    #--------------------
-    currLayout = qt.QFormLayout()
-    currLayout.addRow("Name:", _Settings_Hosts.nameLine)
-    currLayout.addRow("URL:", _Settings_Hosts.urlLine)
-    currLayout.addRow(_Settings_Hosts.setDefault)
-
-
-
-    #--------------------
-    # Create layout for buttons
-    #--------------------
-    buttonLayout = qt.QHBoxLayout()
-    buttonLayout.addStretch(1)
-    buttonLayout.addWidget(cancelButton)
-    buttonLayout.addWidget(saveButton)
-
-
-
-    #--------------------
-    # Combine both layouts
-    #--------------------
-    masterForm = qt.QFormLayout()    
-    masterForm.addRow(currLayout)
-    masterForm.addRow(buttonLayout)
-
-
-
-    #--------------------
-    # Make window
-    #--------------------
-    addHostModal = qt.QDialog(_Settings_Hosts.addButton)
-    addHostModal.setWindowTitle("Add Host")
-    addHostModal.setFixedWidth(300)
-    addHostModal.setLayout(masterForm)
-    addHostModal.setWindowModality(1)
-
-
-
-    #--------------------
-    # Clear previous host
-    #--------------------
-    _Settings_Hosts.prevName = None
-
-    
-
-    #--------------------
-    # Button Connectors
-    #--------------------
-    cancelButton.connect("clicked()", addHostModal.close)
-    saveButton.connect("clicked()", _Settings_Hosts.writeHost)   
-
-    
-    return addHostModal
+    _Settings_Hosts.lineEdits['hostname'].clear()
+    _Settings_Hosts.lineEdits['url'].clear()
+    _Settings_Hosts.lineEdits['hostname'].setEnabled(True)
+    _Settings_Hosts.lineEdits['url'].setEnabled(True)
+    return genericHostEditor(_Settings_Hosts, _Settings_Hosts.writeHost)
 
 
 
@@ -810,112 +796,42 @@ def makeEditHostModal(_Settings_Hosts):
     #--------------------
     selHost = _Settings_Hosts.hostTable.currentRowItems
 
-
     
     #--------------------
     # Populate the line edits from selecting strings.
     #--------------------
-    _Settings_Hosts.nameLine.setText(selHost['name'])
-    _Settings_Hosts.urlLine.setText(selHost['url'])
-
+    _Settings_Hosts.lineEdits['hostname'].setText(selHost['name'])
+    _Settings_Hosts.lineEdits['url'].setText(selHost['url'])
 
 
     #--------------------
     # Prevent editing of default host. 
     #--------------------
-    if not _Settings_Hosts.SettingsFile.isModifiable(selHost['name']):
-        _Settings_Hosts.nameLine.setReadOnly(True)
-        _Settings_Hosts.nameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
-        _Settings_Hosts.nameLine.setEnabled(False)
-        _Settings_Hosts.urlLine.setReadOnly(True)
-        _Settings_Hosts.urlLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC)
-        _Settings_Hosts.urlLine.setEnabled(False)
-
-
-        
-    #--------------------
-    # Otherwise, go ahead.
-    #--------------------
+    if selHost['name'] in _Settings_Hosts.PERMANENT_HOSTS:
+        _Settings_Hosts.lineEdits['hostname'].setEnabled(False)
+        _Settings_Hosts.lineEdits['url'].setEnabled(False)
     else:
-        _Settings_Hosts.nameLine.setEnabled(True)
-        _Settings_Hosts.urlLine.setEnabled(True)
-
-
-
-    #--------------------
-    # Buttons.
-    #--------------------
-    cancelButton = qt.QPushButton("Cancel")   
-    saveButton = qt.QPushButton("OK")
-
-
-
-    #--------------------
-    # Layouts.
-    #--------------------
-    currLayout = qt.QFormLayout()
-    _Settings_Hosts.prevName = _Settings_Hosts.nameLine.text
-    currLayout.addRow("Edit Name:", _Settings_Hosts.nameLine)
-    currLayout.addRow("Edit URL:", _Settings_Hosts.urlLine)
-
+        _Settings_Hosts.lineEdits['hostname'].setEnabled(True)
+        _Settings_Hosts.lineEdits['url'].setEnabled(True)
+    _Settings_Hosts.prevName = _Settings_Hosts.lineEdits['hostname'].text
 
 
     #--------------------
     # Default checkbox if default.
     #--------------------
-    if _Settings_Hosts.SettingsFile.isDefault(_Settings_Hosts.nameLine.text):
-        _Settings_Hosts.setDefault.setCheckState(2)
-
-
-
-    #--------------------
-    # Labels.
-    #--------------------
-    spaceLabel = qt.QLabel("")
-    unmLabel = qt.QLabel("Stored Username:")
-
+    if _Settings_Hosts.SettingsFile.isDefault(\
+                                _Settings_Hosts.lineEdits['hostname'].text):
+        _Settings_Hosts.checkBoxes['setdefault'].setCheckState(2)
 
     
     #--------------------
     # Layouts.
     #--------------------
-    currLayout.addRow(_Settings_Hosts.setDefault)
-    _Settings_Hosts.usernameLine.setText(_Settings_Hosts.\
+    _Settings_Hosts.lineEdits['username'].setText(_Settings_Hosts.\
                                     SettingsFile.getCurrUsername(\
-                                                _Settings_Hosts.nameLine.text))
-    currLayout.addRow(spaceLabel)
-    currLayout.addRow(unmLabel)
-    currLayout.addRow(_Settings_Hosts.usernameLine)
-    
-    buttonLayout = qt.QHBoxLayout()
-    buttonLayout.addStretch(1)
-    buttonLayout.addWidget(cancelButton)
-    buttonLayout.addWidget(saveButton)
-    
-    masterForm = qt.QFormLayout()    
-    masterForm.addRow(currLayout)
-    masterForm.addRow(buttonLayout)
+                                    _Settings_Hosts.lineEdits['hostname'].text))
 
-
-    
-    #--------------------
-    # The modal.
-    #--------------------
-    editHostModal = qt.QDialog(_Settings_Hosts.addButton)
-    editHostModal.setWindowTitle("Edit Host")
-    editHostModal.setFixedWidth(300)
-    editHostModal.setLayout(masterForm)
-    editHostModal.setWindowModality(1)
-
-
-    
-    #--------------------
-    # Button Connectors
-    #--------------------
-    cancelButton.connect("clicked()", editHostModal.close)
-    saveButton.connect("clicked()", _Settings_Hosts.rewriteHost) 
-
-    return editHostModal
+    return genericHostEditor(_Settings_Hosts,_Settings_Hosts.modifyHost,'Edit')
 
 
 
@@ -1009,17 +925,17 @@ def makeButtons(_Settings_Hosts):
     """
     addButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Add', 
                                          toolTip = "Need tool-tip.", 
-                                         font = Settings_Hosts.LABEL_FONT,
+                                         font = Settings_Hosts.FONT,
                                          size = qt.QSize(90, 20), 
                                          enabled = True)
     editButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Edit', 
                                           toolTip = "Need tool-tip.", 
-                                          font = Settings_Hosts.LABEL_FONT,
+                                          font = Settings_Hosts.FONT,
                                           size = qt.QSize(90, 20), 
                                           enabled = True)
     deleteButton = XnatSlicerUtils.generateButton(iconOrLabel = 'Delete', 
                                             toolTip = "Need tool-tip.", 
-                                            font = Settings_Hosts.LABEL_FONT,
+                                            font = Settings_Hosts.FONT,
                                             size = qt.QSize(90, 20), 
                                             enabled = True)
     
@@ -1031,6 +947,98 @@ def makeButtons(_Settings_Hosts):
 
 
 
+def genericHostEditor(_Settings_Hosts, saveCallback, linePrefix = ''):
+    """
+    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @type _Settings_Hosts: Settings_Hosts
+
+    @param saveCallback: The save button callback.
+    @type saveCallback: function
+
+    @param linePrefix: The to prefix to append to the line edit labels.
+    @type linePrefix: str
+    """
+    
+    if len(linePrefix) > 0:
+        linePrefix += ' '
+
+    #--------------------
+    # Create for line editors
+    #--------------------
+    currLayout = qt.QFormLayout()
+    currLayout.addRow(linePrefix + "Name:", 
+                      _Settings_Hosts.lineEdits['hostname'])
+    currLayout.addRow('', _Settings_Hosts.errorLines['hostname'])
+    currLayout.addRow(linePrefix + 'URL:', _Settings_Hosts.lineEdits['url'])
+    currLayout.addRow('', _Settings_Hosts.errorLines['url'])
+    currLayout.addRow(_Settings_Hosts.checkBoxes['setdefault'])
+
+
+    spaceLabel = qt.QLabel("")
+    unmLabel = qt.QLabel("Stored Username:")
+
+    currLayout.addRow(spaceLabel)
+    currLayout.addRow(unmLabel)
+    currLayout.addRow(_Settings_Hosts.lineEdits['username'])
+
+
+    #--------------------    
+    # Buttons
+    #--------------------
+    saveButton = qt.QPushButton("OK")
+    cancelButton = qt.QPushButton("Cancel")
+
+    _Settings_Hosts.saveButtons = {}
+    _Settings_Hosts.saveButtons[linePrefix] = saveButton 
+    _Settings_Hosts.cancelButtons = {}
+    _Settings_Hosts.cancelButtons[linePrefix] = cancelButton 
+
+
+    #--------------------
+    # Create layout for buttons
+    #--------------------
+    buttonLayout = qt.QHBoxLayout()
+    buttonLayout.addStretch(1)
+    buttonLayout.addWidget(cancelButton)
+    buttonLayout.addWidget(saveButton)
+
+
+    #--------------------
+    # Combine both layouts
+    #--------------------
+    masterForm = qt.QFormLayout()    
+    masterForm.addRow(currLayout)
+    masterForm.addRow(buttonLayout)
+
+
+    #--------------------
+    # Make window
+    #--------------------
+    modal = qt.QDialog(_Settings_Hosts)
+    modal.setWindowTitle("Add Host")
+    modal.setFixedWidth(300)
+    modal.setLayout(masterForm)
+    modal.setWindowModality(1)
+
+
+    #--------------------
+    # Clear previous host
+    #--------------------
+    _Settings_Hosts.prevName = None
+
+    
+
+    #--------------------
+    # Button Connectors
+    #--------------------
+    cancelButton.connect("clicked()", modal.close)
+    saveButton.connect("clicked()", saveCallback)
+
+    return modal
+
+
+
+
 def makeSharedHostModalObjects(_Settings_Hosts):
     """ 
     Makes commonly shared UI objects for the Add, Edit popups.
@@ -1038,13 +1046,24 @@ def makeSharedHostModalObjects(_Settings_Hosts):
     @param _Settings_Hosts: The widget that is the parent of the modal.
     @param _Settings_Hosts: Settings_Hosts
     """
-    urlLine = qt.QLineEdit()
-    nameLine = qt.QLineEdit()
-    setDefault = qt.QCheckBox("Set As Default?")
-    usernameLine = qt.QLineEdit()
-        
-    urlLine.setEnabled(True)
-    nameLine.setEnabled(True) 
-    usernameLine.setFont(Settings_Hosts.LABEL_FONT_ITALIC) 
+    lineEdits = {}
+    lineEdits['url'] = qt.QLineEdit()
+    lineEdits['hostname'] = qt.QLineEdit()
 
-    return urlLine, nameLine, setDefault, usernameLine 
+    lineEdits['username'] = qt.QLineEdit()
+
+    errorLines = {}
+    errorLines['url'] = qt.QLabel()
+    errorLines['hostname'] = qt.QLabel()
+    errorLines['username'] = qt.QLabel()
+        
+    checkBoxes = {}
+    checkBoxes['setdefault'] = qt.QCheckBox("Set As Default?")
+
+    lineEdits['url'].setEnabled(True)
+    lineEdits['hostname'].setEnabled(True) 
+    lineEdits['username'].setFont(Settings_Hosts.FONT_ITALIC) 
+
+    
+
+    return lineEdits, errorLines, checkBoxes

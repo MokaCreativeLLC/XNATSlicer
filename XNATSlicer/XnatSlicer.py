@@ -4,6 +4,7 @@ import os
 import inspect
 import sys
 import math
+import copy
 import httplib # to test for SSL installation
 from collections import OrderedDict
 
@@ -234,7 +235,7 @@ class XnatSlicerWidget:
         # Viewer
         #--------------------------------
         self.View = View_Tree(self, self.Settings['VIEW'])  
-
+        
         
         
         #--------------------------------
@@ -815,6 +816,7 @@ class XnatSlicerWidget:
     def onLoginSuccessful(self, callback = None):
       """
       """
+      self.__filterToggled()
       self.__expandCollapsibles(callback)
       self.__storeLoginHost()
 
@@ -973,6 +975,15 @@ class XnatSlicerWidget:
         Event function for when the login button is clicked.
         """        
 
+
+        #--------------------
+        # Don't re-login if we're already logged into the host.
+        #--------------------
+        if self.LoginMenu.hostDropdown.currentText in self.__loggedIn and \
+           self.__loggedIn[self.LoginMenu.hostDropdown.currentText]:
+          return
+
+
         #--------------------
         # Store the current username in settings
         #--------------------
@@ -1061,81 +1072,6 @@ class XnatSlicerWidget:
 
 
 
-    def onFilterButtonClicked(self):
-        """ 
-        As stated.  Handles the toggling of filter
-        buttons relative to one another in the View
-        class.
-        """
-
-
-        try:
-            self.Buttons.buttons['filter']
-        except Exception, e:
-            return
-        #-----------------
-        # Count down buttons
-        #------------------
-        checkedButtons = 0
-        buttonLength = len(self.Buttons.buttons['filter'])
-        for key in self.Buttons.buttons['filter']:
-           currButton = self.Buttons.buttons['filter'][key]
-           if currButton.isChecked():
-               checkedButtons += 1
-
-               
-               
-        #-----------------
-        # If there are no down buttons, apply the ['all']
-        # filter and return.
-        #------------------
-        if checkedButtons == 0:
-            for key in self.Buttons.buttons['filter']:
-                self.Buttons.buttons['filter'][key].setDown(False)
-                self.Buttons.buttons['filter'][key].setChecked(False)
-            self.currentlyToggledFilterButton = ''
-            self.View.loadProjects(['all'])
-            return
- 
-
-        
-        #-----------------
-        # If a new button has been clicked
-        # then set it as the self.currentlyToggledFilterButton. 
-        #------------------
-        for key in self.Buttons.buttons['filter']:
-            currButton = self.Buttons.buttons['filter'][key]
-            if currButton.isChecked() and \
-               self.currentlyToggledFilterButton != currButton:
-                self.currentlyToggledFilterButton = currButton
-                break
-
-            
-                
-        #-----------------
-        # Un-toggle previously toggled buttons.
-        #-----------------
-        for key in self.Buttons.buttons['filter']:
-            currButton = self.Buttons.buttons['filter'][key]
-            if currButton.isChecked() and \
-               self.currentlyToggledFilterButton != currButton:
-                currButton.setDown(False)
-
-                
-
-        #-----------------
-        # Apply method
-        #------------------
-        for key in self.Buttons.buttons['filter']:
-            if self.currentlyToggledFilterButton == \
-               self.Buttons.buttons['filter'][key]:
-                self.View.loadProjects([\
-                              self.currentlyToggledFilterButton.text.lower()])
-
-
-
-
-
     def __collapseDataProbe(self):
         """
         """
@@ -1220,14 +1156,54 @@ class XnatSlicerWidget:
       #try:
       if hasattr(self, 'NodeDetails'):
         self.NodeDetails.updateFromSettings()
+
       if hasattr(self, 'View'):
         self.View.updateFromSettings()
-      if hasattr(self, 'LoginMenu') and isHostChange:
-        self.LoginMenu.updateFromSettings()
+
+      if hasattr(self, 'LoginMenu') and isHostChange: 
+        self.__syncToHostChanges(args[1], args[2])
+
       #except Exception, e:
       #  print (MokaUtils.debug.lf(str(e)))
       #  pass
 
+
+
+
+    def __syncToHostChanges(self, hostChangeEvent, hostName):
+      """
+      Sync function for various changes to Settings_Hosts.
+
+      @param hostChangEvent: The host chang event.
+      @type hostChangeEvent: str
+
+      @param hostName: The name of the host that the operation was performed on.
+      @type hostName: str
+      """
+      #MokaUtils.debug.lf(hostChangeEvent, hostName, 
+      # self.LoginMenu.currHostName)
+      
+      hostCopy = copy.copy(self.LoginMenu.currHostName)
+      isHostAdded = True if hostChangeEvent == 'HOST_ADDED' else False
+      isHostDeleted = True if hostChangeEvent == 'HOST_DELETED' else False
+      isHostModified = True if hostChangeEvent == 'HOST_MODIFIED' else False
+      currLoginHost = self.currLoginHost()
+      currHostChanged = self.LoginMenu.currHostName == hostName
+
+      if not currLoginHost or (currLoginHost 
+                               and isHostDeleted 
+                               and currHostChanged):
+        self.LoginMenu.updateFromSettings()
+      else:
+        self.LoginMenu.Events.suspendEvents(True)
+        self.LoginMenu.updateFromSettings()
+        self.LoginMenu.setHost(hostCopy)
+        self.LoginMenu.Events.suspendEvents(False)
+
+
+
+
+      
 
 
 
@@ -1249,24 +1225,15 @@ class XnatSlicerWidget:
 
           if key == 'VIEW':
                                   
-            def filterToggled():
-              #MokaUtils.debug.lf("FILTER TOGGLED", self.__Settings['VIEW'].\
-              #   buttons['sort']['accessed'].isChecked())
-              if self.__Settings['VIEW'].\
-                 buttons['sort']['accessed'].isChecked():
-                self.View.filter_accessed()
-              else:
-                self.View.filter_all()
-
             #
             # Sort Button event.
             #
-            for key, button \
-                in self.__Settings['VIEW'].buttons['sort'].iteritems():
-              button.connect('clicked()', self.onFilterButtonClicked)
+            #for key, button \
+            #    in self.__Settings['VIEW'].buttons['sort'].iteritems():
+              #button.connect('clicked()', self.onFilterButtonClicked)
 
             self.__Settings['VIEW'].Events.onEvent('FILTERTOGGLED',
-                                                       filterToggled)
+                                 self.__filterToggled)
 
             self.__Settings['VIEW'].linkToSetting(Settings_View.LABEL_METADATA,
                                   self.Settings['METADATA'], 'XNAT Metadata')
@@ -1332,6 +1299,18 @@ class XnatSlicerWidget:
 
 
 
+    def currLoginHost(self):
+      """
+      @return: The key of the loggin host or None
+      @rtype: str
+      """
+      for key, val in self.__loggedIn.iteritems():
+        if val: return key
+      return None
+      
+
+
+
     def __setSettingsWindowLoggedOut(self):
       """
       """
@@ -1374,6 +1353,9 @@ class XnatSlicerWidget:
     def __onHostSelected(self, host):
       """
       As stated.
+
+      @param host: The selected host:
+      @type host: str
       """
       for key, Setting in self.__Settings.iteritems():
         Setting.currXnatHost = host
@@ -1384,3 +1366,24 @@ class XnatSlicerWidget:
         self.__contractCollapsibles()
       else:
         self.__expandCollapsibles()
+
+
+
+
+    def __filterToggled(self, toggled = None):
+        """
+        As stated.
+
+        @param toggled: Whether the button clicked is toggled.
+        @type toggled: bool
+        """
+        #MokaUtils.debug.lf("FILTER TOGGLED", self.__Settings['VIEW'].\
+          #   buttons['sort']['accessed'].isChecked())
+
+        if toggled == None:
+          toggled = self.__Settings['VIEW'].CHECKBOXES\
+                    ['lastAccessed']['widget'].isChecked()
+        if toggled:
+          self.View.filter_accessed()
+        else:
+          self.View.filter_all()

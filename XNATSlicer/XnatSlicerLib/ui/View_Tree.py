@@ -148,11 +148,12 @@ class View_Tree(View, qt.QTreeWidget):
         
 
     def initColumns(self):
-        """ Intializes the columns of the qView_TreeWidget
-            tailoring XNAT metadata to columns.  There are merged 
-            columns that blend two or more columns together
-            and there are single columns associated with single
-            XNAT metadata values.
+        """ 
+        Intializes the columns of the qView_TreeWidget
+        tailoring XNAT metadata to columns.  There are merged 
+        columns that blend two or more columns together
+        and there are single columns associated with single
+        XNAT metadata values.
         """
         self.columns = {}
         for key, level in Xnat.metadata.DEFAULT_TAGS.iteritems():
@@ -286,8 +287,9 @@ class View_Tree(View, qt.QTreeWidget):
 
         
     def getMergedLabelTagByLevel(self, level):
-        """ Points the MERGED_LABEL column tag to the relevant
-            XNAT metadata tag.  This is for the Name/ID/Label column.
+        """ 
+        Points the MERGED_LABEL column tag to the relevant
+        XNAT metadata tag.  This is for the Name/ID/Label column.
         """ 
         level = level.lower()
         if level == 'projects': 
