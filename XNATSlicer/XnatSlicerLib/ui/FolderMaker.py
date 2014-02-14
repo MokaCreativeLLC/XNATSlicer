@@ -15,8 +15,8 @@ from XnatSlicerGlobals import *
 
 class FolderMaker(qt.QWidget):
     """
-    FolderMaker is used for creating new folders
-    within XNAT at the projects, subjects, experiments levels.
+    FolderMaker is used for creating new folders within XNAT at the projects, 
+    subjects, experiments levels.
     """
     FONT_NAME = 'Arial'
     FONT_SIZE = 10
@@ -29,7 +29,7 @@ class FolderMaker(qt.QWidget):
         @param parent: Parent widget.
         @type parent: qt.QWidget
 
-        @param View: The View module.
+        @param View: The View module of XNATSlicer.
         @type View: View
         """
 
@@ -44,14 +44,14 @@ class FolderMaker(qt.QWidget):
         #--------------------
         self.View = View
         self.Events = MokaUtils.Events(self.EVENT_TYPES)
-        self.xsiList = qt.QComboBox()
-        self.xsiList.addItems([key for key, value in \
+        self.__xsiList = qt.QComboBox()
+        self.__xsiList.addItems([key for key, value in \
                                Xnat.xsi.DEFAULT_TYPES.iteritems()])
-        self.levelLabels = {}
-        self.lineEdits = {}
-        self.errorLines = {}
-        self.levelTracker = {}
-        self.nextLevelList = []
+        self.__levelLabels = {}
+        self.__lineEdits = {}
+        self.__errorLines = {}
+        self.__levelTracker = {}
+        self.__nextLevelList = []
 
 
         #--------------------
@@ -67,45 +67,35 @@ class FolderMaker(qt.QWidget):
 
     def show(self):
         """
-        Inherits from qt.QWidget.  Display the FolderMaker widget.
+        Inherits from qt.QWidget.   Conducts some custom routines as well.
         """
         try:
-            for key, widget in self.lineEdits.iteritems():
+            for key, widget in self.__lineEdits.iteritems():
                 widget.clear()
         except:
             pass
         selectedXnatLevel = self.__getSelectedXnatLevel()     
-        self.__storeLevelValues(selectedXnatLevel) 
+        self.__trackRelevantNodes(selectedXnatLevel) 
         
-        # hide and show to bring back to front
+
+        #--------------------
+        # Hide and show to bring back to front
+        #--------------------
         self.hide()
         qt.QWidget.show(self)
-        # enable line edits
-        for level, item in self.lineEdits.iteritems():
+
+
+        #--------------------
+        # Enable line edits
+        #--------------------
+        for level, item in self.__lineEdits.iteritems():
             item.setEnabled(True)
-        # prepopulate based on viewer
+
+
+        #--------------------
+        # Prepopulate
+        #--------------------
         self.__prepopulate_ByViewSelection(selectedXnatLevel)
-
-
-
-
-    def __prepopulate_ByViewSelection(self, level):
-        """
-        As stated.
-        """
-        # Only do this for non-projects
-        levelInd = self.xnatLevels.index(level)
-        if levelInd > 0:
-            levelInd -= 1
-            while levelInd > -1:
-                #MokaUtils.debug.lf(self.levelTracker)
-                currLevel = self.xnatLevels[levelInd]
-                val = self.levelTracker[currLevel][0]
-                self.lineEdits[currLevel].setText(val)
-                self.lineEdits[currLevel].setEnabled(False)
-                levelInd -= 1
-
-                
 
 
 
@@ -113,7 +103,9 @@ class FolderMaker(qt.QWidget):
     def eventFilter(self, widget, event):
         """ 
         Inherits from qt.QWidget -- does not need to be called programatically.
-        Event filter for line edit interaction
+        Event filter for line edit interaction.
+        Refer to: U{http://qt-project.org/doc/qt-4.8/qevent.html#Type-enum} for
+        more information.
 
         @param widget: The widget calling the event.
         @type widget: qt.QWidget
@@ -121,7 +113,7 @@ class FolderMaker(qt.QWidget):
         @param event: The QT event.
         @type event: number     
         """
-        for level, lineEdit in self.lineEdits.iteritems():
+        for level, lineEdit in self.__lineEdits.iteritems():
             # click or key release
             if (event.type() == 3 or event.type() == 7) and widget == lineEdit:
                 #print "CLICK!"
@@ -156,14 +148,14 @@ class FolderMaker(qt.QWidget):
 
     def __generateUriFromLines(self):
         """
-        As sated.
+        Generates an XNAT uri to create a folder based on the line edits.
         @return: The generated XNAT uri.
         @rtype: str
         """
         # Construct URI based on XNAT rules.
         xnatUri = ''
         for level in self.xnatLevels:
-            lineText = XnatSlicerUtils.toPlainText(self.lineEdits[level].text)
+            lineText = XnatSlicerUtils.toPlainText(self.__lineEdits[level].text)
             if len(lineText) > 0:
                 xnatUri += '/' + level + '/'
                 uriAdd = lineText
@@ -171,7 +163,7 @@ class FolderMaker(qt.QWidget):
                 # Special case for experiments
                 if level == 'experiments':
                     xnatUri += '?xsiType=' + \
-                               Xnat.xsi.DEFAULT_TYPES[self.xsiList.currentText]
+                    Xnat.xsi.DEFAULT_TYPES[self.__xsiList.currentText]
             else:
                 break
         return xnatUri
@@ -181,17 +173,18 @@ class FolderMaker(qt.QWidget):
 
     def __clearErrorLines(self):
         """
-        As stated.
+        Clears the error lines.
         """
         #MokaUtils.debug.lf()
-        for key, errorLine in self.errorLines.iteritems():
+        for key, errorLine in self.__errorLines.iteritems():
             errorLine.setText('')
+
 
 
 
     def __onAddButtonClicked(self):
         """
-        As stated.
+        Callback when the add button is clicked.
         """
         self.close()
         self.__clearErrorLines()
@@ -206,7 +199,6 @@ class FolderMaker(qt.QWidget):
         """ 
         Callback if the create button is clicked. Communicates with
         XNAT to create a folder. Details below.
-
         @param button: The button that was clicked.
         @type button: qt.QAbstractButton
         """
@@ -218,9 +210,58 @@ class FolderMaker(qt.QWidget):
 
 
 
-    def __prepopulateParentLines(self, level, item = None):
+    def __onLineEditTextChanged(self, level, text):
+        """ 
+        Validates the line edit text for the folder to add:
+            - Checks for invalid characters.
+            - Checks if the name is already taken.
+            - Populates the line edits accordingly.
+            - Unpopulates the line edits accordingly.
+        @param level: The level of the pertaining lineEdit.
+        @type level: string
+        @param text:  The text in the pertaining lineEdit.
+        @type text: string
         """
-        As stated.
+        if hasattr(self, 'addButton'):
+            self.addButton.setEnabled(True)
+        if len(text.strip(" ")) > 0 and self.View.currentItem():
+            self.__prepopulate_byParentLines(level)
+            self.__unpopulateChildLines(level)
+            self.__errorLines[level].setText('')
+            self.__checkTextInvalid(level, text)
+            self.__checkTextInUse(level, text)
+        else:
+            if hasattr(self, 'addButton'):
+                self.addButton.setEnabled(False)
+
+
+
+
+    def __prepopulate_ByViewSelection(self, level):
+        """
+        Prepopulates the lineEdits based on the selection in the View.
+        @param level: The level of the current lineEdit.
+        @type level: string
+        """
+        # Only do this for non-projects
+        levelInd = self.xnatLevels.index(level)
+        if levelInd > 0:
+            levelInd -= 1
+            while levelInd > -1:
+                #MokaUtils.debug.lf(self.__levelTracker)
+                currLevel = self.xnatLevels[levelInd]
+                val = self.__levelTracker[currLevel][0]
+                self.__lineEdits[currLevel].setText(val)
+                self.__lineEdits[currLevel].setEnabled(False)
+                levelInd -= 1
+
+
+
+
+    def __prepopulate_byParentLines(self, level, item = None):
+        """
+        Prepopulates the line edits based on the the parent lines of the
+        currently edited line edit.
         @param level: The level of the current lineEdit.
         @type level: string
         """
@@ -239,23 +280,22 @@ class FolderMaker(qt.QWidget):
                 # is found in the stored values OR the parent
                 # line is empty.
                 #
-                currText = self.lineEdits[currNodeLevel].text
-                if currText in self.levelTracker[currNodeLevel] or \
+                currText = self.__lineEdits[currNodeLevel].text
+                if currText in self.__levelTracker[currNodeLevel] or \
                    len(currText.strip()) == 0:
-                    self.lineEdits[currNodeLevel].setText(currNodeText)
+                    self.__lineEdits[currNodeLevel].setText(currNodeText)
 
 
 
 
     def __unpopulateChildLines(self, level):
         """
-        As stated.
+        Unpopulates the child lines of a lineEdit given certain criteria.
         @param level: The level of the current lineEdit.
         @type level: string
         """
         currNodeText = self.View.getItemName()
         currNodeLevel = self.View.getItemLevel()
-
         if (currNodeLevel.lower() == level.lower()) and \
            (currNodeLevel in self.xnatLevels):
             currNodeLevelInd = self.xnatLevels.index(currNodeLevel)
@@ -263,60 +303,47 @@ class FolderMaker(qt.QWidget):
             if currNodeLevelInd > -1:
                 childLevel = currNodeLevelInd + 1
                 try:
-                    self.lineEdits[childLevel].setText('')
+                    self.__lineEdits[childLevel].setText('')
                 except: 
                     pass
         
-        
+     
 
-
-    def __showInvalidLineError(self, level):
-        """
-        As sated.
-
-        @param level: The level of the pertaining lineEdit.
-        @type level: string
-        """
-        #
-        # Show error if there are invalid characters
-        #
-        invalidMsg = MokaUtils.string.getInvalidMessage(spacesValid = False)
-        self.errorLines[level].setText(\
-                            '<font color=\"red\">%s</font>'%(invalidMsg))
-        self.addButton.setEnabled(False)
-
-
-
-
+   
     def __checkTextInvalid(self, level, text):
         """ 
+        Checks if a text line is invalid based on it's characters.
         @param level: The level of the pertaining lineEdit.
         @type level: string
-
         @param text:  The text in the pertaining lineEdit.
         @type text: string
         """   
         #print "VALID", MokaUtils.string.isValid(text, spacesValid = False)
         if not MokaUtils.string.isValid(text, spacesValid = False):
             #MokaUtils.debug.lf()
-            self.__showInvalidLineError(level)
+            invalidMsg = MokaUtils.string.getInvalidMessage(spacesValid = False)
+            self.__errorLines[level].setText(\
+                                '<font color=\"red\">%s</font>'%(invalidMsg))
+            self.addButton.setEnabled(False)
             return
 
+               
 
 
-
-    def __isChildLevelPopulated(self, level):
+    def __isChildLineEditPopulated(self, level):
         """
-        As stated.
+        Determines if the child level line edit is populated.
         @param level: The level of the pertaining lineEdit.
         @type level: string
+        @return: Whether the child line edit is populated.
+        @rtype: str
         """
         childLevel = None
         try:
             childLevel = self.xnatLevels[self.xnatLevels.index(level)+1]
         except:
             pass
-        if childLevel and len(self.lineEdits[childLevel].text) > 0:
+        if childLevel and len(self.__lineEdits[childLevel].text) > 0:
             return True
         return False
 
@@ -325,25 +352,24 @@ class FolderMaker(qt.QWidget):
 
     def __checkTextInUse(self, level, text):
         """
-        As stated.
-
+        Shows an error message if a given text is taken already by the sibling
+        nodes of the current view object.
         @param level: The level of the pertaining lineEdit.
         @type level: string
-
         @param text:  The text in the pertaining lineEdit.
         @type text: string
         """
-        #MokaUtils.debug.lf(level, text, self.levelTracker)
-        if level in self.levelTracker:
+        #MokaUtils.debug.lf(level, text, self.__levelTracker)
+        if level in self.__levelTracker:
             
-            for itemText in self.levelTracker[level]:
+            for itemText in self.__levelTracker[level]:
                 #MokaUtils.debug.lf(text.lower(), itemText, itemText.lower())
                 if text.lower() == itemText.lower():
                     #MokaUtils.debug.lf("CHILD POP", 
-                    #                   self.__isChildLevelPopulated(level))
-                    if self.__isChildLevelPopulated(level):
+                    #                   self.__isChildLineEditPopulated(level))
+                    if self.__isChildLineEditPopulated(level):
                         #MokaUtils.debug.lf("CHILD LEVEL POPULATED")
-                        self.errorLines[level].setText('')
+                        self.__errorLines[level].setText('')
                         continue
                     errorText = \
                     "<font color=\"red\">The %s name '%s' is"%(\
@@ -352,60 +378,29 @@ class FolderMaker(qt.QWidget):
                     if level != 'experiments':
                         errorText += '  Populate below fields to remove this '
                         errorText += ' message. </font>'
-                    self.errorLines[level].setText(errorText)
+                    self.__errorLines[level].setText(errorText)
                     self.addButton.setEnabled(False)
 
         parentInd = self.xnatLevels.index(level) - 1
         if parentInd >= 0:
-            self.errorLines[self.xnatLevels[parentInd]].setText('')
+            self.__errorLines[self.xnatLevels[parentInd]].setText('')
                         
 
 
 
-
-    def __onLineEditTextChanged(self, level, text):
-        """ 
-        Validates the line edit text for the folder
-        to add:
-            - Checks for invalid characters.
-            - Checks if the name is already taken.
-            - Populates the line edits accordingly.
-            - Unpopulates the line edits accordingly.
-
-        @param level: The level of the pertaining lineEdit.
-        @type level: string
-
-        @param text:  The text in the pertaining lineEdit.
-        @type text: string
+    def __trackSiblingsAndParents(self, xnatLevel):
         """
-
-        if hasattr(self, 'addButton'):
-            self.addButton.setEnabled(True)
-
-        if len(text.strip(" ")) > 0 and self.View.currentItem():
-            self.__prepopulateParentLines(level)
-            self.__unpopulateChildLines(level)
-            self.errorLines[level].setText('')
-            self.__checkTextInvalid(level, text)
-            self.__checkTextInUse(level, text)
-        else:
-            if hasattr(self, 'addButton'):
-                self.addButton.setEnabled(False)
-
-
-
-
-    def __storeAtXnatLevel(self, xnatLevel):
-        """
+        Stores the sibling nodes of wthin the given XNAT level provided 
+        in the view.
         @param xnatLevel: The selected XNAT devel to derive values from
         @type xnatLevel: string
         """
         #MokaUtils.debug.lf(xnatLevel)
         # Store siblings
-        self.levelTracker = {}
-        self.levelTracker[xnatLevel] = []
+        self.__levelTracker = {}
+        self.__levelTracker[xnatLevel] = []
         def addToList(item):
-            self.levelTracker[xnatLevel].append(self.View.getItemName(item))
+            self.__levelTracker[xnatLevel].append(self.View.getItemName(item))
         self.View.loopSiblingNodes(addToList)
 
         # Store parents
@@ -414,15 +409,16 @@ class FolderMaker(qt.QWidget):
         for parent in itemParents:
             #print self.View.getItemLevel(parent)
             #print self.View.getItemName(parent)
-            self.levelTracker[self.View.getItemLevel(parent)] = \
+            self.__levelTracker[self.View.getItemLevel(parent)] = \
                                                 [self.View.getItemName(parent)]
-        #MokaUtils.debug.lf("STORE PARENTS", self.levelTracker)
+        #MokaUtils.debug.lf("STORE PARENTS", self.__levelTracker)
             
 
 
 
-    def __storeAtChildXnatLevel(self, xnatLevel):
+    def __trackChildren(self, xnatLevel):
         """
+        Tracks the child node values of relative to the given view item.
         @param xnatLevel: The selected XNAT devel to derive values from
         @type xnatLevel: string
         """
@@ -432,30 +428,28 @@ class FolderMaker(qt.QWidget):
             def addToSublevelList(item):                
                 itemLevel = self.View.getItemLevel(item)
                 itemValue = self.View.getItemName(item)
-                if not itemLevel in self.levelTracker: 
-                    self.levelTracker[itemLevel] = []
-                self.levelTracker[itemLevel].append(itemValue)
+                if not itemLevel in self.__levelTracker: 
+                    self.__levelTracker[itemLevel] = []
+                self.__levelTracker[itemLevel].append(itemValue)
             self.View.loopChildren(self.View.currentItem(), addToSublevelList)
 
 
 
 
-    def __storeLevelValues(self, xnatLevel, storeChildLevel = True):
+    def __trackRelevantNodes(self, xnatLevel, trackChildren = True):
         """
-        Store all of the existing values in the current selected XnatLevel.
-        
+        Tracks the relevant nodes for error checking: children, parents, and 
+        siblings.
         @param xnatLevel: The selected XNAT devel to derive values from
         @type xnatLevel: string
-
-        @param storeChildLevel: Whether to store the next level values.
-        @type storeChildLevel: bool
+        @param trackChildren: Whether to store the next level values.
+        @type trackChildren: bool
         """
-        self.__storeAtXnatLevel(xnatLevel)
-        if storeChildLevel:
-            self.__storeAtChildXnatLevel(xnatLevel)
+        self.__trackSiblingsAndParents(xnatLevel)
+        if trackChildren:
+            self.__trackChildren(xnatLevel)
 
             
-
 
 
     def __createLevelLabels(self, level):
@@ -464,9 +458,9 @@ class FolderMaker(qt.QWidget):
         @param level: The level to make the widget for.
         @type level: str
         """
-        self.levelLabels[level] = qt.QLabel(self)
-        self.levelLabels[level].setFixedHeight(25)      
-        self.levelLabels[level].setText('<b>' + 
+        self.__levelLabels[level] = qt.QLabel(self)
+        self.__levelLabels[level].setFixedHeight(25)      
+        self.__levelLabels[level].setText('<b>' + 
                              MokaUtils.string.toTitleCase(level) + ': </b>')    
 
 
@@ -478,9 +472,9 @@ class FolderMaker(qt.QWidget):
         @param level: The level to make the widget for.
         @type level: str
         """
-        self.lineEdits[level] = qt.QLineEdit(self)
-        self.lineEdits[level].installEventFilter(self)
-        self.lineEdits[level].setFixedHeight(25)
+        self.__lineEdits[level] = qt.QLineEdit(self)
+        self.__lineEdits[level].installEventFilter(self)
+        self.__lineEdits[level].setFixedHeight(25)
 
 
 
@@ -491,10 +485,10 @@ class FolderMaker(qt.QWidget):
         @param level: The level to make the widget for.
         @type level: str
         """
-        self.errorLines[level] = qt.QLabel(self)
-        self.errorLines[level].setTextFormat(1)
-        self.errorLines[level].setFixedHeight(12)
-        self.errorLines[level].setFont(qt.QFont(self.FONT_NAME, 
+        self.__errorLines[level] = qt.QLabel(self)
+        self.__errorLines[level].setTextFormat(1)
+        self.__errorLines[level].setFixedHeight(12)
+        self.__errorLines[level].setFont(qt.QFont(self.FONT_NAME, 
                                                 self.FONT_SIZE, 10, False))
 
 
@@ -552,12 +546,12 @@ class FolderMaker(qt.QWidget):
         self.mainLayout = qt.QVBoxLayout()
         for level in self.xnatLevels:
             lineLayout = qt.QHBoxLayout()
-            lineLayout.addWidget(self.levelLabels[level])
+            lineLayout.addWidget(self.__levelLabels[level])
             if level == 'experiments':
-                lineLayout.addWidget(self.xsiList)
-            lineLayout.addWidget(self.lineEdits[level])            
+                lineLayout.addWidget(self.__xsiList)
+            lineLayout.addWidget(self.__lineEdits[level])            
             self.mainLayout.addLayout(lineLayout)
-            self.mainLayout.addWidget(self.errorLines[level])
+            self.mainLayout.addWidget(self.__errorLines[level])
         self.mainLayout.addStretch()
         self.mainLayout.addWidget(self.buttonRow)
         self.setLayout(self.mainLayout)
