@@ -3,6 +3,7 @@ from __main__ import qt
 
 # external
 from Xnat import *
+from MokaUtils import *
 
 # module
 from Timer import *
@@ -59,7 +60,7 @@ class View(object):
 
     
     
-    def begin(self, skipAnim = False):
+    def begin(self, skipAnim = False, hardReset = False):
         """ 
         Begins the the View communication process, 
         first by retrieving the projects from the XNAT server 
@@ -70,14 +71,18 @@ class View(object):
 
         @param skipAnim: Whether to skip the animation.
         @type skipAnim: bool
+
+        @param hardReset: Whether to do a hard reset.
+        @type hardReset: bool
         """
 
-
+        #MokaUtils.debug.lf("BEGIN", skipAnim, hardReset)
         #----------------------
         # Check projects
         #----------------------
         projectContents = None
-        if self.MODULE.XnatIo.projectCache == None:
+        if hardReset or self.MODULE.XnatIo.projectCache == None:
+            #MokaUtils.debug.lf()
             self.clear()
             projectContents = None
 
@@ -111,8 +116,8 @@ class View(object):
         #----------------------
         if not skipAnim:
             self.MODULE.onLoginSuccessful()
-            self.loadProjects(filters = None, projectContents = projectContents)
-            slicer.app.processEvents()
+        self.loadProjects(filters = None, projectContents = projectContents)
+        slicer.app.processEvents()
         self.MODULE.Buttons.setEnabled(buttonKey='addFolder', enabled=True) 
 
 

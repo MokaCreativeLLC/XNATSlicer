@@ -429,7 +429,8 @@ class MokaUtils(object):
         """
         A subclass of MokaUtils pertaining to 'string' objects.
         """
-        
+        ILLEGAL_CHARS = '@!#$%[&^*()+=<>/{}[\]~`].*|;:"\'?'
+
         @staticmethod
         def removeNonAlphanumeric(string):
             """
@@ -554,6 +555,40 @@ class MokaUtils(object):
 
 
 
+        @staticmethod
+        def isValid(string, spacesValid = True):
+            """
+            @param string: The string to check.
+            @type string: str
+            
+            @return: Whether the string is valid, and the message.
+            @rtype: bool, str
+            """
+            illChars = MokaUtils.string.ILLEGAL_CHARS
+            if not spacesValid:
+                illChars += ' '
+            for char in illChars:
+                if char in string:
+                    return False
+            return True
+
+
+
+        @staticmethod
+        def getInvalidMessage(spacesValid = True):
+            """
+            @param string: The string to check.
+            @type string: str
+            
+            @return: Whether the string is valid, and the message.
+            @rtype: bool, str
+            """
+            badChars = MokaUtils.string.ILLEGAL_CHARS
+            if not spacesValid: badChars += ' '
+            return "The following characters are not allowed: '%s'"%(badChars)
+
+
+
 
         @staticmethod 
         def dateTime():
@@ -565,7 +600,8 @@ class MokaUtils(object):
             @rtype: string
             """
             
-            return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").replace(':','_').replace(" ", "__").strip()
+            return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").\
+                replace(':','_').replace(" ", "__").strip()
 
 
 
@@ -578,7 +614,8 @@ class MokaUtils(object):
             @param _str: The string to replace.
             @type str: string
 
-            @param replaceStr: The string to replace the forbidden characters with.
+            @param replaceStr: The string to replace the forbidden characters 
+                with.
             @type replaceStr: string
 
             @return: The modified string.

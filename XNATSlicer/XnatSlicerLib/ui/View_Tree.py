@@ -495,21 +495,38 @@ class View_Tree(View, qt.QTreeWidget):
         
     def getColumn(self, metadataKey):
         """ 
-        Returns a column location within the qTreeWidget
-        based on it's metadata key.
+        Returns a column location within the qTreeWidget based on it's 
+        metadata key.
+        @return: The column number.
+        @rtype: int
         """
         return self.columns[metadataKey]['location']
 
 
 
     
-    def getCurrItemName(self):
+    def getItemName(self, item = None):
         """ 
-        Returns the 'MERGED_LABEL' value of the currenly 
-        selectedItem
+        Returns the 'MERGED_LABEL' value of the item.
+        @return: The 'MERGED_LABEL' value of the item.
+        @rtype: str
         """
-        return self.currentItem().text(self.columns['MERGED_LABEL']['location'])
+        if not item: 
+            item = self.currentItem()
+        return item.text(self.columns['MERGED_LABEL']['location'])
         
+
+
+
+    def getItemLevel(self, item = None):
+        """ 
+        Returns the 'XNAT_LEVEL' value of the item.
+        @return: The 'XNAT_LEVEL' value of the item.
+        @rtype: str
+        """
+        if not item: 
+            item = self.currentItem()
+        return item.text(self.MODULE.View.columns['XNAT_LEVEL']['location'])
 
 
     
@@ -702,21 +719,72 @@ class View_Tree(View, qt.QTreeWidget):
 
 
 
-    def loopChildren(self, currNode, callback):
+    def expandItem(self, item = None):
         """
+        As sated.
         """
-        for i in range(0, currNode.childCount()):            
-            currChild = currNode.child(i)
+        if not item and self.currentItem():
+            item = self.currentItem()
+        self.onTreeItemExpanded(item)
+        
+
+
+
+    def projectExists(self, projectName):
+        """
+        Determines if a project of a given name exists.
+        @param projectName: The project name.
+        @type projectName: str
+        @return: Whether the project exists.
+        @rtype: bool
+        """
+        self.__projExists = False
+        def findProj(item):
+            if projectName.lower() == self.getItemName(item).lower():
+                self.__projExists = True
+        self.loopProjectNodes(findProj)
+        return self.__projExists
+
+
+
+
+    def loopSiblingNodes(self, callback, item = None):
+        """
+        Loops the nodes at the sibling level.
+
+        @param callback: The callback function.
+        @type callback: function
+
+        @param item: The item provided, defaults to current.
+        @type item: qt.QTreeWidgetItem
+        """
+        if not self.currentItem() or self.getItemLevel() == 'projects':
+            self.loopProjectNodes(callback)
+        else:
+            self.loopChildren(self.currentItem().parent(), callback)
+
+
+
+    def loopChildren(self, item, callback):
+        """
+        @param callback: The callback function.
+        @type callback: function
+
+        @param item: The item provided, defaults to current.
+        @type item: qt.QTreeWidgetItem
+        """
+        for i in range(0, item.childCount()):            
+            currChild = item.child(i)
             callback(currChild)
             
 
 
-    def traverseTree(self, currNode, callback):
+    def traverseTree(self, item, callback):
         """
         """
         
-        for i in range(0, currNode.childCount()): 
-            currChild = currNode.child(i)
+        for i in range(0, item.childCount()): 
+            currChild = item.child(i)
             callback(currChild)
             self.traverseTree(currChild, callback)
             
@@ -1159,37 +1227,43 @@ class View_Tree(View, qt.QTreeWidget):
 
             
     def selectItem_byUri(self, pathStr):
-        """  Selects a qTreeWidgetItem based on the URI.  Breaks
-             down the URI and traverses the tree for th relevant strings.
+        """  
+        Selects a qTreeWidgetItem based on the URI.  Breaks
+        down the URI and traverses the tree for th relevant strings.
         """
              
         #------------------------
         # Break apart pathStr to its Xnat categories
         #------------------------
         pathDict = XnatSlicerUtils.getXnatPathDict(pathStr)
-        ##print "PATH DICT1", pathDict
-
+        
         
         #------------------------
         # Reload projects if it can't find the project initially
         #------------------------
-        foundProjects = self.findItems(pathDict['projects'], 0)
-            
-        if not self.findItems(pathDict['projects'], 0) \
-           or len(foundProjects) == 0: 
-            ##print "IT SHOULD LOAD PROJECTS"
-            self.MODULE.XnatIo.projectCache = None
-            self.begin(skipAnim = True)
-            slicer.app.processEvents()
-            foundProjects = self.findItems(pathDict['projects'],1)
+        foundProjects = self.findItems(pathDict['projects'], 1)
+        
 
+        # For Debugging...
+        #MokaUtils.debug.lf("FOUND PROJECTS", foundProjects)
+        #MokaUtils.debug.lf("PATH DICT1", pathStr, pathDict)
+        #def _print(item):
+        #    MokaUtils.debug.lf("ITEM TEXT", item.text(0))
+        #self.loopProjectNodes(_print)
+
+        if len(foundProjects) == 0: 
+            #MokaUtils.debug.lf()
+            self.MODULE.XnatIo.projectCache = None
+            self.begin(skipAnim = True, hardReset = True)
+            slicer.app.processEvents()
+            foundProjects = self.findItems(pathDict['projects'], 1)
+            #MokaUtils.debug.lf("FOUND PROJECTS2", foundProjects)
 
             
         #------------------------
         # Start by setting the current item at the project level, 
         # get its children
         #------------------------
-
         self.setCurrentItem(foundProjects[0])
 
 

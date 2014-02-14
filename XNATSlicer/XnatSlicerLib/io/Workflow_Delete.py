@@ -40,8 +40,10 @@ class Workflow_Delete(object):
         """
         deleteDialog = qt.QMessageBox()
         deleteDialog.setIcon(qt.QMessageBox.Warning)
-        deleteDialog.setText("Are you sure you want to delete '%s' from Xnat?"%(self.MODULE.View.getCurrItemName()))   
-        deleteDialog.connect('buttonClicked(QAbstractButton*)', self.beginWorkflow)
+        deleteDialog.setText("Are you sure you want to delete '%s' from Xnat?"\
+                             %(self.MODULE.View.getItemName()))   
+        deleteDialog.connect('buttonClicked(QAbstractButton*)', 
+                             self.beginWorkflow)
         deleteDialog.addButton(qt.QMessageBox.Ok)
         deleteDialog.addButton(qt.QMessageBox.Cancel) 
         return deleteDialog

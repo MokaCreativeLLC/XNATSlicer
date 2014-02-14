@@ -306,7 +306,8 @@ class XnatSlicerWidget:
     def __initFolderMaker(self):
       """
       """
-      self.FolderMaker = FolderMaker(None, self)
+      self.FolderMaker = FolderMaker(None, self.View)
+      self.FolderMaker.Events.onEvent('folderAdded', self.__onFolderAdded)
 
 
 
@@ -562,6 +563,36 @@ class XnatSlicerWidget:
         #--------------------
         self.View.begin()
 
+
+
+    def __putFolderAndSelect(self, xnatUri, sel = True):
+      """
+      As stated.
+      @param xnatUri: The XNAT uri indicating the added folder.
+      @type xnatUri: str
+      """
+      self.XnatIo.putFolder(xnatUri)
+      slicer.app.processEvents()
+      if not sel:
+        return
+      self.View.selectItem_byUri(xnatUri.split('?')[0])
+      slicer.app.processEvents()
+
+
+
+    def __onFolderAdded(self, xnatUri):
+      """
+      Callback when a folder is added via the FolderMaker class.
+      @param xnatUri: The XNAT uri indicating the added folder.
+      @type xnatUri: str
+      """
+      pathDict = XnatSlicerUtils.getXnatPathDict(xnatUri)
+      projName = pathDict['projects']
+      #MokaUtils.debug.lf(pathDict, projName)
+      if not self.View.projectExists(projName):
+        #MokaUtils.debug.lf("Project", projName, "does not exist!")
+        self.__putFolderAndSelect('projects/' + projName, False)
+      self.__putFolderAndSelect(xnatUri)
 
 
 
@@ -847,6 +878,8 @@ class XnatSlicerWidget:
         #--------------------
         if self.LoginMenu.hostDropdown.currentText in self.__loggedIn and \
            self.__loggedIn[self.LoginMenu.hostDropdown.currentText]:
+          self.__loggedIn[self.LoginMenu.hostDropdown.currentText] = False
+          self. __contractCollapsibles(self.onLoginButtonClicked)
           return
 
 

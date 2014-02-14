@@ -12,31 +12,42 @@ class Xnat(object):
     The Xnat suite for python.
 
     @author: Sunil Kumar (sunilk@mokacreativellc.com)
-    @contact: Sunil Kumar (sunilk@mokacreativellc.com), Dan Marcus (dmarcus@wustl.edu)
-    @organization: Moka Creative, LLC in collaboration wtih The Neuroinformatics Research Group (NRG) 
+    @contact: Sunil Kumar (sunilk@mokacreativellc.com), 
+        Dan Marcus (dmarcus@wustl.edu)
+    @organization: Moka Creative, LLC in collaboration wtih 
+        The Neuroinformatics Research Group (NRG) 
         and The National Alliance for Medial Computing (NA-MIC)
     @copyright: 2014 Washington University, All Rights Reserved
     @license: XNAT Software License Agreement
 
-       Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) / Washington University
+       Copyright 2005 Harvard University / Howard Hughes Medical Institute 
+        (HHMI) / Washington University
        All rights reserved.
 
-       Redistribution and use in source and binary forms, with or without modification, are permitted 
-       provided that the following conditions are met:
+       Redistribution and use in source and binary forms, with or without 
+       modification, are permitted provided that the following conditions are 
+       met:
 
-       Redistributions of source code must retain the above copyright notice, this list of conditions 
-       and the following disclaimer.
-       Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
-       and the following disclaimer in the documentation and/or other materials provided with the distribution.
-       Neither the names of Washington University, Harvard University and HHMI nor the names of its contributors 
-       may be used to endorse or promote products derived from this software without specific prior written permission.
-       THIS SOFTWARE IS PROVIDED BY The COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
-       WARRANTIES, INCLUDING, BUT NOT LIMITED TO, The IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-       PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL The COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
-       ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
-       TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-       HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-       NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF The USE OF THIS SOFTWARE, EVEN IF ADVISED OF The 
+       Redistributions of source code must retain the above copyright notice, 
+       this list of conditions and the following disclaimer.
+       Redistributions in binary form must reproduce the above copyright 
+       notice, this list of conditions and the following disclaimer in the 
+       documentation and/or other materials provided with the distribution.
+       Neither the names of Washington University, Harvard University and HHMI 
+       nor the names of its contributors may be used to endorse or promote 
+       products derived from this software without specific prior written 
+       permission.
+       THIS SOFTWARE IS PROVIDED BY The COPYRIGHT HOLDERS AND CONTRIBUTORS "AS 
+       IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+       TO, The IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+       PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL The COPYRIGHT 
+       HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+       SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+       TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+       PROFITS; OR BUSINESS INTERRUPTION) 
+       HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+       STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+       IN ANY WAY OUT OF The USE OF THIS SOFTWARE, EVEN IF ADVISED OF The 
        POSSIBILITY OF SUCH DAMAGE.
     """
 
@@ -44,15 +55,18 @@ class Xnat(object):
 
     class io(object):
         """
-        XnatIo is a lightweight communicator class to XNAT. XnatIo uses REST calls to 
-        send/receive commands and files to XNAT. Since input is usually string-based, there are 
+        XnatIo is a lightweight communicator class to XNAT. XnatIo uses REST 
+        calls to 
+        send/receive commands and files to XNAT. Since input is usually 
+        string-based, there are 
         several utility methods in this class to clean up strings.  Its primary
         communicator classes are httplib and urllib2.
 
         Example Usage:
 
         >>> from XnatIo import *
-        >>> xnatIo = XnatIo('http://central.xnat.org', 'testUser', 'testUserPassword')
+        >>> xnatIo = XnatIo('http://central.xnat.org', 'testUser', \
+            'testUserPassword')
         >>> contents = xnatIo.getFolder('projects')
         >>> print contents[111]['ID']
         'XNATSlicerTest'    
@@ -73,7 +87,8 @@ class Xnat(object):
             """ 
             Initializes the internal variables. 
 
-            @param host: The XNAT host to interact with.  NOTE: Full domain name needed.
+            @param host: The XNAT host to interact with.  NOTE: Full domain 
+                name needed.
             @type host: string
 
             @param username: The username for the XNAT host.
@@ -109,7 +124,8 @@ class Xnat(object):
             #-------------------
             # Make relevant variables for __httpsRequests
             #-------------------       
-            base64string = base64.encodestring('%s:%s' % (self.username, self.password))[:-1]
+            base64string = base64.encodestring('%s:%s' % (self.username, 
+                                                          self.password))[:-1]
             self.authHeader = { 'Authorization' : 'Basic %s' %(base64string) }
             self.fileDict = {};
 
@@ -121,22 +137,26 @@ class Xnat(object):
             Returns the contents of a given folder provided in the arguments
             'folderUris'.  Returns an object based on the 'metadata' argument
             which filters the return contents.  The 'queryArgs' parameter
-            deals generally with further fitering of certain contents within a given folder. 
-            For instance, to get projects only the user has access to, the URI needs
-            to be appended with '?accessible=True'.
+            deals generally with further fitering of certain contents within a 
+            given folder. 
+            For instance, to get projects only the user has access to, the URI 
+            needs to be appended with '?accessible=True'.
 
-            @param folderUris: A string or list of URIs to retrieve the contents from.
+            @param folderUris: A string or list of URIs to retrieve the 
+                contents from.
             @type folderUris: string | list.<string>
 
-            @param metadata: A list of metadata attributes to include in the return dict.  
-                Default is all metadata.
+            @param metadata: A list of metadata attributes to include in the 
+                return dict.  Default is all metadata.
             @type metadata: list.<string>
 
-            @param queryArgs: A string or list of query argument suffixes to apply (i.e. the '?queryArg=arg' suffixes). 
+            @param queryArgs: A string or list of query argument suffixes to 
+                apply (i.e. the '?queryArg=arg' suffixes). 
                 See XNAT documentation for more details.  Default is no suffix. 
             @type queryArgs: string | list.<string>
 
-            @return: A list of dicts describing the contents of the folders, with metadata as keys.
+            @return: A list of dicts describing the contents of the folders, 
+                with metadata as keys.
             @rtype: list.<dict>
             """
 
@@ -164,7 +184,8 @@ class Xnat(object):
                 # Apply query arguments, if any.
                 #
                 if queryArgs:
-                    folderUri = Xnat.path.applyQueryArguments(folderUri, queryArgs)
+                    folderUri = Xnat.path.applyQueryArguments(folderUri, 
+                                                              queryArgs)
 
 
                 #
@@ -186,8 +207,8 @@ class Xnat(object):
 
                 #
                 # If we want the projects, store projects in a dictionary. 
-                # 'self.projectCache' is reset if the user logs into a new host or 
-                # logs in a again.
+                # 'self.projectCache' is reset if the user logs into a new 
+                # host or logs in a again.
                 #
                 if folderUri.endswith('/projects'):
                     self.projectCache = contents
@@ -195,7 +216,8 @@ class Xnat(object):
             #-------------------- 
             # Exit out if there are non-Json or XML values.
             #-------------------- 
-            if str(contents).startswith("<?xml"): return [] # We don't want text values
+            if str(contents).startswith("<?xml"): return [] 
+            # We don't want text values
 
 
 
@@ -212,7 +234,8 @@ class Xnat(object):
                             #
                             if not metadataTag in returnContents:
                                 returnContents[metadataTag] = []
-                            returnContents[metadataTag].append(content[metadataTag])
+                            returnContents[metadataTag].append(\
+                                                    content[metadataTag])
                 else:
                     returnContents = contents
 
@@ -280,7 +303,8 @@ class Xnat(object):
             Furthermore, 'resources' folders are frequently accessed
             as part of the Slicer file location within an 'experiment'.
 
-            @param folder: The folder to retrieve the 'resources' folder contents from.
+            @param folder: The folder to retrieve the 'resources' folder 
+                contents from.
             @type folder: string
             """
 
@@ -301,10 +325,12 @@ class Xnat(object):
             for r in resources:
                 if 'label' in r:
                     resourceNames.append(r['label'])
-                    #print ( +  "FOUND RESOURCE ('%s') : %s"%(folder, r['label']))
+                    #print ( +  "FOUND RESOURCE ('%s') : %s"%(\
+                    # folder, r['label']))
                 elif 'Name' in r:
                     resourceNames.append(r['Name'])
-                    #print ( +  "FOUND RESOURCE ('%s') : %s"%(folder, r['Name']))                
+                    #print ( +  "FOUND RESOURCE ('%s') : %s"%(\
+                    #folder, r['Name']))                
 
                 return resourceNames
 
@@ -329,35 +355,25 @@ class Xnat(object):
             if fileName in self.fileDict:
                 bytes = int(self.fileDict[fileName]['Size'])
                 return {"bytes": (bytes), "MB" : Xnat.utils.bytesToMB(bytes)}
-
             return {"bytes": None, "MB" : None}
+
 
 
 
         def putFolder(self, _dst):
             """ 
             Function for adding a folder to a given XNAT host.
-
             @param _dst: The uri of the folder to put into the XNAT host.
             @type _dst: string
             """
             if not _dst.startswith(self.host + '/data'):
+                if not _dst.startswith('/'):
+                    _dst = '/' + _dst
                 _dst = self.host + '/data' + _dst
-            _dst = str(_dst).encode('ascii', 'ignore')
-
-
-
-            #-------------------- 
-            # Make folder accodringly.
-            #--------------------        
+            #print "\n\nXNAT 1", _dst
+            _dst = str(Xnat.path.cleanUri(_dst)).encode('ascii', 'ignore')
+            #print "XNAT 2", _dst, '\n\n'     
             response = self.__httpsRequest('PUT', _dst)
-
-
-
-            #-------------------- 
-            # Get and return the response from the connetion.
-            #-------------------- 
-            #print ("XnatIo (makeFolder)", response.read())
             return response
 
 
@@ -374,8 +390,8 @@ class Xnat(object):
             @param _dst: The XNAT dst to upload to.
             @type: string      
 
-            @param delExisting: Delete the exsting _dst if it exists in the XNAT host.
-                Defaults to 'True'.
+            @param delExisting: Delete the exsting _dst if it exists in the 
+                XNAT host.   Defaults to 'True'.
             @type: boolean   
             """
 
@@ -410,7 +426,8 @@ class Xnat(object):
             # Put the file in XNAT using the internal '__httpsRequest'
             # method.
             #-------------------- 
-            response = self.__httpsRequest('PUT', _dst, filebody, {'content-type': 'application/octet-stream'})
+            response = self.__httpsRequest('PUT', _dst, filebody, 
+                            {'content-type': 'application/octet-stream'})
             return response
 
 
@@ -422,7 +439,7 @@ class Xnat(object):
             @param _uri: The XNAT URI to run the "DELETE" method on.
             @type: string
             """
-            print "Deleting %s"%(_uri)
+            print "Deleting '%s'"%(_uri)
             response =  self.__httpsRequest('DELETE', _uri, '')
 
 
@@ -466,14 +483,15 @@ class Xnat(object):
         def search(self, searchString):
             """ 
             Utilizes the XNAT search query function
-            on all three XNAT levels (projects, subjects and experiments) based on the provided
-            'searchString' argument.  Searches through the available
-            columns as described below. CASE INSENSITIVE.
+            on all three XNAT levels (projects, subjects and experiments) 
+            based on the provided 'searchString' argument.  Searches through 
+            the available columns as described below. CASE INSENSITIVE.
 
             @param searchString: The search query string.
             @type searchString: string
 
-            @return: A dictionary of the results where the key is the XNAT level (projec, subject or experiment).
+            @return: A dictionary of the results where the key is the XNAT 
+                level (projec, subject or experiment).
             @rtype: dict.<string, string>
             """
             resultsDict = {}
@@ -484,7 +502,11 @@ class Xnat(object):
             # Projects, subjects, experiments
             #-------------------- 
             levelTags = {}
-            levelTags['projects'] = ['ID', 'secondary_ID',	'name', 'pi_firstname', 'pi_lastname', 'description']
+            levelTags['projects'] = ['ID', 
+                                     'secondary_ID',
+                                     'name', 'pi_firstname', 
+                                     'pi_lastname', 
+                                     'description']
             levelTags['subjects'] = ['ID', 'label']
             levelTags['experiments'] = ['ID', 'label']
 
@@ -506,8 +528,10 @@ class Xnat(object):
                     if level == 'experiments':
                         searchStr2 = searchStr + '&xsiType=xnat:mrSessionData'
                         searchStr = searchStr + '&xsiType=xnat:petSessionData'
-                        resultsDict[level] = resultsDict[level] + self.__getJson(searchStr2)
-                    resultsDict[level] = resultsDict[level] + self.__getJson(searchStr)
+                        resultsDict[level] = resultsDict[level] + \
+                                             self.__getJson(searchStr2)
+                    resultsDict[level] = resultsDict[level] + \
+                                         self.__getJson(searchStr)
 
 
 
@@ -519,10 +543,11 @@ class Xnat(object):
         def onEvent(self, eventKey, callback):
             """
             Adds a callback for a given event.  
-            Callbacks are strored internally as a dictionary of arrays in Xnat.callbacks.
+            Callbacks are strored internally as a dictionary of arrays in 
+            Xnat.callbacks.
 
-            @param eventKey: The eventKey descriptor for the callbacks stored in Xnat.callbacks.  Refer
-              to self.EVENT_TYPES for the list.
+            @param eventKey: The eventKey descriptor for the callbacks stored 
+                in Xnat.callbacks.  Refer to self.EVENT_TYPES for the list.
             @type eventKey: string
 
             @param callback: The callback function to enlist.
@@ -550,19 +575,23 @@ class Xnat(object):
 
         def runEventCallbacks(self, event, *args):
             """
-            Private function that runs the callbacks based on the provided 'event' argument.
+            Private function that runs the callbacks based on the provided 
+            'event' argument.
 
-            @param event: The event descriptor for the callbacks stored in Xnat.callbacks.  Refer
+            @param event: The event descriptor for the callbacks stored in 
+                Xnat callbacks.  Refer
               to self.EVENT_TYPES for the list.
             @type event: string
 
-            @param *args: The arguments that are necessary to run the event callbacks.
+            @param *args: The arguments that are necessary to run the event 
+                callbacks.
 
             @raise: Error if 'event' argument is not a valid event type.
             """
 
             if not event in self.EVENT_TYPES:
-                raise Exception("XnatIo (onEvent): invalid event type '%s'"%(event))
+                raise Exception("XnatIo (onEvent): invalid event type '%s'"%(\
+                                                                    event))
             for callback in self.eventCallbacks__[event]:
                 #print "EVENT CALLBACK", event
                 callback(*args)
@@ -572,7 +601,8 @@ class Xnat(object):
 
         def clearEvents(self, eventKey = None):
             """
-            Clears the event callbacks associated with the 'eventKey' argument.  
+            Clears the event callbacks associated with the 'eventKey' 
+            argument.  
             If 'eventKey' is not specified, clears all of the event callbacks.
 
             @param eventKey: The event key to clear.
@@ -584,7 +614,8 @@ class Xnat(object):
                 return
 
             if not eventKey in self.EVENT_TYPES:
-                raise Exception("%s (clearEvents): invalid event type '%s'"%(self.__class__.__name__, eventKey))
+                raise Exception("%s (clearEvents): invalid event type '%s'"%(\
+                                            self.__class__.__name__, eventKey))
 
             else:
                 self.eventCallbacks__[eventKey] = []
@@ -625,7 +656,8 @@ class Xnat(object):
             self.runEventCallbacks('downloadQueueStarted') 
             while len(self.downloadQueue):
                 if self.downloadQueue[0]['dst'] != None:
-                    self.getFile(self.downloadQueue[0]['src'], self.downloadQueue[0]['dst'])
+                    self.getFile(self.downloadQueue[0]['src'], 
+                                 self.downloadQueue[0]['dst'])
             self.runEventCallbacks('downloadQueueFinished') 
             self.clearDownloadQueue()
 
@@ -637,7 +669,8 @@ class Xnat(object):
             """
             Determines whether a given source is in the download queue.
 
-            @param _src: The source XNAT URL to check if it's in the download queue.
+            @param _src: The source XNAT URL to check if it's in the download 
+                queue.
             @type: string
 
             @return: boolean
@@ -785,9 +818,11 @@ class Xnat(object):
             This method exists as a backup to the urllib2-based '__getFile' 
             function of Xnat.  It's currently not utilized by Xnat.
 
-            urllib2.urlopen + reponse.read is the preferred method for getting files because 
+            urllib2.urlopen + reponse.read is the preferred method for getting 
+                files because 
             files can be downloaded in chunks (to allow for a progress
-            indicator) as opposed to one grab, which httplib.HTTPSConnection does.
+            indicator) as opposed to one grab, which httplib.HTTPSConnection 
+            does.
 
             @param _src: The _src url to run the GET request on.
             @type _src: string
@@ -795,7 +830,8 @@ class Xnat(object):
             @param _dst: The destination path of the GET (for getting files).
             @type _dst: string
 
-            @param dstFile: The python 'file' classType to run the write the file to.
+            @param dstFile: The python 'file' classType to run the write the 
+                file to.
             @type dstFile: file
             """
 
@@ -835,38 +871,44 @@ class Xnat(object):
             This method is in place for the main purpose of downlading
             a given source in packets (buffers) as opposed to one large file.
 
-            It should be noted that the urllib2 manager-based convention of authentication 
-            returns a 401 error if the server does not follow the HTTP authentication standard
-            (some CNDA machines are like this):
+            It should be noted that the urllib2 manager-based convention of 
+            authentication returns a 401 error if the server does not follow 
+            the HTTP authentication standard (some CNDA machines are like this):
 
                 #-------------------- 
                 # RETURNS AN ERROR
                 #-------------------- 
                 >>> passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-                >>> passman.add_password(None, _xnatSrc, self.user, self.password)
+                >>> passman.add_password(None, _xnatSrc, self.user, \
+                    self.password)
                 >>> authhandler = urllib2.HTTPBasicAuthHandler(passman)
                 >>> opener = urllib2.build_opener(authhandler)
                 >>> urllib2.install_opener(opener)
                 >>> response = urllib2.urlopen(_xnatSrc)
 
 
-            A workaround was found for this issue.  It simply includes the authentication header
-            in the request, and we use urllib2 to open the request.
+            A workaround was found for this issue.  It simply includes the 
+            authentication header in the request, and we use urllib2 to open 
+            the request.
 
                 #-------------------- 
                 # WORKS
                 #-------------------- 
                 >>> request = urllib2.Request(xnatUrl)
-                >>> request.add_header("Authorization", self.authHeader['Authorization'])
+                >>> request.add_header("Authorization", \
+                    self.authHeader['Authorization'])
                 >>> response = urllib2.urlopen(request)
 
 
 
             @see:
             U{http://www.voidspace.org.uk/python/articles/authentication.shtml}
-            U{http://blog.oneiroi.co.uk/python/python-urllib2-basic-http-authentication/}
-            U{http://stackoverflow.com/questions/5131403/http-basic-authentication-doesnt-seem-to-work-with-urllib2-in-python}
-            U{http://stackoverflow.com/questions/635113/python-urllib2-basic-http-authentication-and-tr-im/4188709#4188709}
+            U{http://blog.oneiroi.co.uk/python/python-urllib2-basic-http-
+                 authentication/}
+            U{http://stackoverflow.com/questions/5131403/http-basic-
+                 authentication-doesnt-seem-to-work-with-urllib2-in-python}
+            U{http://stackoverflow.com/questions/635113/python-urllib2-
+                 basic-http-authentication-and-tr-im/4188709#4188709}
 
 
             @param _src: The _src url to run the GET request on.
@@ -896,7 +938,8 @@ class Xnat(object):
             #-------------------- 
             xnatUrl = Xnat.path.makeXnatUrl(self.host, _src)
             request = urllib2.Request(xnatUrl)
-            request.add_header("Authorization", self.authHeader['Authorization'])
+            request.add_header("Authorization", 
+                               self.authHeader['Authorization'])
 
 
 
@@ -922,15 +965,20 @@ class Xnat(object):
 
 
             #-------------------- 
-            # Get the content size, first by checking log, then by reading header
+            # Get the content size, first by checking log, then by reading 
+            # header
             #-------------------- 
             self.downloadTracker['downloadedSize']['bytes'] = 0   
-            self.downloadTracker['totalDownloadSize'] = self.getFileSize(xnatUrl)
+            self.downloadTracker['totalDownloadSize'] = \
+                                                self.getFileSize(xnatUrl)
             if not self.downloadTracker['totalDownloadSize']['bytes']:
                 # If not in log, read the header
                 if response.headers and "Content-Length" in response.headers:
-                    self.downloadTracker['totalDownloadSize']['bytes'] = int(response.headers["Content-Length"])  
-                    self.downloadTracker['totalDownloadSize']['MB'] =  Xnat.utils.bytesToMB(self.downloadTracker['totalDownloadSize']['bytes'])
+                    self.downloadTracker['totalDownloadSize']['bytes'] = \
+                                    int(response.headers["Content-Length"])  
+                    self.downloadTracker['totalDownloadSize']['MB'] =  \
+                            Xnat.utils.bytesToMB(\
+                            self.downloadTracker['totalDownloadSize']['bytes'])
 
 
             #-------------------- 
@@ -957,7 +1005,8 @@ class Xnat(object):
             @type response: A file-like object. 
                 @see: U{http://docs.python.org/2/library/urllib2.html}
 
-            @param bufferSize: Buffer size to read.  Defaults to the standard 8192.
+            @param bufferSize: Buffer size to read.  Defaults to the standard 
+                8192.
             @type bufferSize: integer
 
             @return: The total downloaded bytes.  
@@ -968,7 +1017,8 @@ class Xnat(object):
             #--------------------
             # Pre-download callbacks
             #--------------------
-            size = self.downloadTracker['totalDownloadSize']['bytes'] if self.downloadTracker['totalDownloadSize']['bytes'] else -1
+            size = self.downloadTracker['totalDownloadSize']['bytes'] \
+                   if self.downloadTracker['totalDownloadSize']['bytes'] else -1
             self.runEventCallbacks('downloadStarted', _src, size)
 
 
@@ -1009,7 +1059,8 @@ class Xnat(object):
                 # And update progress indicators
                 #
                 self.downloadTracker['downloadedSize']['bytes'] += len(buffer)
-                self.runEventCallbacks('downloading', _src, self.downloadTracker['downloadedSize']['bytes'])
+                self.runEventCallbacks('downloading', _src, 
+                            self.downloadTracker['downloadedSize']['bytes'])
 
 
             return self.downloadTracker['downloadedSize']['bytes']
@@ -1044,7 +1095,8 @@ class Xnat(object):
             try:
                 return json.loads(response)['ResultSet']['Result']
             except Exception, e:
-                self.runEventCallbacks('jsonError', self.host, self.username, response)
+                self.runEventCallbacks('jsonError', self.host, 
+                                       self.username, response)
 
 
 
@@ -1064,7 +1116,8 @@ class Xnat(object):
             @rtype: float
             """
             bytes = int(bytes)
-            mb = str(bytes/(1024*1024.0)).split(".")[0] + "." + str(bytes/(1024*1024.0)).split(".")[1][:2]
+            mb = str(bytes/(1024*1024.0)).split(".")[0] + "." + \
+                 str(bytes/(1024*1024.0)).split(".")[1][:2]
             return float(mb)
 
 
@@ -1104,7 +1157,8 @@ class Xnat(object):
             @param src: The source URI to modify.
             @type src: str
 
-            @param dstBase: The base destination URI to create the appropriate dst from.
+            @param dstBase: The base destination URI to create the appropriate 
+                dst from.
             @type dstBase: str
 
             @returns: The modified src, dst as tuples
@@ -1113,7 +1167,8 @@ class Xnat(object):
 
             src = src + "?format=zip"
             dst = os.path.join(dstBase , 'projects' + 
-                               src.replace('?format=zip', '').split('projects')[1].split('/files')[0] + '/files.zip')
+                               src.replace('?format=zip', '').\
+                        split('projects')[1].split('/files')[0] + '/files.zip')
             return src, dst
 
 
@@ -1144,7 +1199,8 @@ class Xnat(object):
             if level in _uri:
                 return  _uri.split(level)[0] + level
             else:
-                raise Exception("Invalid get level '%s' parameter: %s"%(_uri, level))
+                raise Exception("Invalid get level '%s' parameter: %s"%(\
+                                                            _uri, level))
 
 
 
@@ -1159,15 +1215,21 @@ class Xnat(object):
             @param uri: The xnat URL to clean.
             @type uri: string
 
-
             @return: The cleaned uri.
             @rtype: string            
             """
-            if not uri.startswith("/"):
+            if not uri.startswith("/") and not uri.startswith('http'):
                 uri = "/" + uri
-            uri = uri.replace("//", "/")
+
+            if 'http://' in uri or 'https://' in uri:
+                uri = uri.split('://')[0] + '://' + \
+                      uri.split('://')[1].replace("//", "/")
+            else:
+                uri = uri.replace("//", "/")
+
             if uri.endswith("/"):
                 uri = uri[:-1]
+
             return uri
 
 
@@ -1192,7 +1254,8 @@ class Xnat(object):
             queryArgStr = ''
             for i in range(0, len(queryArgs)):
                 queryArgStr += '?' if i == 0 else '&'
-                queryArgStr += str(Xnat.path.QUERY_FILTERS[queryArgs[i].lower()])
+                queryArgStr += str(Xnat.path.QUERY_FILTERS[queryArgs[i].\
+                                                           lower()])
             return _uri + queryArgStr
 
 
