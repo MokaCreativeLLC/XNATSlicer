@@ -61,7 +61,8 @@ class Loader_Dicom(Loader_Images):
         # Check for string matches between the folder URI
         # and the database files 
         #--------------------
-        self.cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles for abbrevUri in abbrevUris if abbrevUri in dbFile]
+        self.cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles \
+                            for abbrevUri in abbrevUris if abbrevUri in dbFile]
 
                     
         #--------------------   
@@ -99,7 +100,9 @@ class Loader_Dicom(Loader_Images):
         #--------------------
         m = slicer.util.mainWindow()
         if not slicer.dicomDatabase:
-            msg =  """It doesn\'t look like your DICOM database directory is setup. Please set it up in the DICOM module.  You can load your downloaded files here: '***HERE***'."""
+            msg =  "It doesn\'t look like your DICOM database directory is"
+            msg += "setup. Please set it up in the DICOM module.  You can "
+            msg += "load your downloaded files here: '***HERE***'."""
             msg = msg.replace('***HERE***', self._dst)
             self.terminateLoad(['DICOM load', msg ])
             m.moduleSelector().selectModule('DICOM')    

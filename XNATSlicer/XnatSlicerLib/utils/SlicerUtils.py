@@ -28,10 +28,13 @@ class SlicerUtils(object):
         """
         coreIOManager = slicer.app.coreIOManager()
         fileType = coreIOManager.fileType(fileUri)
-        fileSuccessfullyLoaded = slicer.util.loadNodeFromFile(fileUri, fileType)            
+        fileSuccessfullyLoaded = slicer.util.loadNodeFromFile(fileUri, fileType)
+        slicer.app.processEvents()
         if not fileSuccessfullyLoaded:
             errStr = "Could not load '%s'!"%(fileUri)
             print (errStr)
+        else:
+            slicer.app.layoutManager().resetSliceViews()
 
 
 

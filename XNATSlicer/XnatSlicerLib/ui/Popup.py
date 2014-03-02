@@ -156,7 +156,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.downloadRows = {}
 
         self.setFixedWidth(710)
-        self.setMinimumHeight(260)
+        self.setMinimumHeight(300)
         self.setStyleSheet('padding: 0px')
 
         self.innerWidget = None
@@ -168,7 +168,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         self.hide()
         self.cancelCallback = None
 
-        self.rowWidgetHeight = 75
+        self.rowWidgetHeight = 95
 
 
 
@@ -193,10 +193,10 @@ class XnatDownloadPopup(XnatEmptyPopup):
         rowWidget.setObjectName('downloadRowWidget')
         rowWidget.setStyleSheet('#downloadRowWidget {border: 1px '+ 
                 ' solid rgb(160,160,160); border-radius: 2px; width: 100%;}')
-        rowWidget.setFixedHeight(self.rowWidgetHeight)
-        rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
-                                qt.QSizePolicy.MinimumExpanding)
-        layout = qt.QFormLayout()
+        #rowWidget.setFixedHeight(self.rowWidgetHeight)
+        #rowWidget.setSizePolicy(qt.QSizePolicy.MinimumExpanding, 
+        #                        qt.QSizePolicy.MinimumExpanding)
+        layout = qt.QVBoxLayout()
         rowWidget.setLayout(layout)
 
 
@@ -206,11 +206,11 @@ class XnatDownloadPopup(XnatEmptyPopup):
         #-------------------
         textEdit = qt.QTextEdit()
         textEdit.setStyleSheet("border: none")
-        textEdit.setFixedHeight(40)
+        textEdit.setFixedHeight(55)
         textEdit.verticalScrollBar().hide()
         textEdit.setFont(qt.QFont(XnatDownloadPopup.FONT_NAME, 
                                   XnatDownloadPopup.FONT_SIZE, 10, False))
-        layout.addRow(textEdit)
+        layout.addWidget(textEdit)
         
 
         
@@ -244,7 +244,7 @@ class XnatDownloadPopup(XnatEmptyPopup):
         progressRow.addWidget(progressBar)
         progressRow.addStretch()
         progressRow.addWidget(cancelButton)
-        layout.addRow(progressRow)
+        layout.addLayout(progressRow)
         
 
 
