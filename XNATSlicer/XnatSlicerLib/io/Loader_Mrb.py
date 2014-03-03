@@ -12,9 +12,9 @@ from SlicerUtils import *
 class Loader_Mrb(Loader_File):
     """
     Loader_Mrb is a subclass of the Loader class.
-    It contains specific functions for downloadloading scenes from an XNAT server, 
-    and loading them into Slicer.  This is in contrast with loading DICOM sets, 
-    individual files or analyze files.
+    It contains specific functions for downloadloading scenes from an XNAT 
+    server, and loading them into Slicer.  This is in contrast with loading 
+    DICOM sets, individual files or analyze files.
 
     One of the unique aspects of loading scenes is the necessity to parse
     the scene MRML in order to convert all absolute paths to local paths. 
@@ -26,7 +26,8 @@ class Loader_Mrb(Loader_File):
         Main load function for downloading Slicer scenes
         and loading them into Slicer.  
         
-        Refers to a number of functions below (__updateAbsoluteMrmlUrisToRelative, 
+        Refers to a number of functions below 
+        (__updateAbsoluteMrmlUrisToRelative, 
         __makeUnpackDir, etc.) to load the mrml.
         """
 
@@ -48,11 +49,17 @@ class Loader_Mrb(Loader_File):
         #-------------------------
         mrmls = []
         def callback(localFile):
-            if XnatSlicerUtils.isMRML(localFile) and not os.path.basename(localFile).startswith('.'):
-                mrmls.append(self.__updateAbsoluteMrmlUrisToRelative(self._src, localFile))
+            if XnatSlicerUtils.isMRML(localFile) and \
+               not os.path.basename(localFile).startswith('.'):
+                mrmls.append(self.__updateAbsoluteMrmlUrisToRelative(\
+                                                        self._src, localFile))
         MokaUtils.path.fileWalk(unpackDir, callback)
 
         
+        # Delete the dst.
+        os.remove(self._dst)
+
+
         #-------------------------
         # Load the first mrml found in the package.
         #-------------------------

@@ -8,6 +8,7 @@ import zipfile
 import inspect
 import datetime
 import getopt
+import tempfile
 import re
 from collections import OrderedDict
 
@@ -367,18 +368,57 @@ class MokaUtils(object):
             """
             zipURI = src + ".zip"
             if not os.path.isdir(src):
-                raise "MokaUtils.file.writeZip: The argument '%s' must be a directory."%(src)
+                raise "MokaUtils.file.writeZip: The argument " + \
+                    "'%s' must be a directory."%(src)
                 return
-            with closing(zipfile.ZipFile(zipURI, "w", zipfile.ZIP_DEFLATED)) as z:
+            with closing(zipfile.ZipFile(zipURI, "w", zipfile.ZIP_DEFLATED))\
+                 as z:
                 for root, dirs, files in os.walk(src):
                     for fileName in files: #NOTE: ignore empty directories
                         absfileName = os.path.join(root, fileName)
-                        zfileName = absfileName[len(src)+len(os.sep):] # : relative path
+                        # : relative path
+                        zfileName = absfileName[len(src)+len(os.sep):] 
                         z.write(absfileName, zfileName)
 
             dst = zipUri if dst == None else dst
             shutil.move(src, dst)
             return dst
+
+
+
+        @staticmethod 
+        def extractAllFiles(fromFile, toDir):
+            """
+            Extracts files within a zip and writes them to a directory,
+            disregarding the directory structure within the zip file.
+
+            @param fromFile: The source path of the deompressible file.
+            @type fromFile: string
+            
+            @param toDir: The dst directory of the file to decompress. 
+                Disregards the file structure in 'fromFile'.
+            @type dst: string
+            """
+            toDir = os.path.normpath(toDir)
+
+            with zipfile.ZipFile(fromFile) as zip_file:
+                for member in zip_file.namelist():
+                    filename = os.path.basename(member)
+                    # skip directories
+                    if not filename:
+                        continue
+                    # copy file (taken from zipfile's extract)
+                    source = zip_file.open(member)
+                    
+                    try:
+                        os.makedirs(toDir)
+                    except Exception, e:
+                        #print str(e)
+                        pass
+                    target = file(os.path.join(toDir, filename), "wb")
+                    with source, target:
+                        shutil.copyfileobj(source, target)
+
 
 
 
@@ -404,14 +444,16 @@ class MokaUtils(object):
 
 
             if not os.path.isfile(src):
-                raise Exception("MokaUtils.file.decompress: The src argument '%s' must be a file!"%(src))
+                errorStr = "MokaUtils.file.decompress: The src argument"
+                errorStr += "'%s' must be a file!"%(src)
+                raise Exception(errorStr)
                 return
                      
 
             if src.endswith(".zip"):
                 z = zipfile.ZipFile(src)      
                 z.extractall(dst)
-
+    
 
             elif src.endswith(".gz"):
                 a = gzip.GzipFile(src, 'rb')

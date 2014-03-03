@@ -1,6 +1,7 @@
 # python
 import os
 import shutil
+import tempfile
 
 # application
 from __main__ import qt, slicer
@@ -61,34 +62,53 @@ class Loader(object):
         to the appropriate dst.
         """
         
+
         #--------------------
-        # UNZIP The FILE SET
-        #--------------------       
-        self.extractPath = os.path.join(os.path.dirname(self._dst), 'files')
+        # Exit out if no self._dst 
+        #--------------------
+        if not os.path.exists(self._dst):
+            return
+
+        #--------------------
+        # Rename the dst file (it creates errors in Windows if we don't)
+        #--------------------
+        prevDst = self._dst
+        self._dst = os.path.join(os.path.dirname(self._dst), 
+                                 'downloadedFiles.zip')
+        if os.path.exists(self._dst):
+            os.remove(self._dst)
+        os.rename(prevDst, self._dst) 
+        
         
 
+        #--------------------
+        # Generate the extract path
+        #--------------------   
+        self.extractPath = os.path.join(os.path.dirname(self._dst), 
+                            os.path.splitext(os.path.basename(prevDst))[0])
+        
 
         #--------------------
         # Remove existing zipfile extract path if it exists
         #--------------------
         if os.path.exists(self.extractPath): 
-            shutil.rmtree(self.extractPath)
-
+            try:
+                shutil.rmtree(os.path.normpath(self.extractPath))
+                os.makedirs(self.extractPath)
+            except Exception, e:
+                # This fails in windows.
+                #print "LOADER", str(e)
+                pass
 
 
         #--------------------
         # Decompress zips.
         #--------------------
-        # return if self._dst == None (result of a cancel)
-        if not os.path.exists(self._dst):
-            return
-        MokaUtils.file.decompress(self._dst, self.extractPath)
-
-
+        MokaUtils.file.extractAllFiles(self._dst, self.extractPath)
+        
 
         #--------------------
-        # Add to files in the decompressed destination 
-        # to downloadedDicoms list.
+        # Tracj files
         #--------------------
         #print "%s Inventorying downloaded files..."%(MokaUtils.debug.lf())  
         self.extractedFiles = []
@@ -99,29 +119,8 @@ class Loader(object):
                                                         root, relFileName)))
 
 
-
-        #--------------------
-        # Move downloaded files to extactly 'self._dst'
-        #--------------------
-        newExtractFiles = []
-        for fileName in self.extractedFiles:
-            newExtractFile = self._dst.split('.zip')[0] + '/' + \
-                             os.path.basename(fileName)
-            try:
-                #
-                # Make the dstDir if it doesn't exist.
-                #
-                dstDir = os.path.dirname(newExtractFile)
-                if not os.path.exists(dstDir):
-                    os.makedirs(dstDir)
-                #
-                # Move the files
-                #
-                shutil.move(fileName, newExtractFile)
-                newExtractFiles.append(newExtractFile)
-            except Exception, e:
-                print "Warning: Error moving filename '%s' to '%s'.  Error: %s"%(fileName, newExtractFile, str(e))
-        self.extractedFiles = newExtractFiles
+        
+        
 
 
 

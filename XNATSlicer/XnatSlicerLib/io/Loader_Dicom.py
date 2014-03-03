@@ -31,7 +31,10 @@ class Loader_Dicom(Loader_Images):
         @type fileUris: list(str)
         """
 
-
+        # Adjust path slashes
+        fileUris = [MokaUtils.path.adjustPathSlashes(fileUri) \
+                    for fileUri in fileUris]
+        
 
         splitter = '/experiments/'
         #--------------------
@@ -48,12 +51,16 @@ class Loader_Dicom(Loader_Images):
         #--------------------
         # Get database files, abbreviate as necessary
         #--------------------
-        fullDbFiles = [fullDbFile for fullDbFile in \
-                    slicer.dicomDatabase.allFiles() if splitter in fullDbFile ]
+        fullDbFiles = []
+        for fullDbFile in slicer.dicomDatabase.allFiles():
+            adjFile = MokaUtils.path.adjustPathSlashes(fullDbFile)
+            if splitter in adjFile:
+                fullDbFiles.append(adjFile)
+
+
         abbrevDbFiles = [fullDbFile.split(splitter)[1] for \
                          fullDbFile in fullDbFiles]     
         fullToAbbrev = dict(zip(abbrevDbFiles, fullDbFiles))
-   
 
 
                 
@@ -64,7 +71,10 @@ class Loader_Dicom(Loader_Images):
         self.cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles \
                             for abbrevUri in abbrevUris if abbrevUri in dbFile]
 
-                    
+        #print "FULL TO ABBREV", fullToAbbrev
+        #print "ABBREV URIS", abbrevUris
+        #print "CACHED FILES", self.cachedFiles   
+         
         #--------------------   
         # If all URIs are in the database, use cache, exit.
         #--------------------    
@@ -121,7 +131,8 @@ class Loader_Dicom(Loader_Images):
         #--------------------
         dicomIndexer = ctk.ctkDICOMIndexer()
         try:
-            dicomIndexer.addListOfFiles(slicer.dicomDatabase, self.extractedFiles)
+            dicomIndexer.addListOfFiles(slicer.dicomDatabase, \
+                                        self.extractedFiles)
         except Exception, e:
             
             #
@@ -129,10 +140,16 @@ class Loader_Dicom(Loader_Images):
             #
             errorString = str(e)
             if 'uninitialized ctkDICOMItem' in errorString:
-                #print (MokaUtils.debug.lf(), "The slicer.dicomDabase is unitialized (%s).  Initializing it."%(errorString))
+                #print (MokaUtils.debug.lf(), "The slicer.dicomDabase is " + \
+                    #"unitialized (%s).  Initializing it."%(errorString))
                 slicer.dicomDatabase.initialize()
-                dicomIndexer.addListOfFiles(slicer.dicomDatabase, self.extractedFiles)
+                dicomIndexer.addListOfFiles(slicer.dicomDatabase, 
+                                            self.extractedFiles)
 
+        #--------------------
+        # Delete dst
+        #--------------------
+        os.remove(self._dst)
 
 
         #--------------------
@@ -190,7 +207,8 @@ class Loader_Dicom(Loader_Images):
         # the 'DICOMScalarVolumePlugin' class, by feeding in 
         # 'matchedDatabaseFiles' as a nested array.
         #--------------------
-        dicomScalarVolumePlugin = slicer.modules.dicomPlugins['DICOMScalarVolumePlugin']()
+        dicomScalarVolumePlugin = \
+                        slicer.modules.dicomPlugins['DICOMScalarVolumePlugin']()
         loadables = dicomScalarVolumePlugin.examine([matchedDatabaseFiles])
 
 
@@ -233,7 +251,8 @@ class Loader_Dicom(Loader_Images):
         routines.
         """
         ##print(MokaUtils.debug.lf(), "DICOMS successfully loaded.")
-        sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = self.xnatSrc)
+        sessionArgs = XnatSessionArgs(MODULE = self.MODULE, \
+                                      srcPath = self.xnatSrc)
         sessionArgs['sessionType'] = "dicom download"
         self.MODULE.View.startNewSession(sessionArgs)
 
