@@ -64,11 +64,11 @@ class Xnat(object):
 
         Example Usage:
 
-        >>> from XnatIo import *
-        >>> xnatIo = XnatIo('http://central.xnat.org', 'testUser', \
+        >>> from Xnat import *
+        >>> xnat = Xnat.io('http://central.xnat.org', 'testUser', \
             'testUserPassword')
         >>> contents = xnatIo.getFolder('projects')
-        >>> print contents[111]['ID']
+        >>> print contents['111']['ID']
         'XNATSlicerTest'    
         """
 

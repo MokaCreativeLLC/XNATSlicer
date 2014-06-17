@@ -36,7 +36,8 @@ class Workflow_Save(object):
         #------------------------
         # Set wait window
         #------------------------
-        self.waitWindow = qt.QMessageBox(1, "Uploading", "Please wait while file uploads...")
+        self.waitWindow = qt.QMessageBox(1, "Uploading", \
+                                         "Please wait while file uploads...")
 
 
         
@@ -71,8 +72,10 @@ class Workflow_Save(object):
             # Construct new sessionArgs
             #
             fullPath = self.MODULE.View.getXnatUri()
-            remoteURI = self.MODULE.SettingsFile.getAddress(self.MODULE.LoginMenu.hostDropdown.currentText) + fullPath
-            sessionArgs = XnatSessionArgs(MODULE = self.MODULE, srcPath = fullPath)
+            remoteURI = self.MODULE.SettingsFile.getAddress(\
+                    self.MODULE.LoginMenu.hostDropdown.currentText) + fullPath
+            sessionArgs = XnatSessionArgs(MODULE = self.MODULE, \
+                                          srcPath = fullPath)
             sessionArgs['sessionType'] = "scene upload - unlinked"
             self.MODULE.View.sessionManager.startNewSession(sessionArgs)
             self.MODULE.View.setEnabled(False)
@@ -110,7 +113,8 @@ class Workflow_Save(object):
         #------------------------
         # Save the scene locally via ScenePackager.saveSlicerScene
         #------------------------
-        package = self.ScenePackager.saveSlicerScene(self.MODULE.View.sessionManager.sessionArgs)
+        package = self.ScenePackager.saveSlicerScene(\
+                                self.MODULE.View.sessionManager.sessionArgs)
 
 
         
@@ -140,6 +144,16 @@ class Workflow_Save(object):
         if os.path.exists(srcMrb): 
             os.remove(srcMrb) 
 
+        #-----------------------------------
+        # IMPORTANT PLEASE READ!!!!
+        #
+        #
+        # We need to convert any vtk files to ascii so that XTK
+        # can read it when XNATImageViewer is used.
+        #-----------------------------------
+        self.ScenePackager.convertAllBinaryVtksToAscii(projectDir)
+
+
         #
         # Compress the save diectory to the mrb uri.
         #
@@ -160,7 +174,8 @@ class Workflow_Save(object):
         #
         # Construct the upload string.
         #
-        dstMrb = self.MODULE.View.sessionManager.sessionArgs['saveUri'] + "/" + os.path.basename(srcMrb)    
+        dstMrb = self.MODULE.View.sessionManager.sessionArgs['saveUri'] + \
+                 "/" + os.path.basename(srcMrb)    
 
         #
         # Upload via XnatIo
@@ -182,8 +197,10 @@ class Workflow_Save(object):
         #
         # Create a new session
         #
-        self.MODULE.View.sessionManager.sessionArgs['sessionType'] = "scene upload"
-        self.MODULE.View.startNewSession(self.MODULE.View.sessionManager.sessionArgs)
+        self.MODULE.View.sessionManager.sessionArgs['sessionType'] = \
+                                                    "scene upload"
+        self.MODULE.View.startNewSession(\
+                    self.MODULE.View.sessionManager.sessionArgs)
 
         #
         # Select the newly saved object as a node in the viewer.

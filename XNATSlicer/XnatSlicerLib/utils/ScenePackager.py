@@ -31,12 +31,12 @@ class ScenePackager(object):
     TODO : 
     """
        
+    VTK_EXT = '.vtk'
+
     def __init__(self, MODULE = None):
         """ Init function.
         """
         self.MODULE = MODULE
-
-        
 
     
     def saveSlicerScene(self, args):
@@ -56,7 +56,8 @@ class ScenePackager(object):
         #-------------------
         # Create a directory for saving locally.
         #-------------------
-        saveDirectory = os.path.join(XnatSlicerGlobals.LOCAL_URIS['uploads'], packageName)
+        saveDirectory = os.path.join(XnatSlicerGlobals.LOCAL_URIS['uploads'], \
+                                     packageName)
         ##print MokaUtils.debug.lf() +  "CREATE PACKAGE DIRECTORY: %s"%(saveDirectory)
 
 
@@ -122,6 +123,74 @@ class ScenePackager(object):
         return {'path':MokaUtils.path.adjustPathSlashes(saveDirectory), 
                 'mrml': MokaUtils.path.adjustPathSlashes(mrml)}
 
+
+
+
+
+    def convertAllBinaryVtksToAscii(self, projectDir):
+        """
+        @param projectDir: The vtk filename
+        @type projectDir: string
+         
+        @return: Whether the file was converted (1 or 0) for every file.
+        @rtype: array.<number>
+        """
+
+        #
+        # Get the vtk files in the directory 
+        #
+        vtks = []
+        for root, dirs, files in os.walk(projectDir):
+            for relFileName in files:
+                if relFileName.lower().endswith(ScenePackager.VTK_EXT):
+                    vtks.append(os.path.join(root, relFileName))
+        #
+        # Convert the files
+        #
+        converteds = []
+        for vtkFile in vtks:
+            converteds.append(self.convertBinaryVtkToAscii(vtkFile))
+        return converteds
+
+
+
+    def convertBinaryVtkToAscii(self, vtkFile):
+        """
+        @param vtkFile: The vtk filename
+        @type vtkFile: string
+         
+        @return: Whether the file was converted (1 or 0)
+        @rtype: number
+        """
+        #
+        # Generate a tempFilename
+        #
+        tempFilename = os.path.splitext(vtkFile)[0] + \
+                MokaUtils.string.randomAlphaNumeric() + ScenePackager.VTK_EXT
+        #
+        # VTK reader
+        #
+        r = vtk.vtkDataSetReader()
+        r.SetFileName(vtkFile)
+ 
+        #
+        # VTK writer
+        #
+        w = vtk.vtkDataSetWriter()
+        w.SetInput(r.GetOutput())
+        w.SetFileName(tempFilename)
+        converted = w.Write()
+
+        #
+        # Remove the old file and replace with new
+        #
+        os.remove(vtkFile)
+        os.rename(tempFilename, vtkFile)
+
+        #
+        # Return whether file was converted
+        #
+        return converted
 
 
 

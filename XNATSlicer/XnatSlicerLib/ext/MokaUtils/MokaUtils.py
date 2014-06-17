@@ -474,6 +474,24 @@ class MokaUtils(object):
         ILLEGAL_CHARS = '@!#$%[&^*()+=<>/{}[\]~`].*|;:"\'?'
 
         @staticmethod
+        def randomAlphaNumeric(length=12):
+            """
+            From: http://stackoverflow.com/questions/18319101/whats-the-
+                best-way-to-generate-random-strings-of-a-specific-length-in-
+                python
+            @param length: The length of the string.
+            @type length: number
+
+            @return: The random string.
+            @rtype: str
+            """
+            import string
+            import random
+            return ''.join(random.choice(string.ascii_uppercase) \
+                    for i in range(length))
+
+
+        @staticmethod
         def removeNonAlphanumeric(string):
             """
              @param string: The string to adjust.
