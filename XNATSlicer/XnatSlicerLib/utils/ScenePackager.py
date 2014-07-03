@@ -96,11 +96,16 @@ class ScenePackager(object):
 
 
         #-------------------
-        # Call the API command 'slicer.app.applicationLogic().SaveSceneToSlicerDataBundleDirectory'
+        # Call the API command 'slicer.app.applicationLogic().\
+        # SaveSceneToSlicerDataBundleDirectory'
         # which will save the scene and all of its nodes
         # into the provided directory.
         #-------------------
-        slicer.app.applicationLogic().SaveSceneToSlicerDataBundleDirectory(saveDirectory, None)          
+        imageData =  self.storeSceneView('MasterSceneView')
+        slicer.app.applicationLogic().\
+            SaveSceneToSlicerDataBundleDirectory(saveDirectory, imageData)      
+
+        
 
 
 
@@ -151,6 +156,35 @@ class ScenePackager(object):
         for vtkFile in vtks:
             converteds.append(self.convertBinaryVtkToAscii(vtkFile))
         return converteds
+
+
+
+    def storeSceneView(self, name, description=""):
+        """  
+
+        NOTE: Taken from here:
+        https://github.com/Slicer/Slicer/blob/master/Applications/SlicerApp/
+            Testing/Python/SlicerMRBTest.py#L273
+
+
+        Store a scene view into the current scene.
+        TODO: this might move to slicer.util
+
+
+        @param name: TheSceneViewName
+        @return: vtkImageData
+        """
+        viewport = slicer.app.layoutManager().viewport()
+        qImage = qt.QPixmap().grabWidget(viewport).toImage()
+        imageData = vtk.vtkImageData()
+
+        slicer.qMRMLUtils().qImageToVtkImageData(qImage,imageData)
+
+        sceneViewNode = slicer.vtkMRMLSceneViewNode()
+        sceneViewNode.SetScreenShotType(4)
+        sceneViewNode.SetScreenShot(imageData)
+ 
+        return sceneViewNode.GetScreenShot()
 
 
 
