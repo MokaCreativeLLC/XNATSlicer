@@ -956,7 +956,8 @@ class Xnat(object):
             # If the urllib2 version fails then use httplib.
             # See get_httplib for more details.
             #-------------------- 
-            except urllib2.HTTPError, e:
+                #except urllib2.HTTPError, e:
+            except Exception as e:
                 #print str(e)
                 #print _src, _dst
                 #print d

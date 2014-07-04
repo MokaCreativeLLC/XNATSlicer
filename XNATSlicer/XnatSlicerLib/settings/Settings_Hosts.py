@@ -256,15 +256,16 @@ class Settings_Hosts(Settings):
         """ 
         As stated.
         """
-        #MokaUtils.debug.lf('REWRITE')
+        #MokaUtils.debug.lf()
 
         self.currModal.close()
         hostName = self.lineEdits['hostname'].text.strip()
 
         self.__setNonCriticalSettings()
-
+        self.writeHost()
         self.Events.runEventCallbacks('SETTINGS_FILE_MODIFIED', 
-                                      self.__class__.__name__, 'HOST_MODIFIED',
+                                      self.__class__.__name__, 
+                                      'HOST_MODIFIED',
                                       hostName)
 
 
@@ -349,7 +350,7 @@ class Settings_Hosts(Settings):
         @param runEvents: Option to run event callbacks.
         @type runEvents: bool
         """
-
+        #print "write host"
         #--------------------
         # Close popup
         #--------------------
@@ -787,10 +788,10 @@ def makeEditHostModal(_Settings_Hosts):
     """ 
     As stated.
 
-    @param _Settings_Hosts: The widget that is the parent of the modal.
+    @type _Settings_Hosts: The widget that is the parent of the modal.
     @param _Settings_Hosts: Settings_Hosts
     """
-
+    #print "Edit host modal"
     #--------------------
     # Get selected strings from host list.
     #--------------------

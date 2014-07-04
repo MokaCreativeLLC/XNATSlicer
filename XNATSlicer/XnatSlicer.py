@@ -1073,7 +1073,7 @@ class XnatSlicerWidget:
       """
       Sync function for various changes to Settings_Hosts.
 
-      @param hostChangEvent: The host chang event.
+      @param hostChangEvent: The host change event.
       @type hostChangeEvent: str
 
       @param hostName: The name of the host that the operation was performed on.
