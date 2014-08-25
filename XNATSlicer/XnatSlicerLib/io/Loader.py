@@ -174,8 +174,8 @@ class Loader_Images(Loader):
         @param _src: The source URI to begin the load from.
         @type _src: str
 
-        @param fileUris: The fileUrs to download from (in case the download is of
-           an entire 'files' folder).
+        @param fileUris: The fileUrs to download from (in case the download 
+                         is of an entire 'files' folder).
         @type fileUris: list(str)
         """
         super(Loader_Images, self).__init__(MODULE, _src, fileUris)
@@ -192,7 +192,11 @@ class Loader_Images(Loader):
         #--------------------
         self.useCached = self.checkCache(self.fileUris) and \
                          self.isUseCacheChecked()
+
+        
+
         if self.useCached: 
+            print "Using cached set for:", _src
             self.performUseCacheUpdates()
 
             

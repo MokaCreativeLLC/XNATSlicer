@@ -41,8 +41,10 @@ class Loader_Dicom(Loader_Images):
         # Get the abbreviated file URIs
         # and their directories.
         #--------------------
-        abbrevUris = [ fileUri.split(splitter)[1] for fileUri in \
-                       fileUris if XnatSlicerUtils.isDICOM(fileUri) ]
+        abbrevUris = []
+        for fileUri in fileUris:
+            if XnatSlicerUtils.isDICOM(fileUri):
+                abbrevUris.append(fileUri.split(splitter)[1])
         #print "abbrevUris", abbrevUris
                 
 
@@ -51,29 +53,27 @@ class Loader_Dicom(Loader_Images):
         #--------------------
         # Get database files, abbreviate as necessary
         #--------------------
-        fullDbFiles = []
+        fullToAbbrev = {}
         for fullDbFile in slicer.dicomDatabase.allFiles():
             adjFile = MokaUtils.path.adjustPathSlashes(fullDbFile)
             if splitter in adjFile:
-                fullDbFiles.append(adjFile)
-
-
-        abbrevDbFiles = [fullDbFile.split(splitter)[1] for \
-                         fullDbFile in fullDbFiles]     
-        fullToAbbrev = dict(zip(abbrevDbFiles, fullDbFiles))
-
-
+                fullToAbbrev[adjFile.split(splitter)[1]] = adjFile
                 
         #--------------------
         # Check for string matches between the folder URI
         # and the database files 
         #--------------------
-        self.cachedFiles = [fullToAbbrev[dbFile] for dbFile in abbrevDbFiles \
-                            for abbrevUri in abbrevUris if abbrevUri in dbFile]
+        self.cachedFiles = []
+        for key, value in fullToAbbrev.iteritems():
+            for abbrevUri in abbrevUris:
+                if abbrevUri in key:
+                    self.cachedFiles.append(value)
 
         #print "FULL TO ABBREV", fullToAbbrev
         #print "ABBREV URIS", abbrevUris
-        #print "CACHED FILES", self.cachedFiles   
+        #print "CACHED FILES", self.cachedFiles  
+        #print len(self.cachedFiles), len(abbrevUris), \
+        #      len(self.cachedFiles) == len(abbrevUris)
          
         #--------------------   
         # If all URIs are in the database, use cache, exit.

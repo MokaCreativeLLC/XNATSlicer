@@ -1,3 +1,13 @@
+__author__ = "Sunil Kumar (kumar.sunil.p@gmail.com)"
+__copyright__ = "Copyright 2014, Washington University in St. Louis"
+__credits__ = ["Sunil Kumar", "Steve Pieper", "Dan Marcus"]
+__license__ = "XNAT Software License Agreement " + \
+              "(see: http://xnat.org/about/license.php_)"
+__version__ = "2.1.1"
+__maintainer__ = "Rick Herrick"
+__email__ = "herrickr@mir.wustl.edu"
+__status__ = "Production"
+
 # python
 import imp
 import os
@@ -86,11 +96,13 @@ class XnatSlicer:
       parent.title = "XNATSlicer"
       parent.categories = ["XNATSlicer"]
       parent.dependencies = []
-      parent.contributors = ["Sunil Kumar (Moka Creative, LLC), " + \
-        "Dan Marcus (WashU-St. Louis), Steve Pieper (Isomics)"] 
+      parent.contributors = [
+        "Sunil Kumar (Moka Creative, LLC, kumar.sunil.p@gmail.com), " + \
+        "Dan Marcus (WashU-St. Louis, dmarcus@wustl.edu), " + 
+        "Steve Pieper (Isomics, pieper@isomics.com)"] 
       parent.helpText = """XNATSlicer 2.1"""
-      parent.acknowledgementText = "Sunil Kumar for the Neuroinformatics " + \
-        "Research Group at WashU-St.Louis (sunilk@mokacreativellc.com)"
+      parent.acknowledgementText = "Rick Herrick for the Neuroinformatics " + \
+        "Research Group at WashU-St.Louis (herrickr@mir.wustl.edu)"
       self.parent = parent
 
       #--------------------------------
