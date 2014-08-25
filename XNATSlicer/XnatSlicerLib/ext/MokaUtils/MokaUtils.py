@@ -1,5 +1,15 @@
-# python
 from __future__ import with_statement
+
+__author__ = "Sunil Kumar (kumar.sunil.p@gmail.com)"
+__credits__ = ["Sunil Kumar"]
+__license__ = "GPL"
+__version__ = "1.0.1"
+__maintainer__ = "Sunil Kumar"
+__email__ = "kumar.sunil.p@gmail.com"
+__status__ = "Production"
+
+
+# python
 import os
 import sys
 import shutil

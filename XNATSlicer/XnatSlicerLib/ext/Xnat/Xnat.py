@@ -1,3 +1,14 @@
+__author__ = "Sunil Kumar (kumar.sunil.p@gmail.com)"
+__copyright__ = "Copyright 2014, Washington University in St. Louis"
+__credits__ = ["Sunil Kumar", "Tim Olsen", "Dan Marcus", "Rick Herrick"]
+__license__ = "XNAT Software License Agreement " + \
+              "(see: http://xnat.org/about/license.php)"
+__version__ = "1.0.0"
+__maintainer__ = "Rick Herrick"
+__email__ = "herrickr@mir.wustl.edu"
+__status__ = "Production"
+
+
 import os
 import urllib2
 import base64
